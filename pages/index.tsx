@@ -27,12 +27,6 @@ const Home: NextPage = () => {
   const theme = useTheme()
   const { setCurrentId, currentId, pokeInfo, style } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
 
-  const onChangePokemon = React.useCallback(
-    (id: number) => {
-      setCurrentId(id)
-    },
-    [currentId, setCurrentId]
-  )
   return (
     <Box
       sx={{

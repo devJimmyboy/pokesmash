@@ -64,7 +64,7 @@ export default function PokeInfo({}: Props) {
           height: 100%;
         `}
         onCardLeftScreen={() => {
-          setCurrentId(currentId + 1)
+          setCurrentId((id) => id + 1)
           console.log("currentId", currentId)
           if (cardRef.current) cardRef.current.restoreCard()
         }}

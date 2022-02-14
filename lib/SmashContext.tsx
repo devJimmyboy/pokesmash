@@ -7,11 +7,16 @@ import StyleSwitch from "../components/StyleSwitch"
 
 interface CtxData {
   currentId: number
-  setCurrentId: (id: number) => void
+  setCurrentId: (id: number | ((id: number) => number)) => void
   pokeInfo: Pokemon | undefined
   style: "hd" | "showdown"
 }
-const SmashContext = React.createContext<CtxData | null>(null)
+const SmashContext = React.createContext<CtxData>({
+  currentId: 1,
+  setCurrentId: () => {},
+  pokeInfo: undefined,
+  style: "showdown",
+})
 interface Props {}
 const fetcher = async (url: string) => fetch(url).then((r) => r.json())
 export default function SmashProvider(props: PropsWithChildren<Props>) {
@@ -23,9 +28,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   React.useEffect(() => {
     prefetch(currentId)
   }, [currentId])
+  const [ctx, setCtx] = React.useState<CtxData>({ currentId, setCurrentId, pokeInfo, style })
+
+  React.useEffect(() => {
+    setCtx({ currentId, setCurrentId, pokeInfo, style })
+  }, [currentId, setCurrentId, pokeInfo, style])
 
   return (
-    <SmashContext.Provider value={{ currentId, setCurrentId, pokeInfo, style }}>
+    <SmashContext.Provider value={ctx}>
       <Box className="absolute top-2 left-2">
         <FormControlLabel
           sx={{ fontWeight: "bold", fontSize: "48px" }}
