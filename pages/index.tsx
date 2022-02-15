@@ -13,6 +13,7 @@ import useSWR, { mutate } from "swr"
 import { useLocalStorage, useSessionStorage } from "react-use"
 import StyleSwitch from "../components/StyleSwitch"
 import { useSmash } from "../lib/SmashContext"
+import LoginButton from "../components/LoginButton"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
@@ -26,6 +27,7 @@ const headerCSS = css`
 const Home: NextPage = () => {
   const theme = useTheme()
   const { setCurrentId, currentId, pokeInfo, style } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
+  const cardRef = React.useRef<any>(null)
 
   return (
     <Box
@@ -70,11 +72,14 @@ const Home: NextPage = () => {
           SMASH
         </Typography>
       </Typography>
-      {pokeInfo && <PokeInfo />}
+      {pokeInfo && <PokeInfo cardRef={cardRef} />}
       {!pokeInfo && <div>failed to load</div>}
       <Stack direction="column" sx={{ height: 400, mt: 6 }}>
-        <SmashPass />
+        <SmashPass onChoice={(ch) => cardRef.current?.swipe(ch === "smash" ? "right" : "left")} />
       </Stack>
+      <Box sx={{ position: "absolute", right: 4, top: 4 }}>
+        <LoginButton />
+      </Box>
     </Box>
   )
 }
