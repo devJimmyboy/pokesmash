@@ -1,19 +1,19 @@
 import { Card, CardContent, CardHeader, CircularProgress, Stack, Typography } from "@mui/material"
 import { styled, css } from "@mui/system"
-import { useRef } from "react"
+import { Ref, RefObject, useRef } from "react"
 import TinderCard from "react-tinder-card"
 import { useSmash } from "../lib/SmashContext"
 
 import { capitalizeFirstLetter } from "../lib/utils"
+import SwipeCards from "./SwipeCards"
 import Type from "./Type"
 
-type Props = {}
+type Props = { cardRef: RefObject<any> }
 
 const PokeCard = styled(Card)`
   height: 100%;
   min-width: 450px;
   max-height: 600px;
-  margin-block: 1em;
   border-radius: 1.5em;
   box-shadow: 2px 4px 4px -2px #000;
 
@@ -34,10 +34,10 @@ const PokeContent = styled(CardContent)`
   padding: 20px;
   gap: 2;
 `
-export default function PokeInfo({}: Props) {
+export default function PokeInfo({ cardRef }: Props) {
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const { currentId, pokeInfo, setCurrentId, style } = smashCtx
-  const cardRef = useRef<any>(null)
+  // const cardRef = useRef<any>(null)
 
   const bgUrl =
     style && style === "showdown"
@@ -58,17 +58,11 @@ export default function PokeInfo({}: Props) {
         minWidth: "450px",
         maxHeight: "600px",
       }}>
-      <TinderCard
+      <SwipeCards
         ref={cardRef}
-        css={css`
-          height: 100%;
-        `}
-        onCardLeftScreen={() => {
+        onSwipe={(dir) => {
           setCurrentId((id) => id + 1)
-          console.log("currentId", currentId)
-          if (cardRef.current) cardRef.current.restoreCard()
-        }}
-        preventSwipe={["down"]}>
+        }}>
         <PokeCard
           sx={{
             backgroundImage: "url(" + bgUrl + ")," + `url(/backgrounds/bg-beach.png)`,
@@ -87,7 +81,7 @@ export default function PokeInfo({}: Props) {
             <Typography>Succulent. Beautiful.</Typography>
           </PokeContent>
         </PokeCard>
-      </TinderCard>
+      </SwipeCards>
     </div>
   )
 }

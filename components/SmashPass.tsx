@@ -5,28 +5,22 @@ import { motion } from "framer-motion"
 import React from "react"
 import { useKey } from "react-use"
 
-interface Props {}
+interface Props {
+  onChoice: (choice: "smash" | "pass" | undefined) => void
+}
 
-export default function SmashPass({}: Props) {
+export default function SmashPass({ onChoice }: Props) {
   return (
     <Stack
       direction="row"
       justifyContent="space-around"
       spacing={6}
       sx={{ width: "50vw", maxWidth: "400px", my: "2em" }}>
-      <ChoiceButton
-        choiceType="pass"
-        onChoice={() => {
-          console.log("pass")
-        }}>
+      <ChoiceButton choiceType="pass" onChoice={onChoice}>
         Pass
       </ChoiceButton>
       {/* <div className="flex-grow" /> */}
-      <ChoiceButton
-        choiceType="smash"
-        onChoice={() => {
-          console.log("smash")
-        }}>
+      <ChoiceButton choiceType="smash" onChoice={onChoice}>
         Smash
       </ChoiceButton>
     </Stack>
@@ -40,11 +34,11 @@ interface ChoiceButtonProps extends ButtonUnstyledProps {
 
 function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
   const onClick = () => onChoice(choiceType)
-  useKey(choiceType === "smash" ? "ArrowLeft" : "ArrowRight", onClick)
+  useKey(choiceType === "pass" ? "ArrowLeft" : "ArrowRight", onClick)
   return (
     <ButtonUnstyled
       {...props}
-      onClick={onChoice}
+      onClick={onClick}
       component={ChoiceButtonRoot}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}

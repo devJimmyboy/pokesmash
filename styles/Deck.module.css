@@ -1,0 +1,19 @@
+.deck {
+  position: absolute;
+  will-change: transform;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deck > div {
+  touch-action: none;
+  background-color: transparent;
+  background-size: auto 85%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 100%;
+  will-change: transform;
+  border-radius: 10px;
+  box-shadow: 0 12.5px 100px -10px rgba(50, 50, 73, 0.4), 0 10px 10px -10px rgba(50, 50, 73, 0.3);
+}
