@@ -12,7 +12,7 @@ const to = (i: number) => ({
   x: 0,
   y: i * -4,
   scale: 1,
-  rot: -10 + Math.random() * 20,
+  rot: -5 + Math.random() * 10,
   delay: i * 100,
 })
 
