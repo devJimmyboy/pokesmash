@@ -89,7 +89,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         }, 900)
       },
     }),
-    [api, onSwipe]
+    [api, onSwipe, gone]
   )
 
   return (
@@ -97,14 +97,15 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
       <animated.div className={styles.deck} style={{ x, y }}>
         <animated.div
           {...bind()}
-          children={children}
           style={{
             transform: interpolate([rot, scale], trans),
-          }}
-        />
+          }}>
+          {children}
+        </animated.div>
       </animated.div>
     </div>
   )
 })
+SwipeCards.displayName = "SwipeCards"
 
 export default SwipeCards
