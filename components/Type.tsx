@@ -4,7 +4,7 @@ import React from "react"
 import { capitalizeFirstLetter } from "../lib/utils"
 
 interface Props {
-  type: Type
+  type: PokeType
 }
 
 export default function Type({ type }: Props) {
@@ -29,7 +29,7 @@ export default function Type({ type }: Props) {
   )
 }
 
-export type Type =
+export type PokeType =
   | "normal"
   | "fire"
   | "fighting"
@@ -50,7 +50,7 @@ export type Type =
   | "fairy"
 
 type TypeToColor = {
-  [t in Type]: string
+  [t in PokeType]: string
 }
 
 const typeToColor: TypeToColor = {
@@ -77,6 +77,6 @@ const typeToColor: TypeToColor = {
 export type Pokemon = {
   id: number
   name: string
-  type: Type[]
+  type: PokeType[]
   image: string
 }

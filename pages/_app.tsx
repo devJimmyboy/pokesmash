@@ -28,6 +28,9 @@ export default function MyApp(props: MyAppProps) {
       <CacheProvider value={emotionCache}>
         <Head>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
+          <link rel="icon" type="image/webp" href="/sillychamp.webp" />
+          {/* <link rel="shortcut icon" href="/favicon.ico" /> */}
+          <title>Pokemon Smash or Pass</title>
         </Head>
         <SmashProvider>
           <ThemeProvider theme={theme}>

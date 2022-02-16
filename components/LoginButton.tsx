@@ -3,6 +3,7 @@ import { Avatar, Button, ButtonProps, Card, CardContent, Stack } from "@mui/mate
 import { styled } from "@mui/system"
 import classNames from "classnames"
 import { useSession, signIn, signOut } from "next-auth/react"
+import { useRouter } from "next/router"
 
 const SignInBtn = styled(Button)`
   --twitchAlpha: 0.75;
@@ -36,12 +37,17 @@ const SignInBtn = styled(Button)`
 
 export default function LoginButton(props: ButtonProps) {
   const { data: session } = useSession()
+  const router = useRouter()
   const cardClasses = classNames("m-4")
   const cardContentClasses = classNames("p-4")
   if (session) {
     return (
       <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
-        <Avatar sx={{ height: "100%", border: "2px white solid" }} src={session.user.image || ""} />
+        <Avatar
+          sx={{ height: "100%", border: "2px white solid", cursor: "pointer" }}
+          onClick={() => router.push(`/users/${session.user.name}`)}
+          src={session.user.profileImageUrl || ""}
+        />
         <SignInBtn startIcon={<Icon icon="mdi:logout" />} onClick={() => signOut()}>
           Sign out
         </SignInBtn>

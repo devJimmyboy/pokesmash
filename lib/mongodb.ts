@@ -1,14 +1,15 @@
 // This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
-import { MongoClient } from "mongodb"
+import { Document, MongoClient } from "mongodb"
 
 const uri = process.env.MONGODB_URI
 
-let client: MongoClient
+let client: MongoClient;
 let clientPromise: Promise<MongoClient>
 
-if (!uri) {
+if (!process.env.MONGODB_URI) {
   throw new Error("Please add your Mongo URI to .env.local")
 }
+
 declare global {
   var _mongoClientPromise: typeof clientPromise
 }
@@ -30,3 +31,19 @@ if (process.env.NODE_ENV === "development") {
 // Export a module-scoped MongoClient promise. By doing this in a
 // separate module, the client can be shared across functions.
 export default clientPromise
+
+export interface PokemonSchema extends Document {
+  _id: number;
+  smashes: number;
+  passes: number;
+
+}
+export interface ScoreSchema extends Document {
+  id: string;
+  name: string;
+  numCompleted: number;
+  choices: {
+    [key: number]: "smash" | "pass" | null;
+  }
+
+}

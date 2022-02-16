@@ -2,8 +2,8 @@ import React, { PropsWithChildren, PropsWithRef, useState } from "react"
 import { useSpring, animated, to as interpolate } from "@react-spring/web"
 import { useDrag } from "@use-gesture/react"
 import styles from "../styles/Deck.module.css"
-import { useBoolean } from "react-use"
-
+import { motion } from "framer-motion"
+const RESTORE_DELAY = 350
 interface Props {
   onSwipe: (direction: "left" | "right" | "up" | "down") => void
 }
@@ -52,20 +52,25 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         }
       })
       if (!active && gone[0]) {
-        onSwipe(xDir > 0 ? "left" : "right")
+        onSwipe(xDir > 0 ? "right" : "left")
         setTimeout(() => {
           gone[0] = 0
           console.log("back")
           api.start(() => to(0))
-        }, 900)
+        }, RESTORE_DELAY)
       }
     }
   )
   const { x, y, scale, rot } = props
 
+  const backgroundColor = x.to((val) => (val > 0 ? "blue" : "red"))
+  const opacity = x.to((val) => Math.min(normalize(Math.abs(val), window.innerWidth, 0), 0.75))
+
   React.useImperativeHandle(
     ref,
     () => ({
+      x,
+      y,
       async reset() {
         gone[0] = 0
         api.start(() => to(0))
@@ -86,10 +91,10 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         setTimeout(() => {
           gone[0] = 0 // Reset the gone flag
           api.start(() => to(0))
-        }, 900)
+        }, RESTORE_DELAY)
       },
     }),
-    [api, onSwipe, gone]
+    [api, onSwipe, gone, x, y]
   )
 
   return (
@@ -100,6 +105,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
           style={{
             transform: interpolate([rot, scale], trans),
           }}>
+          <animated.div className="absolute w-full h-full" style={{ backgroundColor, opacity }} />
           {children}
         </animated.div>
       </animated.div>
@@ -109,3 +115,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
 SwipeCards.displayName = "SwipeCards"
 
 export default SwipeCards
+
+function normalize(val: number, max: number, min: number) {
+  return (val - min) / (max - min)
+}
