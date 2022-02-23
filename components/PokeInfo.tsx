@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CircularProgress, Stack, Typography } from "@mui/material"
 import { styled, css } from "@mui/system"
+import { PokemonSpecies } from "pokenode-ts"
 import { Ref, RefObject, useRef, useState } from "react"
 import TinderCard from "react-tinder-card"
-import { Results, useSmash } from "../lib/SmashContext"
+import useSWR from "swr"
+import { useSmash } from "../lib/SmashContext"
 
 import { capitalizeFirstLetter } from "../lib/utils"
 import SwipeCards from "./SwipeCards"
@@ -19,14 +21,14 @@ const getBgByType: { [key in PokeType]: string[] } = {
   fighting: ["city", "meadow"],
   fire: ["volcanocave", "desert"],
   flying: ["mountain", "route"],
-  ghost: ["cave"],
+  ghost: ["earthycave"],
   grass: ["meadow"],
   ground: ["mountain", "earthycave", "route"],
   ice: ["icecave"],
   normal: ["route", "city"],
   poison: ["earthycave"],
   psychic: ["city", "spl"],
-  rock: ["mountain", "cave"],
+  rock: ["mountain", "earthycave"],
   steel: ["mountain"],
   water: ["beach", "beachshore", "river", "deepsea"],
 }
@@ -55,22 +57,38 @@ const PokeContent = styled(CardContent)`
   padding: 20px;
   gap: 2;
 `
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
+
 export default function PokeInfo({ cardRef }: Props) {
-  const [results, setResults] = useState<Results>()
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
-  const { currentId, pokeInfo, setCurrentId, style, score } = smashCtx
+  const { currentId, pokeInfo, setCurrentId, style, score, shockRef } = smashCtx
   // const cardRef = useRef<any>(null)
+  const { data } = useSWR<PokemonSpecies>(() => pokeInfo?.species.url, fetcher)
 
   const bgUrl =
     style && style === "showdown"
       ? pokeInfo?.sprites.versions["generation-v"]["black-white"].animated.front_default
       : pokeInfo?.sprites.other["official-artwork"].front_default || "/loading.png"
 
+  const chosenBg =
+    pokeInfo &&
+    getBgByType[pokeInfo.types[0].type.name as PokeType][
+      Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
+    ]
+
   if (!smashCtx || !pokeInfo) {
     return (
-      <PokeCard>
-        <CircularProgress />
-      </PokeCard>
+      <div
+        className="cardContainer h-full"
+        style={{
+          minWidth: "450px",
+          maxHeight: "600px",
+        }}>
+        <PokeCard>
+          <CircularProgress />
+        </PokeCard>
+      </div>
     )
   }
   return (
@@ -82,13 +100,16 @@ export default function PokeInfo({ cardRef }: Props) {
       }}>
       <SwipeCards
         ref={cardRef}
-        onSwipe={(dir) => {
-          if (dir === "left") {
-            score.pass().then((res) => setResults(res))
-          } else if (dir === "right") {
-            score.smash().then((res) => setResults(res))
+        onSwipe={async (dir) => {
+          if (data?.is_baby && dir === "right") shockRef.current?.shocked(cardRef)
+          else {
+            setTimeout(() => cardRef.current.reset(), 500)
           }
-
+          if (dir === "left") {
+            score.pass()
+          } else if (dir === "right") {
+            score.smash()
+          }
           setCurrentId((id) => id + 1)
         }}>
         <PokeCard
@@ -97,11 +118,7 @@ export default function PokeInfo({ cardRef }: Props) {
               "url(" +
               bgUrl +
               ")," +
-              `url(/backgrounds/bg-${
-                getBgByType[pokeInfo.types[0].type.name as PokeType][
-                  Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
-                ] || "beach"
-              }.png)`,
+              `url(/backgrounds/bg-${chosenBg || "beach"}.${chosenBg === "space" ? "jpg" : "png"})`,
             backgroundSize: "80%, cover",
             backgroundPosition: "center, left",
           }}>
@@ -114,7 +131,9 @@ export default function PokeInfo({ cardRef }: Props) {
                 <Type type={type.type.name as any} key={i} />
               ))}
             </Stack>
-            <Typography>Succulent. Beautiful.</Typography>
+            <Typography>
+              {data?.flavor_text_entries.find((v) => v.language.name === "en")?.flavor_text || "Succelent, Beautiful."}
+            </Typography>
           </PokeContent>
         </PokeCard>
       </SwipeCards>

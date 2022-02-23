@@ -3,21 +3,15 @@ import { Pokemon } from "pokenode-ts"
 import React, { PropsWithChildren } from "react"
 import { useSessionStorage } from "react-use"
 import useSWR, { mutate } from "swr"
+import ShockValue, { ShockRef } from "../components/ShockValue"
 import StyleSwitch from "../components/StyleSwitch"
 
 interface Score {
   smashes: number
   passes: number
   hotTakes: number
-  smash: () => Promise<Results>
-  pass: () => Promise<Results>
-}
-
-export interface Results {
-  id: number
-  totalSmashes: number
-  totalPasses: number
-  total: number
+  smash: () => Promise<void>
+  pass: () => Promise<void>
 }
 
 interface CtxData {
@@ -27,6 +21,7 @@ interface CtxData {
   style: "hd" | "showdown"
   error: any
   score: Score
+  shockRef: React.RefObject<ShockRef>
 }
 const SmashContext = React.createContext<CtxData>({
   currentId: 1,
@@ -34,16 +29,13 @@ const SmashContext = React.createContext<CtxData>({
   pokeInfo: undefined,
   style: "showdown",
   error: undefined,
+  shockRef: { current: null },
   score: {
     smashes: 0,
     passes: 0,
     hotTakes: 0,
-    async smash() {
-      return { id: -1, totalSmashes: 0, totalPasses: 0, total: 0 }
-    },
-    async pass() {
-      return { id: -1, totalSmashes: 0, totalPasses: 0, total: 0 }
-    },
+    async smash() {},
+    async pass() {},
   },
 })
 interface Props {}
@@ -52,6 +44,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const [currentId, setCurrentId] = React.useState<number>(1)
   const [style, setStyle] = useSessionStorage<"hd" | "showdown">("pokemonStyle", "showdown")
   const [score, setScore] = React.useState<Omit<Score, "smash" | "pass">>({ smashes: 0, passes: 0, hotTakes: 0 })
+  const shockRef = React.useRef<ShockRef>(null)
 
   const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(`/api/pokemon?id=${currentId}`, fetcher)
 
@@ -61,10 +54,9 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       id: currentId.toString(),
       choice: "smash",
     })
-    const res: Results = await fetch(`/api/choice?${body.toString()}`, {
+    await fetch(`/api/choice?${body.toString()}`, {
       method: "POST",
-    }).then((res) => res.json())
-    return res
+    })
   }, [currentId])
   const pass = React.useCallback(async () => {
     setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
@@ -72,8 +64,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       id: currentId.toString(),
       choice: "pass",
     })
-    const res: Results = await fetch(`/api/choice?${body.toString()}`, { method: "POST" }).then((res) => res.json())
-    return res
+    await fetch(`/api/choice?${body.toString()}`, { method: "POST" })
   }, [currentId])
 
   React.useEffect(() => {
@@ -86,11 +77,12 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     style,
     error,
     score: { ...score, smash, pass },
+    shockRef,
   })
 
   React.useEffect(() => {
-    setCtx({ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass } })
-  }, [currentId, setCurrentId, pokeInfo, style, error, score])
+    setCtx({ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef })
+  }, [currentId, setCurrentId, pokeInfo, style, error, score, shockRef, pass, smash])
 
   return (
     <SmashContext.Provider value={ctx}>
@@ -101,6 +93,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
           label={style === "hd" ? "HD Style" : "Showdown Style"}
         />
       </Box>
+      <ShockValue ref={shockRef} />
       {props.children}
     </SmashContext.Provider>
   )

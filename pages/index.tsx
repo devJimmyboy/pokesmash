@@ -14,7 +14,8 @@ import { useLocalStorage, useSessionStorage } from "react-use"
 import StyleSwitch from "../components/StyleSwitch"
 import { useSmash } from "../lib/SmashContext"
 import LoginButton from "../components/LoginButton"
-import ShockValue, { ShockRef } from "../components/ShockValue"
+import { styled } from "@mui/material/styles"
+import UserStats from "../components/UserStats"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
@@ -27,11 +28,10 @@ const headerCSS = css`
 
 const Home: NextPage = () => {
   const theme = useTheme()
-  const { error, setCurrentId, currentId, pokeInfo, style, score } = useSmash() as NonNullable<
+  const { error, setCurrentId, currentId, pokeInfo, style, score, shockRef } = useSmash() as NonNullable<
     ReturnType<typeof useSmash>
   >
   const cardRef = React.useRef<any>(null)
-  const shockRef = React.useRef<ShockRef>(null)
 
   return (
     <Box
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        height: "100%",
+        height: "100vh",
       }}>
       <Typography
         variant="h4"
@@ -79,25 +79,66 @@ const Home: NextPage = () => {
       {pokeInfo && <PokeInfo cardRef={cardRef} />}
       {!pokeInfo && !error && <div>Loading...</div>}
       {error && <div>Error! {error.message || "Please Reload"}</div>}
-      <Stack direction="column" sx={{ height: 400, mt: 6 }}>
+      <Stack direction="column" sx={{ height: 400, mt: 6 }} spacing={4}>
+        <Typography fontSize={32} fontWeight="bold" align="center">
+          Pokemon {currentId} of 898
+        </Typography>
         <SmashPass
           smashes={score.smashes}
           passes={score.passes}
           onChoice={(ch) => {
             cardRef.current?.swipe(ch === "smash" ? "right" : "left")
-            shockRef.current?.shocked()
           }}
         />
-        <Typography fontSize={32} fontWeight="bold" align="center">
-          Pokemon {currentId} of 898
-        </Typography>
+
+        <UserStats />
       </Stack>
       <Box sx={{ position: "absolute", right: 4, top: 4 }}>
         <LoginButton />
       </Box>
-      <ShockValue ref={shockRef} />
+      <Footer>
+        <CreatedCard>
+          Created by{" "}
+          <Link
+            href="https://jimmyboy.tv"
+            target="_blank"
+            sx={(theme) => ({
+              fontFamily: "Lilita One",
+              textDecoration: "none",
+              color: theme.palette.twitch.muted.widow,
+              fontWeight: 400,
+              textShadow: "2px 2px 1px #000",
+              transition: "text-shadow 200ms ease-in-out",
+              "&:hover": {
+                textShadow: "4px 4px 2px #000",
+              },
+            })}>
+            devJimmyboy
+          </Link>
+        </CreatedCard>
+      </Footer>
     </Box>
   )
 }
 
 export default Home
+
+const Footer = styled("footer")`
+  position: fixed;
+  pointer-events: none;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+`
+
+const CreatedCard = styled("div")`
+  background: ${(props) => props.theme.palette.twitch.main};
+  pointer-events: auto;
+  user-select: none;
+  font-size: 28px;
+  padding: 0.325em 0.825em;
+  border-radius: 0.45em 0.45em 0 0;
+  margin-left: 15px;
+  font-weight: bold;
+`

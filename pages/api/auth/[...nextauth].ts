@@ -1,9 +1,12 @@
 import NextAuth, { User } from "next-auth"
 import TwitchProvider from "next-auth/providers/twitch"
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
-import clientPromise, { ScoreSchema } from "../../../lib/mongodb"
+import { FirebaseAdapter } from "../../../lib/FirebaseAdapter"
 import { ClientCredentialsAuthProvider } from "@twurple/auth"
 import { ApiClient, HelixUser } from "@twurple/api"
+
+import { createFirebaseApp } from "../../../firebase/clientApp"
+
+const app = createFirebaseApp();
 
 const auth = new ClientCredentialsAuthProvider(process.env.TWITCH_ID as string, process.env.TWITCH_SECRET as string)
 const api = new ApiClient({ authProvider: auth })
@@ -34,7 +37,7 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: FirebaseAdapter(app),
   callbacks: {
     async session({ session, user }) {
       if (user.access_token)

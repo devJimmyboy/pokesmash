@@ -1,18 +1,12 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": [
-      "types"
-    ],
+    "typeRoots": ["types"],
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -23,21 +17,6 @@
     "incremental": true,
     "noEmit": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "scripts/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "ts-node": {
-    "compilerOptions": {
-      "module": "CommonJS"
-    },
-    // It is faster to skip typechecking.
-    // Remove if you want ts-node to do typechecking.
-    "files": true
-  }
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }

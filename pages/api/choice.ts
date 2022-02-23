@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { FieldValue } from "firebase-admin/firestore"
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession, } from "next-auth/react"
 import { Pokemon } from "pokenode-ts"
-import clientPromise, { PokemonSchema, ScoreSchema } from "../../lib/mongodb"
+import admin from "../../firebase/adminApp"
 import api from "../../lib/pokemonapi"
-import { Results } from "../../lib/SmashContext"
 
 
-type Data = Partial<Results> | { error: string }
+type Data = { error: string }
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,31 +26,30 @@ export default async function handler(
 
 
   const session = await getSession({ req })
-  let results: Partial<Results> & { id: number } = { id }
-  const client = await clientPromise;
-  const db = client.db();
-  const pokemon = db.collection<PokemonSchema>("pokemon")
-  const scores = db.collection<ScoreSchema>("scores")
+  const db = admin.firestore()
+  const batch = db.batch();
+
+  const scores = db.collection("scores")
+  const pokemonDoc = db.collection("pokemon").doc(_id as string)
 
 
-  pokemon.findOneAndUpdate({ _id: results.id }, { $inc: choice === "smash" ? { smashes: 1, passes: 0 } : { passes: 1, smashes: 0 } }, { upsert: true, }).then(doc => {
-    if (doc.ok) {
-      results = { ...results, totalPasses: doc.value?.passes, totalSmashes: doc.value?.smashes, total: (doc.value?.smashes || 0) + (doc.value?.passes || 0) }
-    } else {
-      res.status(500).json({ error: "Error updating document" })
-    }
-  })
+  batch.set(pokemonDoc, choice === "smash" ? {
+    smashes: FieldValue.increment(1)
+  } : { passes: FieldValue.increment(1) }, { merge: true })
+
   if (session) {
-    scores.findOneAndUpdate({ id: session.user.name }, {
-      $set: { [`choices.${results.id}`]: choice }, $max: {
-        numCompleted:
-          id
+    const scoreDoc = scores.doc(session.user.name)
+    await scoreDoc.get().then(doc => {
+      const data = doc.data();
+      let docSet: { choices: { [id: string]: string }, numCompleted?: number } = {
+        choices: { [_id as string]: choice as string }
       }
-    }, { upsert: true, }).then(doc => {
-      if (!doc.ok) {
-        res.status(500).json({ error: "Error updating user score document" })
+      if ((data?.numCompleted === undefined || data.numCompleted < id)) {
+        docSet.numCompleted = id;
       }
+      batch.set(scoreDoc, docSet, { merge: true })
     })
   }
-  res.status(200).json(results)
+  await batch.commit()
+  res.status(200).end();
 }

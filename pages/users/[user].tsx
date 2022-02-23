@@ -1,21 +1,23 @@
 import { Avatar, Container, Grid, IconButton, Stack, Typography } from "@mui/material"
 import { GetServerSideProps, NextPage } from "next"
 import { User } from "next-auth"
-import clientPromise, { ScoreSchema } from "../../lib/mongodb"
 
 import { gsap } from "gsap"
 import React, { useEffect, useLayoutEffect } from "react"
 import { Icon } from "@iconify/react"
 import { useRouter } from "next/router"
 import { styled } from "@mui/system"
+import { ObjectId } from "mongodb"
+import admin from "../../firebase/adminApp"
+import { useSmash } from "../../lib/SmashContext"
+import { hdBuilder, showdownBuilder } from "../../lib/utils"
 
 const ScoreHolder = styled("div")`
   background-position: center;
   background-size: 80%;
   background-repeat: no-repeat;
   background-color: #10151a;
-  border-radius: 10px;
-  border: 1px solid /* neon green */ #55df55;
+
   padding: 5px;
   display: flex;
   flex-direction: column;
@@ -29,19 +31,17 @@ interface Error {
 }
 
 type UserProp = User | string
-type ScoreProp = ScoreSchema | string
+type ScoreProp =
+  | { id: string; name: string; numCompleted: number; choices: { [key: string]: "smash" | "pass" } }
+  | string
 interface Props {
   user: UserProp
   score: ScoreProp
 }
 
-const showdownBuilder = (i: number) =>
-  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${i}.gif`
-const hdBuilder = (i: number) =>
-  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/35.png`
-
 const tl = gsap.timeline({ repeat: -1 })
 const UserProfile: NextPage<Props> = ({ user, score }) => {
+  const { style } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
   const router = useRouter()
   useEffect(() => {
@@ -59,7 +59,7 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
   } else
     return (
-      <Stack direction="column" p={6} alignItems="center">
+      <Stack overflow="hidden scroll" direction="column" p={6} alignItems="center">
         <IconButton
           className="absolute top-12 left-4 hover:bg-blue-600 bg-blue-500 text-yellow-300"
           onClick={() => router.back()}>
@@ -90,14 +90,26 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
             </IconButton>{" "}
             {user.displayName}
           </Typography>
+          <div className="flex-grow" />
+          <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
+            {(typeof score !== "string" && score.numCompleted) || "?"} / 868
+          </Typography>
         </div>
         {typeof score !== "string" ? (
-          <Grid container spacing={2}>
+          <Grid
+            container
+            spacing={0}
+            sx={{ borderRadius: "10px", border: "1px solid #55df55", overflow: "hidden" }}
+            columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
             {Object.values(score.choices).map((choice, i) => (
-              <Grid item xs={6} sm={6} md={4} lg={3} key={i}>
+              <Grid item xs={2} sm={3} md={3} lg={4} key={i}>
                 <ScoreHolder
-                  className="w-20 h-20"
-                  style={{ backgroundImage: `url(${showdownBuilder(i + 1)})`, backgroundSize: "80%" }}>
+                  className="w-full aspect-square"
+                  style={{
+                    backgroundImage: `url(${style === "hd" ? hdBuilder(i + 1) : showdownBuilder(i + 1)})`,
+                    backgroundSize: "80%",
+                    imageRendering: style === "hd" ? "auto" : "crisp-edges",
+                  }}>
                   {choice as string}
                 </ScoreHolder>
               </Grid>
@@ -113,29 +125,38 @@ export default UserProfile
 
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const { user } = context.query
-  const client = await clientPromise
-  const db = client.db()
-  const users = db.collection<User>("users")
-  const userInfo = await users.findOne({ name: user }).then((doc) => {
-    if (doc) {
-      return { ...doc, _id: null }
-    } else {
-      return "User not found"
-    }
-  })
-  const scores = db.collection<ScoreSchema>("scores")
-  const scoreInfo = await scores.findOne({ $or: [{ id: user }, { name: user }] }).then((score) => {
-    if (score) {
-      return { ...score, _id: null }
-    } else {
-      return "User has not Smashed nor Passed a Single Pokemon"
-    }
-  })
-
+  const firestore = admin.firestore()
+  const users = firestore.collection("users")
+  const userInfo = await users
+    .where("name", "==", user as string)
+    .get()
+    .then((q) => {
+      const doc = q.docs[0]
+      if (doc?.exists) {
+        const data = doc.data()
+        delete data.email
+        return data
+      } else {
+        return "User not found"
+      }
+    })
+  const scores = firestore.collection("scores")
+  const scoreInfo = await scores
+    .doc(user as string)
+    .get()
+    .then((score) => {
+      const data = score.data()
+      if (score.exists) {
+        return { ...data, _id: null }
+      } else {
+        return "User has not Smashed nor Passed a Single Pokemon"
+      }
+    })
+  const props = {
+    user: userInfo,
+    score: scoreInfo,
+  }
   return {
-    props: {
-      user: userInfo,
-      score: scoreInfo,
-    },
+    props: JSON.parse(JSON.stringify(props)),
   }
 }

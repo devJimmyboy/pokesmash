@@ -1,14 +1,16 @@
 import { Icon } from "@iconify/react"
 import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui/base"
 import { Button, Stack, Typography } from "@mui/material"
-import { styled } from "@mui/system"
+import { styled } from "@mui/material/styles"
 import { motion } from "framer-motion"
 import React from "react"
 import { useKey } from "react-use"
 
 const MotionButton = motion(Button)
 const ChoiceButtonRoot = styled(MotionButton)`
-  --bColor: #d2d2d2;
+  --bColor: ${({ theme }) => theme.palette.primary.main};
+  display: flex;
+  gap: 6px;
   width: 250px;
   height: 100px;
   border-radius: 20px;
@@ -17,11 +19,16 @@ const ChoiceButtonRoot = styled(MotionButton)`
   font-weight: bold;
   color: var(--bColor);
   transition: color 250ms linear;
+  background-color: transparent;
 
   &:hover {
-    --bColor: #b026ff;
+    &.pass {
+      --bColor: ${({ theme }) => theme.palette.pass.main};
+    }
+    &.smash {
+      --bColor: ${({ theme }) => theme.palette.smash.main};
+    }
     border: 6px solid;
-    background-color: transparent;
   }
 `
 
@@ -39,9 +46,11 @@ const Kbd = styled("kbd")`
 `
 
 const ScoreDisplay = styled("div")`
-  font-size: 56px;
+  font-size: 32px;
   display: flex;
-  padding: 0.1em;
+  padding: 0.75em;
+  gap: 2px;
+  color: ${(props) => props.theme.palette.text.primary};
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -49,13 +58,15 @@ const ScoreDisplay = styled("div")`
   font-family: "Lilita One", "Segoe UI", sans-serif;
   border-radius: 15px;
   vertical-align: bottom;
-  width: 100px;
-  height: 100px;
+  width: 25px;
+  height: 25px;
   &.passes {
-    background-color: #00995a;
+    background-color: ${(props) => props.theme.palette.pass.main}ac;
+    right: 5%;
   }
   &.smashes {
-    background: radial-gradient(red, orange);
+    background-color: ${(props) => props.theme.palette.smash.main}ac;
+    left: 5%;
   }
 `
 
@@ -68,31 +79,19 @@ interface Props {
 export default function SmashPass({ onChoice, smashes, passes }: Props) {
   return (
     <Stack direction="row" justifyContent="space-around" spacing={6} className="w-full" sx={{ mt: "2em" }}>
-      <ScoreDisplay className="passes">
-        <Typography>Passes:</Typography>
-        <span>{passes}</span>
-      </ScoreDisplay>
       <Stack direction="column" justifyContent="center" spacing={2}>
         <ChoiceButton choiceType="pass" onChoice={onChoice}>
-          <Kbd>
-            <Icon icon="bi:arrow-left" />
-          </Kbd>
-          Pass
+          <span className="flex-grow">Pass</span>
+          <ScoreDisplay className="passes mr-4">{passes}</ScoreDisplay>
         </ChoiceButton>
       </Stack>
       {/* <div className="flex-grow" /> */}
       <Stack direction="column" justifyContent="center" spacing={2}>
         <ChoiceButton choiceType="smash" onChoice={onChoice}>
-          Smash
-          <Kbd>
-            <Icon icon="bi:arrow-right" />
-          </Kbd>
+          <ScoreDisplay className="smashes ml-4">{smashes}</ScoreDisplay>
+          <span className="flex-grow">Smash</span>
         </ChoiceButton>
       </Stack>
-      <ScoreDisplay className="smashes">
-        <Typography>Smashes:</Typography>
-        <span>{smashes}</span>
-      </ScoreDisplay>
     </Stack>
   )
 }
@@ -108,6 +107,7 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
   return (
     <ButtonUnstyled
       {...props}
+      className={choiceType}
       onClick={onClick}
       component={ChoiceButtonRoot}
       whileHover={{ scale: 1.1 }}

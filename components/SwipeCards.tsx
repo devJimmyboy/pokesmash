@@ -3,6 +3,9 @@ import { useSpring, animated, to as interpolate } from "@react-spring/web"
 import { useDrag } from "@use-gesture/react"
 import styles from "../styles/Deck.module.css"
 import { motion } from "framer-motion"
+import { Icon } from "@iconify/react"
+import { useTheme } from "@mui/system"
+import { useWindowSize } from "react-use"
 const RESTORE_DELAY = 350
 interface Props {
   onSwipe: (direction: "left" | "right" | "up" | "down") => void
@@ -26,21 +29,30 @@ interface SwipeRef {
 }
 
 const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ children, onSwipe }, ref) => {
+  const theme = useTheme()
+  const [word, setWord] = useState("PASS")
+  const { width: windowWidth, height: windowHeight } = useWindowSize()
+
   const [gone] = useState<[number]>([0]) // The set flags all the cards that are flicked out
   const [props, api] = useSpring(() => ({
     ...to(0),
     from: from(0),
   })) // Create a bunch of springs using the helpers above
   const bind = useDrag(
-    ({ active, elapsedTime, xy: [px, py], movement: [mx, my], direction: [xDir, yDir], velocity: [vx, vy] }) => {
+    ({ active, elapsedTime, values: [px, py], movement: [mx, my], direction: [xDir, yDir], velocity: [vx, vy] }) => {
       const trigger = vx > 0.2 // If you flick hard enough it should trigger the card to fly out
       const dir = mx === 0 ? 0 : mx / Math.abs(mx) // Direction should either be -1 (left), 1 (right), or 0 (none)
+      if (word === "PASS" && px > windowWidth / 2) {
+        setWord("SMASH")
+      } else if (word === "SMASH" && px < windowWidth / 2) {
+        setWord("PASS")
+      }
       if (!active && trigger) {
         gone[0] = xDir !== 0 ? xDir : dir
         console.log("gone")
       } // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
       api.start(() => {
-        const x = gone[0] ? (200 + window.innerWidth) * (xDir === 0 ? dir : xDir) : active ? mx : 0 // When a card is gone it flys out left or right, otherwise goes back to zero
+        const x = gone[0] ? (200 + windowWidth) * (xDir === 0 ? dir : xDir) : active ? mx : 0 // When a card is gone it flys out left or right, otherwise goes back to zero
         const rot = mx / 100 + (gone ? xDir * 10 * vx : 0) // How much the card tilts, flicking it harder makes it rotate faster
         const scale = active ? 1.1 : 1 // Active cards lift up a bit
         return {
@@ -53,18 +65,14 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
       })
       if (!active && gone[0]) {
         onSwipe(xDir > 0 ? "right" : "left")
-        setTimeout(() => {
-          gone[0] = 0
-          console.log("back")
-          api.start(() => to(0))
-        }, RESTORE_DELAY)
       }
     }
   )
   const { x, y, scale, rot } = props
 
-  const backgroundColor = x.to((val) => (val > 0 ? "blue" : "red"))
-  const opacity = x.to((val) => Math.min(normalize(Math.abs(val), window.innerWidth, 0), 0.75))
+  const currDir = x.to<number>((val) => (val < 0 ? -1 : val > 0 ? 1 : 0))
+
+  const opacity = x.to((val) => Math.min(normalize(Math.abs(val), windowWidth / 3, 0), 0.9))
 
   React.useImperativeHandle(
     ref,
@@ -79,7 +87,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         const yDir = direction === "up" ? -1 : direction === "down" ? 1 : 0,
           xDir = direction === "left" ? -1 : direction === "right" ? 1 : 0
         api.start(() => ({
-          x: window.innerWidth * xDir,
+          x: windowWidth * xDir,
           y: window.innerHeight * yDir,
           rot: 45 * xDir,
           scale: 1.1,
@@ -88,13 +96,9 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         }))
         gone[0] = xDir
         onSwipe(direction)
-        setTimeout(() => {
-          gone[0] = 0 // Reset the gone flag
-          api.start(() => to(0))
-        }, RESTORE_DELAY)
       },
     }),
-    [api, onSwipe, gone, x, y]
+    [api, onSwipe, gone, x, y, windowWidth]
   )
 
   return (
@@ -105,7 +109,23 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
           style={{
             transform: interpolate([rot, scale], trans),
           }}>
-          <animated.div className="absolute w-full h-full" style={{ backgroundColor, opacity }} />
+          <animated.div className="absolute w-full h-full z-10" style={{ opacity }}>
+            <div
+              className="border-current border-8 border-solid rounded-lg px-2 py-0"
+              style={{
+                fontSize: 48,
+                fontFamily: "Lilita One",
+                backgroundColor: "",
+                fontWeight: 700,
+                position: "absolute",
+                top: "30%",
+                left: word === "PASS" ? "75%" : "25%",
+                color: word === "PASS" ? theme.palette.pass.main : theme.palette.smash.main,
+                transform: `translate(-50%,-50%) rotate(${word === "PASS" ? 15 : -15}deg)`,
+              }}>
+              {word}
+            </div>
+          </animated.div>
           {children}
         </animated.div>
       </animated.div>
