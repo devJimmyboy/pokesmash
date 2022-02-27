@@ -97,7 +97,7 @@ const Home: NextPage = () => {
         <LoginButton />
       </Box>
       <Footer>
-        <CreatedCard>
+        <CreatedCard sx={{fontSize: [12,16,24,28]}}>
           Created by{" "}
           <Link
             href="https://jimmyboy.tv"
@@ -109,7 +109,7 @@ const Home: NextPage = () => {
               fontWeight: 400,
               textShadow: "2px 2px 1px #000",
               transition: "text-shadow 200ms ease-in-out",
-              "&:hover": {
+              "div:hover > &": {
                 textShadow: "4px 4px 2px #000",
               },
             })}>
@@ -136,7 +136,7 @@ const CreatedCard = styled("div")`
   background: ${(props) => props.theme.palette.twitch.main};
   pointer-events: auto;
   user-select: none;
-  font-size: 28px;
+  font-size: 18px;
   padding: 0.325em 0.825em;
   border-radius: 0.45em 0.45em 0 0;
   margin-left: 15px;
