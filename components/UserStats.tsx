@@ -1,16 +1,5 @@
 import { useTheme } from "@mui/material"
-import {
-  collection,
-  doc,
-  QuerySnapshot,
-  DocumentData,
-  getDoc,
-  getDocs,
-  getFirestore,
-  query,
-  getDocsFromServer,
-  onSnapshot,
-} from "firebase/firestore"
+import { child, getDatabase, onValue, ref } from "firebase/database"
 import { motion, useAnimation, useMotionValue } from "framer-motion"
 import Image from "next/image"
 import React, { useCallback, useEffect, useState } from "react"
@@ -23,8 +12,8 @@ import { capitalizeWords, hdBuilder, showdownBuilder } from "../lib/utils"
 type Props = {}
 
 const app = createFirebaseApp()
-const db = getFirestore(app)
-const pokemon = collection(db, "pokemon")
+const db = getDatabase(app)
+const pokemon = ref(db, "pokemon")
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -32,36 +21,34 @@ export default function UserStats({}: Props) {
   const theme = useTheme()
   const { currentId, pokeInfo, style } = useSmash()
   const { data: prevPokemon } = useSWR(() => currentId > 1 && "/api/pokemon?id=" + `${currentId - 1}`, fetcher)
-  const [pokeDocs, setDocs] = useState<QuerySnapshot<DocumentData>>()
+  const [pokeDoc, setDoc] = useState<{ smashes: number; passes: number }>()
 
-  useEffect(() => {
-    if (currentId % 100 === 0)
-      getDocsFromServer(query(pokemon)).then((snap) => {
-        setDocs(snap)
-      })
-  }, [currentId])
-
-  useEffect(() => {
-    getDocsFromServer(query(pokemon)).then((snap) => {
-      setDocs(snap)
-    })
-  }, [])
-  const [pokeDoc, setDoc] = useState<DocumentData>()
   const smashWidth = useAnimation()
   const passWidth = useAnimation()
   useEffect(() => {
-    const doc = pokeDocs?.docs.find((v) => v.id === `${currentId - 1}`)
-    if (doc?.exists()) {
-      let docData = doc.data()
-      setDoc(docData)
-      let smashes = docData.smashes || 0
-      let passes = docData.passes || 0
-      smashWidth.start({ width: `${((smashes === 0 ? 0.1 : smashes) / (smashes + passes)) * 100}%` })
-      passWidth.start({ width: `${((passes === 0 ? 0.1 : passes) / (smashes + passes)) * 100}%` })
-    } else setDoc(undefined)
-  }, [currentId, pokeDocs, smashWidth, passWidth])
+    if (currentId >= 1) {
+      const unsub = onValue(child(pokemon, `${currentId - 1}`), (snap) => {
+        if (!snap.exists()) {
+          setDoc(undefined)
+        } else {
+          let smashes = snap.child("smashCount").val()
+          let passes = snap.child("passCount").val()
+          setDoc({ smashes, passes })
+        }
+      })
+      return () => {
+        unsub()
+      }
+    }
+  }, [currentId])
 
-  if (!prevPokemon || !pokeDoc) return null
+  useEffect(() => {
+    let smashes = pokeDoc?.smashes || 0
+    let passes = pokeDoc?.passes || 0
+    smashWidth.start({ width: `${((smashes === 0 ? 0.1 : smashes) / (smashes + passes)) * 100}%` })
+    passWidth.start({ width: `${((passes === 0 ? 0.1 : passes) / (smashes + passes)) * 100}%` })
+  }, [smashWidth, passWidth, pokeDoc])
+  if (!prevPokemon) return null
   return (
     <div className="flex flex-col items-center gap-0.5">
       <div className="flex flex-row w-full h-full items-center justify-center gap-2">

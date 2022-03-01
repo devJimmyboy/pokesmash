@@ -26,30 +26,19 @@ export default async function handler(
 
 
   const session = await getSession({ req })
-  const db = admin.firestore()
-  const batch = db.batch();
+  const db = admin.database()
+  const ref = db.ref(`/pokemon/${id}`);
+  const userScoreRef = session ? db.ref(`/scores/${session.user.id}/choices`) : null;
+  const userScore = userScoreRef ? (await userScoreRef.get()) : null;
+  const prevChoice = userScore?.exists() && userScore.val()[_id as string]
 
-  const scores = db.collection("scores")
-  const pokemonDoc = db.collection("pokemon").doc(_id as string)
 
+  const scores = ref.transaction(async (current) => {
+    if (choice === "smash")
+      return { smashes: (current.smashes || 0) + 1, passes: prevChoice === "pass" ? (current.passes || 0) - 1 : current.passes || 0 }
+    else
+      return { passes: (current.smashes || 0) + 1, smashes: prevChoice === "smash" ? (current.passes || 0) - 1 : current.passes || 0 }
+  });
 
-  batch.set(pokemonDoc, choice === "smash" ? {
-    smashes: FieldValue.increment(1)
-  } : { passes: FieldValue.increment(1) }, { merge: true })
-
-  if (session) {
-    const scoreDoc = scores.doc(session.user.name)
-    await scoreDoc.get().then(doc => {
-      const data = doc.data();
-      let docSet: { choices: { [id: string]: string }, numCompleted?: number } = {
-        choices: { [_id as string]: choice as string }
-      }
-      if ((data?.numCompleted === undefined || data.numCompleted < id)) {
-        docSet.numCompleted = id;
-      }
-      batch.set(scoreDoc, docSet, { merge: true })
-    })
-  }
-  await batch.commit()
   res.status(200).end();
 }

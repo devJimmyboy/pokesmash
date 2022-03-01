@@ -1,4 +1,4 @@
-import { Avatar, Container, Grid, IconButton, Stack, Typography } from "@mui/material"
+import { Avatar, Container, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import { GetServerSideProps, NextPage } from "next"
 import { User } from "next-auth"
 
@@ -7,10 +7,12 @@ import React, { useEffect, useLayoutEffect } from "react"
 import { Icon } from "@iconify/react"
 import { useRouter } from "next/router"
 import { styled } from "@mui/system"
-import { ObjectId } from "mongodb"
 import admin from "../../firebase/adminApp"
 import { useSmash } from "../../lib/SmashContext"
 import { hdBuilder, showdownBuilder } from "../../lib/utils"
+import { getDatabase, ref, get, onValue } from "firebase/database"
+import { createFirebaseApp } from "../../firebase/clientApp"
+import Link from "../../src/Link"
 
 const ScoreHolder = styled("div")`
   background-position: center;
@@ -31,19 +33,45 @@ interface Error {
 }
 
 type UserProp = User | string
-type ScoreProp =
-  | { id: string; name: string; numCompleted: number; choices: { [key: string]: "smash" | "pass" } }
-  | string
+type ScoreProp = { [key: string]: "smash" | "pass" }
 interface Props {
   user: UserProp
-  score: ScoreProp
 }
 
 const tl = gsap.timeline({ repeat: -1 })
-const UserProfile: NextPage<Props> = ({ user, score }) => {
+const UserProfile: NextPage<Props> = ({ user }) => {
+  const db = getDatabase(createFirebaseApp())
   const { style } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const [score, setScore] = React.useState<ScoreProp | string>("Loading...")
+  const [numSmashed, setNum] = React.useState(0)
+  useEffect(() => {
+    if (typeof user === "string") {
+      return
+    }
+    const userScoreRef = ref(db, `pokemon`)
+    const id = `${user.name.toLowerCase()}`
+    const unsubscribe = onValue(userScoreRef, (pokemon) => {
+      let choices: ScoreProp = {}
+      let numSmashed = 0
+      pokemon.forEach((mon) => {
+        if (!mon.exists()) {
+          return
+        }
+        const userSmashed = mon.child(`smashes/${id}`).val()
+        const userPassed = mon.child(`passes/${id}`).val()
+        if (mon.key && (userSmashed || userPassed)) {
+          choices[mon.key] = userSmashed ? "smash" : "pass"
+          numSmashed++
+        }
+      })
+      setScore(choices)
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
   useEffect(() => {
     if (pictureBgRef.current) {
       tl.fromTo(
@@ -60,11 +88,11 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
   } else
     return (
       <Stack overflow="hidden scroll" direction="column" p={6} alignItems="center">
-        <IconButton
-          className="absolute top-12 left-4 hover:bg-blue-600 bg-blue-500 text-yellow-300"
-          onClick={() => router.back()}>
-          <Icon icon="fa-solid:arrow-left" />
-        </IconButton>
+        <Tooltip className="absolute top-12 left-4" title="Go Back">
+          <IconButton className=" w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
+            <Icon icon="fa-solid:arrow-left" />
+          </IconButton>
+        </Tooltip>
         <div className="flex flex-row gap-6 items-center w-11/12 h-full my-6 relative">
           <div
             ref={pictureBgRef}
@@ -73,8 +101,8 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
           />
           <Avatar
             className="self-start"
-            alt={user.displayName}
-            src={user.profileImageUrl}
+            alt={user?.name}
+            src={user?.profileImageUrl}
             sx={{ width: 112, height: 112 }}
           />
 
@@ -85,7 +113,7 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
             <IconButton
               className="p-0 m-0"
               sx={{ fontSize: "inherit" }}
-              onClick={() => router.push(`https://twitch.tv/${user.displayName}`, {}, { shallow: true })}>
+              onClick={() => router.push(`https://twitch.tv/${user?.displayName}`, {}, { shallow: true })}>
               <Icon icon="fa-brands:twitch" display="inline-block" />
             </IconButton>{" "}
             {user.displayName}
@@ -101,7 +129,7 @@ const UserProfile: NextPage<Props> = ({ user, score }) => {
             spacing={0}
             sx={{ borderRadius: "10px", border: "1px solid #55df55", overflow: "hidden" }}
             columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
-            {Object.values(score.choices).map((choice, i) => (
+            {Object.values(score).map((choice, i) => (
               <Grid item xs={2} sm={3} md={3} lg={4} key={i}>
                 <ScoreHolder
                   className="w-full aspect-square"
@@ -126,6 +154,7 @@ export default UserProfile
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const { user } = context.query
   const firestore = admin.firestore()
+  const db = admin.database()
   const users = firestore.collection("users")
   const userInfo = await users
     .where("name", "==", user as string)
@@ -140,21 +169,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
         return "User not found"
       }
     })
-  const scores = firestore.collection("scores")
-  const scoreInfo = await scores
-    .doc(user as string)
-    .get()
-    .then((score) => {
-      const data = score.data()
-      if (score.exists) {
-        return { ...data, _id: null }
-      } else {
-        return "User has not Smashed nor Passed a Single Pokemon"
-      }
-    })
+
   const props = {
     user: userInfo,
-    score: scoreInfo,
   }
   return {
     props: JSON.parse(JSON.stringify(props)),

@@ -6,7 +6,7 @@ import Box from "@mui/material/Box"
 import Link from "../src/Link"
 import PokeInfo from "../components/PokeInfo"
 import SmashPass from "../components/SmashPass"
-import { css, FormControlLabel, Stack, useTheme } from "@mui/material"
+import { css, FormControlLabel, IconButton, Stack, Tooltip, useTheme } from "@mui/material"
 import { Pokemon } from "pokenode-ts"
 import { useState } from "react"
 import useSWR, { mutate } from "swr"
@@ -16,6 +16,7 @@ import { useSmash } from "../lib/SmashContext"
 import LoginButton from "../components/LoginButton"
 import { styled } from "@mui/material/styles"
 import UserStats from "../components/UserStats"
+import { Icon } from "@iconify/react"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
@@ -113,9 +114,18 @@ const Home: NextPage = () => {
                 textShadow: "4px 4px 2px #000",
               },
             })}>
-            devJimmyboy
+            Jimmyboy
           </Link>
         </CreatedCard>
+        <div className="flex-grow" />
+        <Tooltip
+          className="pointer-events-auto p-0 m-0 mr-12"
+          title="Support me for more content like this!"
+          placement="left-start">
+          <IconButton className="w-10 h-10 p-0 m-0" target="_blank" href="https://www.patreon.com/devJimmyboy">
+            <Icon fontSize={18} icon="fa-brands:patreon" />
+          </IconButton>
+        </Tooltip>
       </Footer>
     </Box>
   )

@@ -29,8 +29,34 @@ export default function MyApp(props: MyAppProps) {
         <Head>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
           <link rel="icon" type="image/webp" href="/sillychamp.webp" />
-          {/* <link rel="shortcut icon" href="/favicon.ico" /> */}
-          <title>Pokemon Smash or Pass</title>
+          <title>Pokémon Smash or Pass</title>
+          <meta name="title" content="PokéSmash - Pokémon Smash or Pass" />
+          <meta
+            name="description"
+            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon. This website is a means of making that trend have more mainstream accessibility.Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
+          />
+
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://pokesmash.xyz/" />
+          <meta property="og:title" content="PokéSmash - Pokémon Smash or Pass" />
+          <meta
+            property="og:description"
+            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon.
+This website is a means of making that trend have more mainstream accessibility.
+Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
+          />
+          <meta property="og:image" content="/meta.png" />
+
+          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:url" content="https://pokesmash.xyz/" />
+          <meta property="twitter:title" content="PokéSmash - Pokémon Smash or Pass" />
+          <meta
+            property="twitter:description"
+            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon.
+This website is a means of making that trend have more mainstream accessibility.
+Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
+          />
+          <meta property="twitter:image" content="/meta.png" />
         </Head>
         <SmashProvider>
           <ThemeProvider theme={theme}>

@@ -1,10 +1,32 @@
 import { Box, FormControlLabel } from "@mui/material"
+import { child, getDatabase, onValue, ref, runTransaction } from "firebase/database"
+import { getSession, useSession } from "next-auth/react"
 import { Pokemon } from "pokenode-ts"
-import React, { PropsWithChildren } from "react"
-import { useSessionStorage } from "react-use"
+import React, { PropsWithChildren, useEffect } from "react"
+import { useList, useSessionStorage } from "react-use"
 import useSWR, { mutate } from "swr"
 import ShockValue, { ShockRef } from "../components/ShockValue"
 import StyleSwitch from "../components/StyleSwitch"
+import { createFirebaseApp } from "../firebase/clientApp"
+import { getMessaging, onMessage } from "firebase/messaging"
+import { useRouter } from "next/router"
+
+declare global {
+  interface PokemonModel {
+    smashes:
+      | {
+          [uid: string]: boolean | null
+        }
+      | undefined
+    passes:
+      | {
+          [uid: string]: boolean | null
+        }
+      | undefined
+    smashCount: number
+    passCount: number
+  }
+}
 
 interface Score {
   smashes: number
@@ -22,7 +44,14 @@ interface CtxData {
   error: any
   score: Score
   shockRef: React.RefObject<ShockRef>
+  messages: FBMessage[]
 }
+export type FBMessage = {
+  data: {
+    [key: string]: string
+  }
+}
+
 const SmashContext = React.createContext<CtxData>({
   currentId: 1,
   setCurrentId: () => {},
@@ -37,39 +66,153 @@ const SmashContext = React.createContext<CtxData>({
     async smash() {},
     async pass() {},
   },
+  messages: [],
 })
+
 interface Props {}
 const fetcher = async (url: string) => fetch(url).then((r) => r.json())
 export default function SmashProvider(props: PropsWithChildren<Props>) {
+  const app = createFirebaseApp()
+  const router = useRouter()
+
+  const db = getDatabase(app)
+  const pokeRef = ref(db, `pokemon`)
+  const [showStyleSwitch, setShowStyleSwitch] = React.useState(false)
+
+  useEffect(() => {
+    const bool = router.pathname.match(/^\/(users(\/.*?)?)?$/y)
+    setShowStyleSwitch(!!bool)
+  }, [router.pathname])
+
+  const { data: session, status } = useSession({ required: false })
   const [currentId, setCurrentId] = React.useState<number>(1)
   const [style, setStyle] = useSessionStorage<"hd" | "showdown">("pokemonStyle", "showdown")
+  const [messages, setMessages] = useList<FBMessage>([])
   const [score, setScore] = React.useState<Omit<Score, "smash" | "pass">>({ smashes: 0, passes: 0, hotTakes: 0 })
   const shockRef = React.useRef<ShockRef>(null)
 
   const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(`/api/pokemon?id=${currentId}`, fetcher)
 
   const smash = React.useCallback(async () => {
-    setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 }))
-    const body = new URLSearchParams({
-      id: currentId.toString(),
-      choice: "smash",
+    if (!session || status === "unauthenticated") {
+      setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 }))
+      runTransaction(child(pokeRef, `${currentId}`), (current) => {
+        if (current) {
+          current.smashCount = (current.smashCount || 0) + 1
+        } else {
+          current = { smashes: {}, passes: {}, smashCount: 1, passCount: 0 }
+        }
+        return current
+      })
+
+      return
+    }
+    const uid = session.user.name.toLowerCase()
+    await runTransaction(child(pokeRef, `${currentId}`), (current) => {
+      if (current) {
+        if (current.passes && current.passes[uid]) {
+          current.passCount--
+          current.passes[uid] = null
+        }
+        if (!current.smashes?.[uid]) {
+          if (current.smashCount) current.smashCount++
+          else current.smashCount = 1
+          if (!current.smashes) {
+            current.smashes = {}
+          }
+          current.smashes[uid] = true
+        }
+      } else {
+        current = {
+          smashes: {
+            [uid]: true,
+          },
+          passes: {},
+          smashCount: 1,
+          passCount: 0,
+        }
+      }
+
+      return current
     })
-    await fetch(`/api/choice?${body.toString()}`, {
-      method: "POST",
-    })
-  }, [currentId])
+  }, [currentId, session])
   const pass = React.useCallback(async () => {
-    setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
-    const body = new URLSearchParams({
-      id: currentId.toString(),
-      choice: "pass",
+    if (!session || status === "unauthenticated") {
+      setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
+      runTransaction(child(pokeRef, `${currentId}`), (current) => {
+        if (current) {
+          current.passCount = (current.passCount || 0) + 1
+        } else {
+          current = { passes: {}, smashes: {}, passCount: 1, smashCount: 0 }
+        }
+        return current
+      })
+
+      return
+    }
+    const uid = session.user.name.toLowerCase()
+    await runTransaction(child(pokeRef, `${currentId}`), (current) => {
+      if (current) {
+        if (current.smashes && current.smashes[uid]) {
+          current.smashCount--
+          current.smashes[uid] = null
+        }
+        if (!current.passes?.[uid]) {
+          if (current.passCount) current.passCount++
+          else current.passCount = 1
+          if (!current.passes) {
+            current.passes = {}
+          }
+          current.passes[uid] = true
+        }
+      } else {
+        current = {
+          smashes: {},
+          passes: {
+            [uid]: true,
+          },
+          smashCount: 0,
+          passCount: 1,
+        }
+      }
+
+      return current
     })
-    await fetch(`/api/choice?${body.toString()}`, { method: "POST" })
-  }, [currentId])
+  }, [currentId, session])
+  React.useEffect(() => {
+    if (!session || status === "unauthenticated") return
+
+    const uid = session.user.name.toLowerCase()
+    const msgRef = ref(db, `messages/${uid}`)
+    const unsubMessages = onValue(msgRef, (payload) => {
+      if (!payload.exists()) return
+      console.log("Message received. ", payload)
+      payload.forEach((msg) => {
+        setMessages.push(msg.val() as any)
+      })
+    })
+    const unsub = onValue(pokeRef, (val) => {
+      let smashes = 0
+      let passes = 0
+      val.forEach((pokemonSnapshot) => {
+        // const pokeId = pokemonSnapshot.key
+        const smashesRef = pokemonSnapshot.child(`smashes/${uid}`)
+        const passesRef = pokemonSnapshot.child(`passes/${uid}`)
+        if (smashesRef.val()) smashes++
+        if (passesRef.val()) passes++
+      })
+      setScore((curScore) => ({ ...curScore, smashes, passes, hotTakes: smashes - passes < 0 ? 0 : smashes - passes }))
+    })
+    return () => {
+      unsub()
+      unsubMessages()
+    }
+  }, [session])
 
   React.useEffect(() => {
     prefetch(currentId)
   }, [currentId])
+
   const [ctx, setCtx] = React.useState<CtxData>({
     currentId,
     setCurrentId,
@@ -78,21 +221,24 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     error,
     score: { ...score, smash, pass },
     shockRef,
+    messages,
   })
 
   React.useEffect(() => {
-    setCtx({ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef })
-  }, [currentId, setCurrentId, pokeInfo, style, error, score, shockRef, pass, smash])
+    setCtx({ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef, messages })
+  }, [currentId, setCurrentId, pokeInfo, style, error, score, shockRef, pass, smash, messages])
 
   return (
     <SmashContext.Provider value={ctx}>
-      <Box className="absolute top-2 left-2">
-        <FormControlLabel
-          sx={{ fontWeight: "bold", fontSize: "48px" }}
-          control={<StyleSwitch style={style} onSwitch={() => setStyle(style === "hd" ? "showdown" : "hd")} />}
-          label={style === "hd" ? "HD Style" : "Showdown Style"}
-        />
-      </Box>
+      {showStyleSwitch && (
+        <Box className="absolute top-2 left-2">
+          <FormControlLabel
+            sx={{ fontWeight: "bold", fontSize: "48px" }}
+            control={<StyleSwitch style={style} onSwitch={() => setStyle(style === "hd" ? "showdown" : "hd")} />}
+            label={style === "hd" ? "HD Style" : "Showdown Style"}
+          />
+        </Box>
+      )}
       <ShockValue ref={shockRef} />
       {props.children}
     </SmashContext.Provider>

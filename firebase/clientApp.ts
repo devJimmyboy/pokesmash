@@ -1,7 +1,13 @@
-import { initializeApp, getApps } from 'firebase/app'
+import { initializeApp, getApps, FirebaseOptions } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions'
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore"
+import { connectDatabaseEmulator, getDatabase } from "firebase/database"
+
+const isDev = process.env.NODE_ENV === 'development';
+
 export const createFirebaseApp = () => {
-  const clientCredentials = {
+  const clientCredentials: FirebaseOptions = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
     databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
@@ -21,6 +27,18 @@ export const createFirebaseApp = () => {
         getAnalytics()
       }
     }
+
+
+    if (isDev) {
+      // const functions = getFunctions(app);
+      // const firestore = getFirestore(app)
+      // const db = getDatabase(app);
+      // connectFunctionsEmulator(functions, "localhost", 5001);
+      // connectFirestoreEmulator(firestore, 'localhost', 8080);
+      // // Point to the RTDB emulator running on localhost.
+      // connectDatabaseEmulator(db, "localhost", 9000);
+    }
     return app
   }
 }
+
