@@ -12,6 +12,7 @@ declare module "next-auth" {
     id: string;
     name: string;
     email?: string;
+    username: string;
     displayName: string;
     description: string;
     type: "staff" | "admin" | "global_mod" | "";

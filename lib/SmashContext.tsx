@@ -214,7 +214,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       unsub()
       unsubMessages()
     }
-  }, [session, pokeRef, db])
+  }, [session])
 
   React.useEffect(() => {
     prefetch(currentId)

@@ -23,6 +23,7 @@ export default NextAuth({
           id: profile.sub,
           name: profile.preferred_username,
           email: profile.email,
+          username: userInfo.name,
           displayName: userInfo.displayName,
           description: userInfo.description,
           broadcasterType: userInfo.broadcasterType as any,

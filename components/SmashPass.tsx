@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react"
 import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui/base"
 import { Button, Stack, Typography } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { motion } from "framer-motion"
+import { motion, useAnimation, Variants } from "framer-motion"
 import React from "react"
 import { useKey } from "react-use"
 
@@ -21,7 +21,8 @@ const ChoiceButtonRoot = styled(MotionButton)`
   transition: color 250ms linear;
   background-color: transparent;
 
-  &:hover {
+  &:hover,
+  &.selected {
     &.pass {
       --bColor: ${({ theme }) => theme.palette.pass.main};
     }
@@ -29,6 +30,8 @@ const ChoiceButtonRoot = styled(MotionButton)`
       --bColor: ${({ theme }) => theme.palette.smash.main};
     }
     border: 6px solid;
+    &.selected {
+    }
   }
 `
 
@@ -102,13 +105,22 @@ interface ChoiceButtonProps extends ButtonUnstyledProps {
 }
 
 function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
-  const onClick = () => onChoice(choiceType)
+  const api = useAnimation()
+  const variants: Variants = {
+    selected: { scale: 1.1, onEnded: () => api.start("idle"), dur: 0.25, className: `selected ${choiceType}` },
+    idle: { scale: 1, className: `${choiceType}` },
+  }
+  const onClick = async () => {
+    await api.start("selected")
+    onChoice(choiceType)
+  }
   useKey(choiceType === "pass" ? "ArrowLeft" : "ArrowRight", onClick)
   return (
     <ButtonUnstyled
       {...props}
-      className={choiceType}
+      className={`${choiceType}`}
       onClick={onClick}
+      animate={api}
       component={ChoiceButtonRoot}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}

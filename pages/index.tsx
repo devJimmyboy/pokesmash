@@ -21,7 +21,8 @@ import { SwipeRef } from "../components/SwipeCards"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
-  font-size: 60px;
+  font-size: 5vh;
+
   font-weight: bold;
   font-family: Pokemon;
   cursor: default;
@@ -58,7 +59,7 @@ const Home: NextPage = () => {
         <Typography
           display="inline"
           css={css`
-            font-size: 72px;
+            font-size: 6vh;
             margin-left: 8px;
             font-family: "Lilita One";
             font-weight: 600;

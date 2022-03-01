@@ -87,13 +87,13 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
   } else
     return (
-      <Stack overflow="hidden scroll" direction="column" p={6} alignItems="center">
+      <Stack sx={{ overflowX: "hidden", overflowY: "auto" }} direction="column" p={6} alignItems="center">
         <Tooltip className="absolute top-12 left-4" title="Go Back">
           <IconButton className=" w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
             <Icon icon="fa-solid:arrow-left" />
           </IconButton>
         </Tooltip>
-        <div className="flex flex-row gap-6 items-center w-11/12 h-full my-6 relative">
+        <div className="flex flex-row gap-6 items-center w-11/12 h-full my-6 ">
           <div
             ref={pictureBgRef}
             className="rounded-full absolute border-purple-700"
@@ -127,7 +127,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
           <Grid
             container
             spacing={0}
-            sx={{ borderRadius: "10px", border: "1px solid #55df55", overflow: "hidden" }}
+            sx={{ borderRadius: "10px", border: "1px solid #55df55" }}
             columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
             {Object.values(score).map((choice, i) => (
               <Grid item xs={2} sm={3} md={3} lg={4} key={i}>
@@ -152,11 +152,11 @@ const UserProfile: NextPage<Props> = ({ user }) => {
 export default UserProfile
 
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const { user } = context.query
+  const { user } = context.query as { user: string }
   const firestore = admin.firestore()
   const users = firestore.collection("users")
   const userInfo = await users
-    .where("name", "==", user as string)
+    .where("username", "==", user.toLowerCase())
     .get()
     .then((q) => {
       const doc = q.docs[0]
