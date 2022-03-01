@@ -13,7 +13,7 @@ export default class MyDocument extends Document {
           <meta name="theme-color" content={theme.palette.primary.main} />
 
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-          <link href="https://fonts.googleapis.com/css?family=Lilita+One:regular" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css?family=Lilita+One:regular&display=swap" rel="stylesheet" />
           {/* Inject MUI styles first to match with the prepend: true configuration. */}
           {(this.props as any).emotionStyleTags}
         </Head>

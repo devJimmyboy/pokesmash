@@ -71,7 +71,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     return () => {
       unsubscribe()
     }
-  }, [])
+  }, [db, user])
   useEffect(() => {
     if (pictureBgRef.current) {
       tl.fromTo(

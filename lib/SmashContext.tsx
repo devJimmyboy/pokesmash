@@ -135,7 +135,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
       return current
     })
-  }, [currentId, session])
+  }, [currentId, session, pokeRef])
   const pass = React.useCallback(async () => {
     if (!session) {
       setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
@@ -178,7 +178,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
       return current
     })
-  }, [currentId, session])
+  }, [currentId, session, pokeRef])
   React.useEffect(() => {
     if (!session) return
 
@@ -207,7 +207,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       unsub()
       unsubMessages()
     }
-  }, [session])
+  }, [session, pokeRef, db, setMessages])
 
   React.useEffect(() => {
     prefetch(currentId)

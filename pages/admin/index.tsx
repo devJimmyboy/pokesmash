@@ -27,7 +27,7 @@ const Admin: NextPage = (props) => {
       setAllowed(false)
       router.push("/")
     }
-  }, [session])
+  }, [session, router])
   if (status === "loading") {
     return <div>Loading or not authenticated...</div>
   }
@@ -69,7 +69,7 @@ const PokemonData: React.FC<PokemonDataProps> = ({}) => {
     return () => {
       unsub()
     }
-  }, [])
+  }, [db])
   const theme = useTheme()
   return (
     <Paper
