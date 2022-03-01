@@ -94,7 +94,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(`/api/pokemon?id=${currentId}`, fetcher)
 
   const smash = React.useCallback(async () => {
-    if (!session || status === "unauthenticated") {
+    if (!session) {
       setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 }))
       runTransaction(child(pokeRef, `${currentId}`), (current) => {
         if (current) {
@@ -137,7 +137,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     })
   }, [currentId, session])
   const pass = React.useCallback(async () => {
-    if (!session || status === "unauthenticated") {
+    if (!session) {
       setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
       runTransaction(child(pokeRef, `${currentId}`), (current) => {
         if (current) {
@@ -180,7 +180,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     })
   }, [currentId, session])
   React.useEffect(() => {
-    if (!session || status === "unauthenticated") return
+    if (!session) return
 
     const uid = session.user.name.toLowerCase()
     const msgRef = ref(db, `messages/${uid}`)
