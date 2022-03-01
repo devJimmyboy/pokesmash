@@ -83,7 +83,7 @@ export default function PokeInfo({ cardRef }: Props) {
       setBg(getBg(pokeInfo))
       setSprite(getSprite(currentId, style))
     }
-  }, [pokeInfo])
+  }, [pokeInfo, style])
 
   if (!smashCtx || !pokeInfo) {
     return (

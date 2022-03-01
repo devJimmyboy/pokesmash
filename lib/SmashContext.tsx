@@ -76,11 +76,13 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   const db = getDatabase(app)
   const pokeRef = ref(db, `pokemon`)
-  const [showStyleSwitch, setShowStyleSwitch] = React.useState(false)
+  const [showStyleSwitch, setShowStyleSwitch] = React.useState(true)
 
   useEffect(() => {
     const onRouteChange = (url: string, { shallow }: { shallow: boolean }) => {
-      const bool = url.match(/\/(users(\/.*?)?)?$/y)
+      const bool = url.toString().match(/\/?(users(\/.*?)?)?$/y)
+      console.log(url, bool)
+
       setShowStyleSwitch(!!bool)
     }
     router.events.on("routeChangeStart", onRouteChange)
