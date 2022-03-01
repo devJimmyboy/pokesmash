@@ -1,8 +1,9 @@
 import { motion, useAnimation } from "framer-motion"
 import Image from "next/image"
 import React, { RefObject, useEffect, useState } from "react"
+import { SwipeRef } from "./SwipeCards"
 export type ShockRef = {
-  shocked: (cardRef?: RefObject<any>) => void
+  shocked: (cardRef?: RefObject<SwipeRef>) => void
 }
 type Props = {}
 
@@ -36,7 +37,7 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
         transition: { duration: 0.2, ease: "easeOut" },
         transitionEnd: { scale: 0.75 },
       })
-      if (cardRef) {
+      if (cardRef && cardRef.current) {
         cardRef.current.reset()
       }
     },

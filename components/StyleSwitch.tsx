@@ -7,7 +7,13 @@ import { blue, grey } from "@mui/material/colors"
 type Props = { style: string; onSwitch: () => void }
 
 export default function StyleSwitch({ style, onSwitch }: Props) {
-  return <PokeSwitch checked={style === "showdown"} onChange={onSwitch} />
+  return (
+    <PokeSwitch
+      sx={{ imageRendering: style === "hd" ? "auto" : "pixelated" }}
+      checked={style === "showdown"}
+      onChange={onSwitch}
+    />
+  )
 }
 
 const PokeSwitch = styled(SwitchUnstyled)(

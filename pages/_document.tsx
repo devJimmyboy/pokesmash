@@ -3,6 +3,8 @@ import Document, { Html, Head, Main, NextScript } from "next/document"
 import createEmotionServer from "@emotion/server/create-instance"
 import theme from "../src/theme"
 import createEmotionCache from "../src/createEmotionCache"
+import Script from "next/script"
+import { NoSsr } from "@mui/material"
 
 export default class MyDocument extends Document {
   render() {
@@ -20,6 +22,9 @@ export default class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          {/* <Script type="module">
+            
+          </Script> */}
         </body>
       </Html>
     )

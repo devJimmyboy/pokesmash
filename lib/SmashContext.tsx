@@ -8,7 +8,6 @@ import useSWR, { mutate } from "swr"
 import ShockValue, { ShockRef } from "../components/ShockValue"
 import StyleSwitch from "../components/StyleSwitch"
 import { createFirebaseApp } from "../firebase/clientApp"
-import { getMessaging, onMessage } from "firebase/messaging"
 import { useRouter } from "next/router"
 
 declare global {
@@ -80,9 +79,15 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const [showStyleSwitch, setShowStyleSwitch] = React.useState(false)
 
   useEffect(() => {
-    const bool = router.pathname.match(/^\/(users(\/.*?)?)?$/y)
-    setShowStyleSwitch(!!bool)
-  }, [router.pathname])
+    const onRouteChange = (url: string, { shallow }: { shallow: boolean }) => {
+      const bool = url.match(/\/(users(\/.*?)?)?$/y)
+      setShowStyleSwitch(!!bool)
+    }
+    router.events.on("routeChangeStart", onRouteChange)
+    return () => {
+      router.events.off("routeChangeStart", onRouteChange)
+    }
+  }, [])
 
   const { data: session, status } = useSession({ required: false })
   const [currentId, setCurrentId] = React.useState<number>(1)
@@ -201,35 +206,21 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         if (smashesRef.val()) smashes++
         if (passesRef.val()) passes++
       })
-      setScore((curScore) => ({ ...curScore, smashes, passes, hotTakes: smashes - passes < 0 ? 0 : smashes - passes }))
+      setScore((prev) => ({ ...prev, smashes, passes, hotTakes: smashes - passes < 0 ? 0 : smashes - passes }))
     })
     return () => {
       unsub()
       unsubMessages()
     }
-  }, [session, pokeRef, db, setMessages])
+  }, [session, pokeRef, db])
 
   React.useEffect(() => {
     prefetch(currentId)
   }, [currentId])
 
-  const [ctx, setCtx] = React.useState<CtxData>({
-    currentId,
-    setCurrentId,
-    pokeInfo,
-    style,
-    error,
-    score: { ...score, smash, pass },
-    shockRef,
-    messages,
-  })
-
-  React.useEffect(() => {
-    setCtx({ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef, messages })
-  }, [currentId, setCurrentId, pokeInfo, style, error, score, shockRef, pass, smash, messages])
-
   return (
-    <SmashContext.Provider value={ctx}>
+    <SmashContext.Provider
+      value={{ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef, messages }}>
       {showStyleSwitch && (
         <Box className="absolute top-2 left-2">
           <FormControlLabel

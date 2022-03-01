@@ -1,5 +1,4 @@
-import { Chip } from "@mui/material"
-import { css } from "@mui/system"
+import { Chip, css } from "@mui/material"
 import React from "react"
 import { capitalizeFirstLetter } from "../lib/utils"
 

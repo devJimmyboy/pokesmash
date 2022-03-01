@@ -120,7 +120,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
           </Typography>
           <div className="flex-grow" />
           <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-            {(typeof score !== "string" && score.numCompleted) || "?"} / 868
+            {(typeof score !== "string" && Object.values(score).length) || "?"} / 868
           </Typography>
         </div>
         {typeof score !== "string" ? (
@@ -136,7 +136,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
                   style={{
                     backgroundImage: `url(${style === "hd" ? hdBuilder(i + 1) : showdownBuilder(i + 1)})`,
                     backgroundSize: "80%",
-                    imageRendering: style === "hd" ? "auto" : "crisp-edges",
+                    imageRendering: style === "hd" ? "auto" : "pixelated",
                   }}>
                   {choice as string}
                 </ScoreHolder>
@@ -154,7 +154,6 @@ export default UserProfile
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const { user } = context.query
   const firestore = admin.firestore()
-  const db = admin.database()
   const users = firestore.collection("users")
   const userInfo = await users
     .where("name", "==", user as string)

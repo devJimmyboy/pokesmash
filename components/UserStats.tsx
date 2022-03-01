@@ -78,7 +78,7 @@ export default function UserStats({}: Props) {
               backgroundRepeat: "no-repeat",
               backgroundSize: "90%",
               backgroundPosition: "center",
-              imageRendering: style === "hd" ? "auto" : "crisp-edges",
+              imageRendering: style === "hd" ? "auto" : "pixelated",
             }}
           />
         </div>

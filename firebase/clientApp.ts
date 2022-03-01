@@ -1,8 +1,6 @@
 import { initializeApp, getApps, FirebaseOptions } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions'
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore"
-import { connectDatabaseEmulator, getDatabase } from "firebase/database"
+import { getPerformance } from 'firebase/performance'
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -26,6 +24,9 @@ export const createFirebaseApp = () => {
       if ('measurementId' in clientCredentials) {
         getAnalytics()
       }
+      // Initialize Performance Monitoring and get a reference to the service
+      const perf = getPerformance(app);
+
     }
 
 

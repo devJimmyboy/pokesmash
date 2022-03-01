@@ -17,6 +17,7 @@ import LoginButton from "../components/LoginButton"
 import { styled } from "@mui/material/styles"
 import UserStats from "../components/UserStats"
 import { Icon } from "@iconify/react"
+import { SwipeRef } from "../components/SwipeCards"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
@@ -32,7 +33,7 @@ const Home: NextPage = () => {
   const { error, setCurrentId, currentId, pokeInfo, style, score, shockRef } = useSmash() as NonNullable<
     ReturnType<typeof useSmash>
   >
-  const cardRef = React.useRef<any>(null)
+  const cardRef = React.useRef<SwipeRef>(null)
 
   return (
     <Box
@@ -77,8 +78,8 @@ const Home: NextPage = () => {
           SMASH
         </Typography>
       </Typography>
-      {pokeInfo && <PokeInfo cardRef={cardRef} />}
-      {!pokeInfo && !error && <div>Loading...</div>}
+      <PokeInfo cardRef={cardRef} />
+
       {error && <div>Error! {error.message || "Please Reload"}</div>}
       <Stack direction="column" sx={{ height: 400, mt: 6 }} spacing={4}>
         <Typography fontSize={32} fontWeight="bold" align="center">
@@ -98,7 +99,7 @@ const Home: NextPage = () => {
         <LoginButton />
       </Box>
       <Footer>
-        <CreatedCard sx={{fontSize: [12,16,24,28]}}>
+        <CreatedCard sx={{ fontSize: [12, 16, 24, 28] }}>
           Created by{" "}
           <Link
             href="https://jimmyboy.tv"

@@ -1,16 +1,14 @@
-import { Card, CardContent, CardHeader, CircularProgress, Stack, Typography } from "@mui/material"
-import { styled, css } from "@mui/system"
-import { PokemonSpecies } from "pokenode-ts"
-import { Ref, RefObject, useRef, useState } from "react"
-import TinderCard from "react-tinder-card"
+import { Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material"
+import { styled } from "@mui/system"
+import { Pokemon, PokemonSpecies } from "pokenode-ts"
+import React, { RefObject, useState } from "react"
 import useSWR from "swr"
 import { useSmash } from "../lib/SmashContext"
-
-import { capitalizeFirstLetter } from "../lib/utils"
-import SwipeCards from "./SwipeCards"
+import { capitalizeFirstLetter, hdBuilder, showdownBuilder } from "../lib/utils"
+import SwipeCards, { SwipeRef } from "./SwipeCards"
 import Type, { PokeType } from "./Type"
 
-type Props = { cardRef: RefObject<any> }
+type Props = { cardRef: RefObject<SwipeRef> }
 
 const getBgByType: { [key in PokeType]: string[] } = {
   bug: ["forest"],
@@ -45,6 +43,7 @@ const PokeCard = styled(Card)`
   background-repeat: no-repeat;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  image-rendering: pixelated;
 `
 const PokeContent = styled(CardContent)`
   display: flex;
@@ -60,22 +59,31 @@ const PokeContent = styled(CardContent)`
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
+const getBg = (pokeInfo: Pokemon) => {
+  return getBgByType[pokeInfo.types[0].type.name as PokeType][
+    Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
+  ]
+}
+const getSprite = (currentId: number, style: ReturnType<typeof useSmash>["style"]) => {
+  if (style === "hd") return hdBuilder(currentId)
+  else return showdownBuilder(currentId)
+}
+
 export default function PokeInfo({ cardRef }: Props) {
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const { currentId, pokeInfo, setCurrentId, style, score, shockRef } = smashCtx
   // const cardRef = useRef<any>(null)
   const { data } = useSWR<PokemonSpecies>(() => pokeInfo?.species.url, fetcher)
 
-  const bgUrl =
-    style && style === "showdown"
-      ? pokeInfo?.sprites.versions["generation-v"]["black-white"].animated.front_default
-      : pokeInfo?.sprites.other["official-artwork"].front_default || "/loading.png"
+  const [bgUrl, setSprite] = useState(pokeInfo && getSprite(currentId, style))
 
-  const chosenBg =
-    pokeInfo &&
-    getBgByType[pokeInfo.types[0].type.name as PokeType][
-      Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
-    ]
+  const [chosenBg, setBg] = useState(pokeInfo && getBg(pokeInfo))
+  React.useEffect(() => {
+    if (pokeInfo) {
+      setBg(getBg(pokeInfo))
+      setSprite(getSprite(currentId, style))
+    }
+  }, [pokeInfo])
 
   if (!smashCtx || !pokeInfo) {
     return (
@@ -91,6 +99,7 @@ export default function PokeInfo({ cardRef }: Props) {
       </div>
     )
   }
+
   return (
     <div
       className="cardContainer h-full"
@@ -100,11 +109,16 @@ export default function PokeInfo({ cardRef }: Props) {
       }}>
       <SwipeCards
         ref={cardRef}
-        onSwipe={async (dir) => {
-          if (data?.is_baby && dir === "right") shockRef.current?.shocked(cardRef)
-          else {
-            setTimeout(() => cardRef.current.reset(), 500)
+        onSwipe={async (dir: "left" | "right" | "up" | "down") => {
+          if (data?.is_baby && dir === "right") {
+            shockRef.current?.shocked(cardRef)
+          } else {
+            if (!cardRef.current) console.error("CardRef not found!")
+            if (!window.setTimeout) console.error("window.setTimeout was overridden...")
+
+            setTimeout(() => cardRef.current?.reset(), 500)
           }
+          if (process.env.NODE_ENV === "development") console.log(dir)
           if (dir === "left") {
             score.pass()
           } else if (dir === "right") {
@@ -121,6 +135,7 @@ export default function PokeInfo({ cardRef }: Props) {
               `url(/backgrounds/bg-${chosenBg || "beach"}.${chosenBg === "space" ? "jpg" : "png"})`,
             backgroundSize: "80%, cover",
             backgroundPosition: "center, left",
+            imageRendering: style === "hd" ? "auto" : "pixelated",
           }}>
           <PokeContent className="select-none">
             <Typography variant="h4" fontWeight={700} component="h1">
