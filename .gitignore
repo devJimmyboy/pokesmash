@@ -45,5 +45,7 @@ database*
 /*-debug.log
 functions
 
-public/sprites
-!public/sprites/pokemon/custom/**/*
+/public/sprites/pokemon/*
+/public/sprites/items
+
+!/public/sprites/pokemon/custom

@@ -89,5 +89,6 @@ const Simulator = React.forwardRef<SimulatorRef, Props>(({ width, height, ready,
     </Stage>
   )
 })
+Simulator.displayName = "Simulator"
 
 export default Simulator
