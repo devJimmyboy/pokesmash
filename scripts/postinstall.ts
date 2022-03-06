@@ -23,15 +23,16 @@ async function readDir(ctx: ListrContext, task: ListrTaskWrapper) {
 
 }
 
+const throttledLog = throttle((task: ListrTaskWrapper, output: string) => {
+  task.output = output;
+}, 1000)
 
 const tarPath = path.join(outDir, 'sprites.tar.gz')
 let dataDownloaded = 0;
 let dataToDownload = 227909000;
 async function downloadTar(ctx: ListrContext, task: ListrTaskWrapper) {
   return new Promise((resolve, reject) => {
-    const throttledLog = throttle((task: ListrTaskWrapper, output: string) => {
-      task.output = output;
-    }, 2500)
+
 
 
     const tarFile = createWriteStream(tarPath);
@@ -60,10 +61,10 @@ async function cloneSprites(ctx: ListrContext, task: ListrTaskWrapper) {
   const promises = filesInPath.map(async (file) => {
     const inPath = path.join(dirPath, file)
     const outPath = path.join(outDir, file)
-    await fs.rename(inPath, outPath).then(() => { task.output = chalk.bgGreen.white(`\uf00c ${chalk.green(file.endsWith(".png") ? `Sprite ${file} cloned` : `Folder ${file} cloned`)}`) }).catch(err => { task.output = chalk.bgRed.white(`\uf071 ${err}`) })
+    await fs.rename(inPath, outPath).then(() => { throttledLog(task, chalk.bgGreen.white(`\uf00c ${chalk.green(file.endsWith(".png") ? `Sprite ${file} cloned` : `Folder ${file} cloned`)}`)) }).catch(err => { throttledLog(task, chalk.bgRed.white(`\uf071 ${err}`)) })
   })
   await Promise.all(promises)
-  await fs.rmdir(path.join(outDir, 'sprites-2.0.0'))
+  await fs.rmdir(path.join(outDir, 'sprites-2.0.0'), { recursive: true, })
   return "All Done :)"
 
 }
