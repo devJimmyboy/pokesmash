@@ -10,6 +10,7 @@ import createEmotionCache from "../src/createEmotionCache"
 import SmashProvider from "../lib/SmashContext"
 import { SessionProvider } from "next-auth/react"
 import { Session } from "next-auth"
+import { Toaster } from "react-hot-toast"
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
@@ -27,14 +28,16 @@ export default function MyApp(props: MyAppProps) {
     <SessionProvider session={session}>
       <CacheProvider value={emotionCache}>
         <Head>
+          <meta charSet="utf-8" />
           <meta name="viewport" content="initial-scale=1, width=device-width" />
-          <link rel="icon" type="image/webp" href="/sillychamp.webp" />
+          <link rel="icon" type="image/png" href="/favicon.png" />
           <title>Pokémon Smash or Pass</title>
           <meta name="title" content="PokéSmash - Pokémon Smash or Pass" />
           <meta
-            name="description"
+            name="Description"
             content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon. This website is a means of making that trend have more mainstream accessibility.Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
           />
+          <meta name="robots" content="noindex,nofollow" />
 
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://pokesmash.xyz/" />
@@ -58,15 +61,16 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
           />
           <meta property="twitter:image" content="/meta.png" />
         </Head>
-        <SmashProvider>
-          <ThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
+          <SmashProvider>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline enableColorScheme />
             <div className="h-screen ">
               <Component {...pageProps} />
             </div>
-          </ThemeProvider>{" "}
-        </SmashProvider>
+            <Toaster position="top-center" gutter={5} toastOptions={{}} />
+          </SmashProvider>
+        </ThemeProvider>
       </CacheProvider>
     </SessionProvider>
   )

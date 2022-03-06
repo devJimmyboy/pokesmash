@@ -122,6 +122,8 @@ export const FirebaseAdapter = (firebaseApp?: FirebaseApp): Adapter => {
       if (accountSnapshot.exists() && Accounts.converter) {
         return Accounts.converter.fromFirestore(accountSnapshot);
       }
+      else
+        return null;
     },
 
     async unlinkAccount({ provider, providerAccountId }) {
@@ -213,6 +215,7 @@ export const FirebaseAdapter = (firebaseApp?: FirebaseApp): Adapter => {
 
         return verificationToken;
       }
+      else return null;
     },
 
     async useVerificationToken({ identifier, token }) {

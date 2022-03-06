@@ -1,4 +1,4 @@
-import { Avatar, Container, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material"
+import { Avatar, Box, Container, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import { GetServerSideProps, NextPage } from "next"
 import { User } from "next-auth"
 
@@ -9,17 +9,17 @@ import { useRouter } from "next/router"
 import { styled } from "@mui/system"
 import admin from "../../firebase/adminApp"
 import { useSmash } from "../../lib/SmashContext"
-import { hdBuilder, showdownBuilder } from "../../lib/utils"
+import { usePokemonPicture } from "../../lib/utils"
 import { getDatabase, ref, get, onValue } from "firebase/database"
 import { createFirebaseApp } from "../../firebase/clientApp"
 import Link from "../../src/Link"
+import PokemonSquare from "../../components/PokemonSquare"
 
 const ScoreHolder = styled("div")`
   background-position: center;
   background-size: 80%;
   background-repeat: no-repeat;
   background-color: #10151a;
-
   padding: 5px;
   display: flex;
   flex-direction: column;
@@ -66,6 +66,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
           numSmashed++
         }
       })
+
       setScore(choices)
     })
     return () => {
@@ -87,8 +88,8 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
   } else
     return (
-      <Stack sx={{ overflowX: "hidden", overflowY: "auto" }} direction="column" p={6} alignItems="center">
-        <Tooltip className="absolute top-12 left-4" title="Go Back">
+      <Stack sx={{ overflow: "hidden" }} direction="column" p={6} alignItems="center">
+        <Tooltip className="absolute top-24 left-4" title="Go Back">
           <IconButton className=" w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
             <Icon icon="fa-solid:arrow-left" />
           </IconButton>
@@ -127,19 +128,12 @@ const UserProfile: NextPage<Props> = ({ user }) => {
           <Grid
             container
             spacing={0}
+            overflow="hidden"
             sx={{ borderRadius: "10px", border: "1px solid #55df55" }}
             columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
             {Object.values(score).map((choice, i) => (
               <Grid item xs={2} sm={3} md={3} lg={4} key={i}>
-                <ScoreHolder
-                  className="w-full aspect-square"
-                  style={{
-                    backgroundImage: `url(${style === "hd" ? hdBuilder(i + 1) : showdownBuilder(i + 1)})`,
-                    backgroundSize: "80%",
-                    imageRendering: style === "hd" ? "auto" : "pixelated",
-                  }}>
-                  {choice as string}
-                </ScoreHolder>
+                <PokemonSquare i={i} choice={choice} style={style} />
               </Grid>
             ))}
           </Grid>

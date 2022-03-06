@@ -44,3 +44,6 @@ firestore*
 database*
 /*-debug.log
 functions
+
+public/sprites
+!public/sprites/pokemon/custom/**/*
