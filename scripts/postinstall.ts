@@ -4,6 +4,7 @@ import path from "path";
 import tar from 'tar';
 import Listr, { ListrContext, ListrTaskWrapper } from "listr";
 import chalk from "chalk";
+import throttle from 'lodash.throttle';
 import { createWriteStream } from "fs";
 
 const spritesTarDL = "https://codeload.github.com/PokeAPI/sprites/tar.gz/refs/tags/2.0.0"
@@ -28,12 +29,17 @@ let dataDownloaded = 0;
 let dataToDownload = 227909000;
 async function downloadTar(ctx: ListrContext, task: ListrTaskWrapper) {
   return new Promise((resolve, reject) => {
+    const throttledLog = throttle((task: ListrTaskWrapper, output: string) => {
+      task.output = output;
+    }, 2500)
+
+
     const tarFile = createWriteStream(tarPath);
     https.get(spritesTarDL, response => {
       response.pipe(tarFile);
       response.on("data", (chunk) => {
         dataDownloaded += chunk.length
-        task.output = chalk.bgBlue.white(`\uf09b Downloading ${dataDownloaded}/${dataToDownload} ${chalk.greenBright(`(${((dataDownloaded / dataToDownload) * 100).toPrecision(4)}%)`)} bytes`)
+        throttledLog(task, chalk.bgBlue.white(`\uf09b Downloading ${dataDownloaded}/${dataToDownload} ${chalk.greenBright(`(${((dataDownloaded / dataToDownload) * 100).toPrecision(4)}%)`)} bytes`))
       })
       response.on("end", () => {
         if (response.statusCode === 200) {
