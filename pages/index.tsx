@@ -36,7 +36,11 @@ const Home: NextPage = () => {
       messages
         .filter((msg) => !msg?.played)
         .forEach((msg) => {
-          toast(msg.data?.message || "yo", { icon: <Icon icon="fa-solid:comment" /> })
+          toast(msg.message, {
+            icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
+            style: { color: msg?.color },
+            id: msg.id,
+          })
         })
     }
   }, [messages])

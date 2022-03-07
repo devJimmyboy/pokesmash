@@ -55,10 +55,12 @@ interface CtxData {
   setMessages: ListActions<FBMessage> | undefined
 }
 export type FBMessage = {
+  id: string
   title: string
   message: string
   icon?: string
   color?: string
+  played?: boolean
   data?: {
     url?: string
   }
@@ -170,7 +172,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       if (payload.empty) return
       console.log("Messages received: ", payload.size)
       payload.forEach((msg) => {
-        setMessages.push(msg.data())
+        setMessages.push({ ...msg.data(), id: msg.id, played: false })
       })
     })
     const userRef = ref(db, `users/${uid}`)
