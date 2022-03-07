@@ -1,6 +1,6 @@
 import React from "react";
 import { useSmash } from "./SmashContext";
-
+const buildUrl = (path: string) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${path}`
 
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -19,7 +19,7 @@ export const usePokemonPicture = (i?: number) => {
   React.useEffect(() => {
 
     const id = i || currentId;
-    const shinyChance = 1;
+    const shinyChance = 100 / 4096;
     const isShiny = chance.bool({ likelihood: shinyChance });
 
     setShiny(isShiny);
@@ -27,23 +27,23 @@ export const usePokemonPicture = (i?: number) => {
     switch (style) {
       case "showdown":
         if (id > 649)
-          setSprite(`/sprites/pokemon/custom${shiny ? "/shiny/" : "/"}${id}.png`)
+          setSprite(buildUrl(`${shiny ? "/shiny/" : "/"}${id}.png`))
         else
-          setSprite(`/sprites/pokemon/versions/generation-v/black-white/animated${shiny ? "/shiny/" : "/"}${id}.gif`)
+          setSprite(buildUrl(`/versions/generation-v/black-white/animated${shiny ? "/shiny/" : "/"}${id}.gif`))
         break;
       case "hd":
-        setSprite(`/sprites/pokemon/other/official-artwork/${id}.png`)
+        setSprite(buildUrl(`/other/official-artwork/${id}.png`))
         break;
       case "3d":
-        setSprite(`/sprites/pokemon/other/home${shiny ? "/shiny/" : "/"}/${id}.png`)
+        setSprite(buildUrl(`/other/home${shiny ? "/shiny/" : "/"}/${id}.png`))
         break;
       default:
       case "clean":
-        if (id <= 649) setSprite(`/sprites/pokemon/other/dream-world/${id}.svg`)
+        if (id <= 649) setSprite(buildUrl(`/other/dream-world/${id}.svg`))
         else
-          setSprite(`/sprites/pokemon/model/${id}.png`)
+          setSprite(buildUrl(`/${id}.png`))
     }
-  }, [i, currentId, style, chance, shiny])
+  }, [i, currentId, style, chance])
   return { bgUrl: sprite, shiny }
 }
 

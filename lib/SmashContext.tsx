@@ -13,6 +13,7 @@ import Chance from "chance"
 import { ListActions } from "react-use/lib/useList"
 import gsap from "gsap"
 import Celebration, { CelebrationRef } from "../components/Celebration"
+import { collection, CollectionReference, getFirestore, onSnapshot, query, where } from "firebase/firestore"
 
 declare global {
   interface PokemonModel {
@@ -54,10 +55,13 @@ interface CtxData {
   setMessages: ListActions<FBMessage> | undefined
 }
 export type FBMessage = {
-  data: {
-    [key: string]: string
+  title: string
+  message: string
+  icon?: string
+  color?: string
+  data?: {
+    url?: string
   }
-  played: boolean
 }
 
 const SmashContext = React.createContext<CtxData>({
@@ -83,6 +87,7 @@ interface Props {}
 const fetcher = async (url: string) => fetch(url).then((r) => r.json())
 const app = createFirebaseApp()
 const db = getDatabase(app)
+const fs = getFirestore(app)
 
 export default function SmashProvider(props: PropsWithChildren<Props>) {
   const router = useRouter()
@@ -93,6 +98,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   const startCelebration = async () => {
     await gsap.to("#appControl", { autoAlpha: 0, duration: 7.5 })
+    celebrateRef.current?.start()
   }
 
   useEffect(() => {
@@ -110,7 +116,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   const { data: session, status } = useSession({ required: false })
   const [style, setStyle] = useSessionStorage<Styling>("pokemonStyle", "showdown")
-  const [chance, setChance] = React.useState(new Chance())
+  const [chance] = React.useState(new Chance())
   // useEffect(() => {
   //   if(session?.user?.id)
   //     setChance(new Chance(session?.user?.id))
@@ -127,7 +133,11 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
-  const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(`/api/pokemon?id=${currentId}`, fetcher)
+  const {
+    error,
+    isValidating,
+    data: pokeInfo,
+  } = useSWR<Pokemon>(currentId > 898 ? null : `/api/pokemon?id=${currentId}`, fetcher)
 
   useEffect(() => {
     if (currentId < score.currentId) return
@@ -138,10 +148,13 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [currentId])
 
   const smash = React.useCallback(async () => {
+    if (currentId > 898) return
+
     fetch(`/api/choice?id=${currentId}&choice=smash`, { method: "POST" })
     setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 }))
   }, [currentId, session, pokeRef])
   const pass = React.useCallback(async () => {
+    if (currentId > 898) return
     fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
     setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
   }, [currentId, session, pokeRef])
@@ -149,12 +162,15 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (!session) return
 
     const uid = session.user.name.toLowerCase()
-    const msgRef = ref(db, `messages/${uid}`)
-    const unsubMessages = onValue(msgRef, (payload) => {
-      if (!payload.exists()) return
-      console.log("Message received. ", payload)
+    const messages = query<FBMessage>(
+      collection(fs, `messages`) as CollectionReference<FBMessage>,
+      where("for", "in", [uid, "all"])
+    )
+    const unsubMessages = onSnapshot<FBMessage>(messages, (payload) => {
+      if (payload.empty) return
+      console.log("Messages received: ", payload.size)
       payload.forEach((msg) => {
-        setMessages.push(msg.val() as FBMessage)
+        setMessages.push(msg.data())
       })
     })
     const userRef = ref(db, `users/${uid}`)
@@ -177,7 +193,10 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   useEffect(() => {
     const raw = sessionStorage.getItem("score")
     const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
-    if (storageScore) setScore(storageScore)
+    if (storageScore) {
+      setScore(storageScore)
+      setCurrentId(storageScore.currentId)
+    }
   }, [])
   useEffect(() => {
     sessionStorage.setItem("score", JSON.stringify(score))

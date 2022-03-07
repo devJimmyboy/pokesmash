@@ -7,6 +7,9 @@ import chalk from "chalk";
 import throttle from 'lodash.throttle';
 import { createWriteStream } from "fs";
 
+// "prebuild": "ts-node scripts/prebuild.ts"
+
+
 const spritesTarDL = "https://codeload.github.com/PokeAPI/sprites/tar.gz/master"
 
 const tasks = new Listr([{ title: `Reading current sprites dir`, task: readDir }, { "title": "Downloading latest release...", task: downloadTar }, { title: `Cloning sprites from ${chalk.bgGray.white("\uf09b PokeAPI/sprites")}...`, task: cloneSprites }]);

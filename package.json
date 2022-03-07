@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "prebuild": "ts-node scripts/prebuild.ts"
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",

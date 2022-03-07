@@ -154,7 +154,7 @@ export default function PokeInfo({ cardRef }: Props) {
           }
           setCurrentId((id) => id + 1)
         }}>
-        <PokeCard className={shiny ? "is-shiny" : ""}>
+        <PokeCard className={""}>
           <div
             style={{
               height: "100%",
@@ -204,6 +204,29 @@ export default function PokeInfo({ cardRef }: Props) {
               />
             )}
           </div>
+          {shiny && (
+            <div
+              style={{
+                width: "200%",
+                height: "125%",
+
+                transform: "translateX(-25%) rotate(60deg) ",
+                position: "absolute",
+              }}>
+              <motion.div
+                className={"is-shiny transform-gpu"}
+                animate={{ y: ["-150%", "1500%", "-150%"], rotate: [0, 5, 0], scaleY: [2, 1, 2] }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20,
+                  mass: 0.5,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  repeatDelay: 3,
+                }}></motion.div>
+            </div>
+          )}
           <PokeContent className="select-none absolute">
             <Typography id="pokeName" variant="h4" fontWeight={700} component="h1">
               {capitalizeFirstLetter(pokeInfo.name)}
