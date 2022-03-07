@@ -9,7 +9,7 @@
     "lint": "next lint",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "postinstall": "ts-node scripts/postinstall.ts"
+    "prebuild": "ts-node scripts/prebuild.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",

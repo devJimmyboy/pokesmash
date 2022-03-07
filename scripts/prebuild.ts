@@ -7,7 +7,7 @@ import chalk from "chalk";
 import throttle from 'lodash.throttle';
 import { createWriteStream } from "fs";
 
-const spritesTarDL = "https://codeload.github.com/PokeAPI/sprites/tar.gz/refs/tags/2.0.0"
+const spritesTarDL = "https://codeload.github.com/PokeAPI/sprites/tar.gz/master"
 
 const tasks = new Listr([{ title: `Reading current sprites dir`, task: readDir }, { "title": "Downloading latest release...", task: downloadTar }, { title: `Cloning sprites from ${chalk.bgGray.white("\uf09b PokeAPI/sprites")}...`, task: cloneSprites }]);
 
@@ -18,7 +18,7 @@ async function readDir(ctx: ListrContext, task: ListrTaskWrapper) {
 
   if (filesInDir.length > 1) {
     task.title = `${chalk.bgRed.white('\uf071')} ${chalk.red('Sprites already cloned!')}`
-    process.exit(0)
+    process.exit(1)
   }
 
 }
@@ -54,9 +54,9 @@ async function downloadTar(ctx: ListrContext, task: ListrTaskWrapper) {
 
 
 async function cloneSprites(ctx: ListrContext, task: ListrTaskWrapper) {
-  await tar.x({ cwd: outDir, file: tarPath }, ["sprites-2.0.0/sprites/pokemon"]).then(() => { task.output = chalk.bgGreen.white(`\uf00c ${chalk.green('Sprites cloned')}`) }).catch(err => { task.output = chalk.bgRed.white(`\uf071 ${err}`) })
+  await tar.x({ cwd: outDir, file: tarPath }, ["sprites-master/sprites/pokemon"]).then(() => { task.output = chalk.bgGreen.white(`\uf00c ${chalk.green('Sprites cloned')}`) }).catch(err => { task.output = chalk.bgRed.white(`\uf071 ${err}`) })
   await fs.rm(tarPath)
-  const dirPath = path.join(outDir, 'sprites-2.0.0/sprites/pokemon')
+  const dirPath = path.join(outDir, 'sprites-master/sprites/pokemon')
   const filesInPath = await fs.readdir(dirPath);
   const promises = filesInPath.map(async (file) => {
     const inPath = path.join(dirPath, file)
@@ -64,7 +64,7 @@ async function cloneSprites(ctx: ListrContext, task: ListrTaskWrapper) {
     await fs.rename(inPath, outPath).then(() => { throttledLog(task, chalk.bgGreen.white(`\uf00c ${chalk.green(file.endsWith(".png") ? `Sprite ${file} cloned` : `Folder ${file} cloned`)}`)) }).catch(err => { throttledLog(task, chalk.bgRed.white(`\uf071 ${err}`)) })
   })
   await Promise.all(promises)
-  await fs.rmdir(path.join(outDir, 'sprites-2.0.0'), { recursive: true, })
+  await fs.rmdir(path.join(outDir, 'sprites-master'), { recursive: true, })
   return "All Done :)"
 
 }
@@ -72,4 +72,4 @@ async function cloneSprites(ctx: ListrContext, task: ListrTaskWrapper) {
 tasks.run().catch(err => {
   console.error(err);
   process.exit(1);
-}).then(process.exit(0))
+}).then(() => process.exit(0))

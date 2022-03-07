@@ -41,7 +41,7 @@ export const usePokemonPicture = (i?: number) => {
       case "clean":
         if (id <= 649) setSprite(`/sprites/pokemon/other/dream-world/${id}.svg`)
         else
-          setSprite(`/sprites/pokemon/versions/generation-vii/ultra-sun-ultra-moon${shiny ? "/shiny/" : "/"}${id}.png`)
+          setSprite(`/sprites/pokemon/model/${id}.png`)
     }
   }, [i, currentId, style, chance, shiny])
   return { bgUrl: sprite, shiny }

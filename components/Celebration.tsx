@@ -28,7 +28,7 @@ const text = ["", "Hello there. \nMy name is Professor $m0ak."]
 const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => {
   const animRef = useRef<confetti.CreateTypes | null>(null)
   const audioRef = useRef<ReactAudioPlayer | null>(null)
-  const simRef = useRef<SimulatorRef>(null)
+  // const simRef = useRef<SimulatorRef>(null)
   const { width, height } = useWindowSize()
   const [started, start] = useBoolean(false)
   const [source, setSource] = useState("")
@@ -130,9 +130,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           height: "100vh",
           top: 0,
           left: 0,
-        }}>
-        <Simulator text={text} ready={true} width={width} height={height} ref={simRef} />
-      </div>
+        }}></div>
     </>
   )
 })
