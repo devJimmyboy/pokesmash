@@ -32,3 +32,12 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.cardContainer {
+  @media screen and (max-width: 800px){
+    width: 100%;
+    height: 100%;
+  }
+  max-width: 28.125em;
+  max-height: 37.5em;
+}

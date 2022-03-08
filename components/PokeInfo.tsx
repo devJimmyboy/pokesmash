@@ -33,6 +33,12 @@ const getBgByType: { [key in PokeType]: string[] } = {
 
 const PokeCard = styled(Card)`
   height: 100%;
+  @media screen and (max-width: 800px){
+     min-width:100%;
+  }
+
+
+
   min-width: 450px;
   max-height: 600px;
   border-radius: 1.5em;
@@ -104,8 +110,6 @@ export default function PokeInfo({ cardRef }: Props) {
     <div
       className="cardContainer h-full"
       style={{
-        minWidth: "450px",
-        maxHeight: "600px",
       }}>
       <SwipeCards
         ref={cardRef}

@@ -11,6 +11,10 @@ const ChoiceButtonRoot = styled(MotionButton)`
   --bColor: ${({ theme }) => theme.palette.primary.main};
   display: flex;
   gap: 6px;
+  @media screen and (max-width: 800px){
+    width: 40%;
+    height: calc(1.5em+5vh);
+  }
   width: 250px;
   height: 100px;
   border-radius: 20px;
