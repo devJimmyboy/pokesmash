@@ -101,7 +101,7 @@ const Home: NextPage = () => {
       </Box>
       <Footer>
         <CreatedCard className="h-8 md:h-auto" sx={{ fontSize: [16, 18, 24, 28] }}>
-          <div className="hidden md:visible">Created by </div>
+          <div className="hidden md:inline">Created by </div>
           <Link
             href="https://jimmyboy.tv"
             target="_blank"

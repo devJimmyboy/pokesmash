@@ -51,7 +51,7 @@ export default function LoginButton(props: ButtonProps) {
           src={session.user.profileImageUrl || ""}
         />
         <SignInBtn onClick={() => signOut()}>
-          <Icon icon="mdi:logout" />
+          <Icon fontSize={24} icon="mdi:logout" />
         </SignInBtn>
       </Stack>
     )
