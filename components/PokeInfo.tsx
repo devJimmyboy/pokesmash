@@ -198,7 +198,6 @@ export default function PokeInfo({ cardRef }: Props) {
               </>
             ) : (
               <img
-                className=""
                 style={{ transform: style === "showdown" ? "scale(400%)" : "scale(85%)", minWidth: "75px" }}
                 src={bgUrl}
               />

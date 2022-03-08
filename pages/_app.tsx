@@ -2,7 +2,7 @@ import * as React from "react"
 import Head from "next/head"
 import "../styles/globals.css"
 import { AppProps } from "next/app"
-import { ThemeProvider } from "@mui/material/styles"
+import { ThemeProvider, useTheme } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { CacheProvider, EmotionCache } from "@emotion/react"
 import theme from "../src/theme"
@@ -10,7 +10,9 @@ import createEmotionCache from "../src/createEmotionCache"
 import SmashProvider from "../lib/SmashContext"
 import { SessionProvider } from "next-auth/react"
 import { Session } from "next-auth"
-import { Toaster } from "react-hot-toast"
+import toast, { ToastBar, Toaster } from "react-hot-toast"
+import { Box, IconButton } from "@mui/material"
+import { Icon } from "@iconify/react"
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
@@ -68,7 +70,33 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
             <div className="h-screen ">
               <Component {...pageProps} />
             </div>
-            <Toaster position="top-center" gutter={5} toastOptions={{}} />
+            <Toaster position="top-center" gutter={5} toastOptions={{}}>
+              {(t) => {
+                return (
+                  <ToastBar
+                    style={{
+                      backgroundColor: theme.palette.background.paper,
+                    }}
+                    toast={t}>
+                    {({ icon, message }) => (
+                      <div className="flex flex-row items-center px-1 py-1">
+                        {icon}
+                        {message}
+                        {t.type !== "loading" && (
+                          <Box
+                            component="button"
+                            sx={{ width: 20, height: 20, outlineColor: theme.palette.pass.main }}
+                            className="border-none p-0 ml-4 focus:ring rounded-md bg-transparent hover:bg-gray-50 hover:bg-opacity-50 flex flex-col items-center justify-center transition-colors outline-1 hover:outline-2 outline focus:outline-none"
+                            onClick={() => toast.dismiss(t.id)}>
+                            <Icon icon="fa6-solid:xmark" />
+                          </Box>
+                        )}
+                      </div>
+                    )}
+                  </ToastBar>
+                )
+              }}
+            </Toaster>
           </SmashProvider>
         </ThemeProvider>
       </CacheProvider>

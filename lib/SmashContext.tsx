@@ -60,6 +60,7 @@ export type FBMessage = {
   message: string
   icon?: string
   color?: string
+  for: string
   played?: boolean
   data?: {
     url?: string

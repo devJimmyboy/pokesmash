@@ -12,31 +12,6 @@ export default function IdField({}: Props) {
   const updateId = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.currentTarget.value && e.currentTarget.value.length > 0) {
-        if (unlockedState < 5) {
-          let input = e.currentTarget.value.replace(currentId.toString(), "")
-          if (input.match(/[penis]/i)) {
-            console.log("noticed trying to enter password 😏", "current unlock state:", unlockedState)
-
-            if (unlockedState === 0 && input.includes("p")) setUnlockedState(1)
-            if (unlockedState === 1 && input.includes("e")) setUnlockedState(2)
-            if (unlockedState === 2 && input.includes("n")) setUnlockedState(3)
-            if (unlockedState === 3 && input.includes("i")) setUnlockedState(4)
-            if (unlockedState === 4 && input.includes("s")) {
-              console.log("unlocked")
-              setUnlockedState(5)
-            }
-          }
-        } else {
-          try {
-            const nId = parseInt(e.currentTarget.value)
-
-            setCurrentId(nId)
-          } catch (e) {
-            console.error("Invalid ID")
-          }
-          return
-        }
-
         let nId = currentId
         try {
           nId = parseInt(e.currentTarget.value)
@@ -69,8 +44,11 @@ const InputEditable = styled(InputUnstyled)`
   overflow: hidden;
   background: transparent;
   border: 0;
+  font-size: 1.5rem;
 
   & .${inputUnstyledClasses.input} {
+    border: 0;
+
     outline: none;
     max-width: 4ch;
     border-radius: 12px;

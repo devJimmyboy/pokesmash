@@ -1,26 +1,21 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "incremental": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "importHelpers": true,
-    "strict": true,
-    "composite": true,
-    "resolveJsonModule": true,
-    "noImplicitReturns": true,
-    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "checkJs": true,
+    "skipLibCheck": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "baseUrl": ".",
-    "jsxImportSource": "@emotion/react"
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
+    "incremental": true
   },
-  "exclude": ["node_modules", ".next", "out", "storybook-static", "functions", "stories"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.mjs", "**/*.jsx", ".storybook/*.js"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }

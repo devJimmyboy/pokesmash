@@ -18,7 +18,6 @@ import toast from "react-hot-toast"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
-  font-size: 5vh;
 
   font-weight: bold;
   font-family: Pokemon;
@@ -49,7 +48,7 @@ const Home: NextPage = () => {
     <>
       <Box
         sx={{
-          my: 4,
+          py: { md: 0, lg: 2, xl: 4 },
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -57,19 +56,20 @@ const Home: NextPage = () => {
           height: "100vh",
         }}>
         <Typography
+          fontSize={{ sm: "2vh", md: "4vh", xl: "6vh" }}
           variant="h4"
           component="h1"
           css={headerCSS}
           gutterBottom
           sx={{
             color: "#FFDE00",
-            mt: 5,
+            mt: { sm: 0, "2xl": 5 },
           }}>
           Poké
           <Typography
             display="inline"
+            fontSize={{ sm: "2vh", md: "4vh", xl: "6vh" }}
             css={css`
-              font-size: 6vh;
               margin-left: 8px;
               font-family: "Lilita One";
               font-weight: 600;
@@ -140,7 +140,10 @@ const Home: NextPage = () => {
             className="pointer-events-auto p-0 m-0 mr-12"
             title="Support me for more content like this!"
             placement="left-start">
-            <IconButton className="w-10 h-10 p-0 m-0" target="_blank" href="https://www.patreon.com/devJimmyboy">
+            <IconButton
+              className="w-10 h-10 p-0 m-0 fancy-bg"
+              target="_blank"
+              href="https://www.patreon.com/devJimmyboy">
               <Icon fontSize={18} icon="fa-brands:patreon" />
             </IconButton>
           </Tooltip>

@@ -15,10 +15,23 @@ export default async function handler(
     query: { id: _id, choice: _choice },
     method,
   } = req
-  if (req.method !== "POST") {
+  if (method !== "POST") {
     res.setHeader('Allow', ['POST'])
-    return res.status(405).end(`Method ${req.method} not allowed`)
+    return res.status(405).end(`Method ${method} not allowed`)
   }
+  if (_choice !== "smash" && _choice !== "pass") {
+    return res.status(400).json({ error: "Invalid choice" })
+  }
+
+  try {
+    const testId = Number(_id as string);
+    if (isNaN(testId)) {
+      return res.status(400).json({ error: "Invalid id" })
+    }
+  } catch (e) {
+    return res.status(400).json({ error: "Invalid id" })
+  }
+
   const id = Number(_id as string)
   const choice = _choice as "smash" | "pass"
   const otherChoice = choice === "smash" ? "pass" : "smash"

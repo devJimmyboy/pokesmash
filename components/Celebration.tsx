@@ -2,18 +2,39 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import ReactCanvasConfetti from "react-canvas-confetti"
 import { gsap } from "gsap"
 import { Promise } from "bluebird"
-import { useBoolean, useRafLoop, useWindowSize } from "react-use"
-import { Button, NoSsr, Portal, useTheme } from "@mui/material"
-import ReactAudioPlayer from "react-audio-player"
-import type { SimulatorRef } from "./Simulator/Simulator"
-import dynamic from "next/dynamic"
-const Simulator = dynamic(() => import("./Simulator/Simulator"), {
-  ssr: false,
-})
+import { useBoolean, useList, useRaf, useRafLoop, useWindowSize } from "react-use"
+import { Button, IconButton, NoSsr, Portal, Typography, useTheme } from "@mui/material"
+import { Howl, Howler } from "howler"
+import { motion, useAnimation } from "framer-motion"
+import { Icon } from "@iconify/react"
+import { useSmash } from "../lib/SmashContext"
+import { createFirebaseApp } from "../firebase/clientApp"
+import { get, getDatabase, ref } from "firebase/database"
+import { useSession } from "next-auth/react"
+import { usePokemonPicture } from "../lib/utils"
+import { FixedSizeList as List, FixedSizeListProps, ListChildComponentProps } from "react-window"
 
-const audioSources = {
-  crescendo: "/sounds/crescendo.mp3",
-  kidCheer: "/sounds/kid-cheer.mp3",
+import useSWR from "swr"
+// import type { SimulatorRef } from "./Simulator/Simulator"
+// import dynamic from "next/dynamic"
+// const Simulator = dynamic(() => import("./Simulator/Simulator"), {
+//   ssr: false,
+// })
+
+var howler = Howler as unknown as HowlerGlobal
+howler.autoUnlock = true
+
+howler.volume(0.5)
+const sounds: { [key: string]: Howl } = {
+  crescendo: new Howl({
+    src: ["/sounds/crescendo.mp3"],
+    sprite: {
+      sound: [0, 6850],
+    },
+  }),
+  confettiPop: new Howl({ src: ["/sounds/pop.mp3"] }),
+  kidCheer: new Howl({ src: ["/sounds/kid-cheer.mp3"] }),
+  music: new Howl({ src: ["/sounds/music/rhubarb-pie.mp3"], loop: true, volume: 0.15 }),
 }
 
 export interface CelebrationRef {
@@ -21,26 +42,35 @@ export interface CelebrationRef {
   confetti: confetti.CreateTypes | null
 }
 var skew = 1
+
+const ids = {
+  root: "#rootText",
+  text: "#celebrateText",
+  scoreText: "#scoreText",
+}
+
 interface Props {}
 
 const text = ["", "Hello there. \nMy name is Professor $m0ak."]
-
 const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => {
   const animRef = useRef<confetti.CreateTypes | null>(null)
-  const audioRef = useRef<ReactAudioPlayer | null>(null)
+  const listRef = useRef<List>(null)
+
+  const [tlTxt] = useState(gsap.timeline({ paused: true }))
   // const simRef = useRef<SimulatorRef>(null)
-  const { width, height } = useWindowSize()
+  // const { width, height } = useWindowSize()
   const [started, start] = useBoolean(false)
-  const [source, setSource] = useState("")
 
   useEffect(() => {
-    if (audioRef.current && audioRef.current.audioEl.current) {
-      audioRef.current.audioEl.current.volume = 0.65
-      console.log("Playing " + source, "volume", audioRef.current.audioEl.current.volume)
-      audioRef.current.audioEl.current.src = source
-      audioRef.current.audioEl.current.play()
-    }
-  }, [source])
+    if (!started) return
+    gsap.set(ids.scoreText, { autoAlpha: 0 })
+    gsap.set(ids.root, { autoAlpha: 0, scale: 0.01 })
+    tlTxt.to(ids.root, { autoAlpha: 1, duration: 0.5, scale: 1, ease: "bounce" }, 0)
+    tlTxt.to(ids.text, { duration: 1, y: -window.innerHeight / 3, ease: "bounce", delay: 5 })
+    tlTxt.call(() => {
+      listRef.current?.scrollTo()
+    })
+  }, [started])
 
   const getInstance = useCallback((instance: confetti.CreateTypes | null) => {
     animRef.current = instance
@@ -50,8 +80,12 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
 
   const [loopStop, loopStart, isActive] = useRafLoop((time) => {
     if (time < 0.5) console.log("Rendering")
-    if (!animRef.current) return
-    skew = Math.max(0.8, skew - 0.001)
+    if (!animRef.current) {
+      console.log("No animation")
+
+      return
+    }
+    if (skew > 0) skew = Math.max(0.8, skew - 0.001)
     animRef.current({
       particleCount: 1,
       startVelocity: randomInRange(0, -10),
@@ -79,10 +113,17 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     tl.to("body", { backgroundColor: "#101010", duration: 7.0 }, 0)
 
     start(true)
-    setSource(audioSources.crescendo)
+    sounds.crescendo.play("sound")
     await tl.play()
-    setSource(audioSources.kidCheer)
+    if (animRef.current) {
+      sounds.confettiPop.play()
+
+      animRef.current({ angle: -90, particleCount: 100, origin: { x: 0.5, y: -0.1 }, spread: 45 })
+    }
+    sounds.kidCheer.play()
     loopStart()
+    tlTxt.play()
+    sounds.music.play()
   }, [start, loopStart, isActive])
 
   React.useImperativeHandle(
@@ -96,6 +137,10 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     }),
     [animRef, start]
   )
+  const [muted, setMuted] = useBoolean(false)
+  useEffect(() => {
+    sounds.music.mute(muted)
+  }, [muted])
 
   if (!started && process.env.NODE_ENV === "development")
     return (
@@ -109,7 +154,6 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
 
   return (
     <>
-      <ReactAudioPlayer ref={(audioR) => (audioRef.current = audioR)} src={source} />
       <ReactCanvasConfetti
         style={{
           position: "fixed",
@@ -122,6 +166,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
         refConfetti={getInstance}
       />
       <div
+        className="flex flex-col items-center justify-center"
         style={{
           position: "absolute",
           zIndex: 999,
@@ -130,13 +175,97 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           height: "100vh",
           top: 0,
           left: 0,
-        }}></div>
+        }}>
+        <IconButton
+          className="fixed top-4 left-4 w-10 h-10"
+          sx={{
+            backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
+            "&:hover": {
+              backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
+              backgroundOpacity: 0.8,
+            },
+          }}
+          onClick={() => setMuted()}>
+          <Icon fontSize={24} icon={muted ? "fa-solid:volume-mute" : "fa-solid:volume"} />
+        </IconButton>
+
+        <div id="rootText" className="flex flex-col items-center justify-center">
+          <div id="scoreText" className="absolute flex flex-col items-center overflow-hidden os-scrollbar-unusable">
+            <ScoresList ref={listRef} />
+          </div>
+          <Typography id="celebrateText" variant="h1" style={{ fontSize: "10vw" }}>
+            Congratulations!
+          </Typography>
+        </div>
+      </div>
     </>
   )
 })
 Celebration.displayName = "Celebration"
 export default Celebration
 
+const MotionText = motion(Typography)
+
 function randomInRange(min: number, max: number) {
   return Math.random() * (max - min) + min
+}
+const app = createFirebaseApp()
+const db = getDatabase(app)
+
+const ScoresList = React.forwardRef<List, {}>((props, listRef) => {
+  const { data: session } = useSession()
+  const [scores, setScores] = useState<("pass" | "smash")[]>([])
+  useEffect(() => {
+    if (!session) return
+    const uid = session.user.name.toLowerCase()
+
+    let choices: ("pass" | "smash")[] = []
+    const userRef = ref(db, `users/${uid}`)
+    const userInfo = get(userRef).then((userData) => {
+      const passes = userData.child("passes").val()
+      const smashes = userData.child("smashes").val()
+      Object.keys(passes).forEach((key) => {
+        choices[Number(key)] = "pass"
+      })
+      Object.keys(smashes).forEach((key) => {
+        choices[Number(key)] = "smash"
+      })
+      if (choices.length < 898) {
+        console.log("??? Couldn't retrieve all scores.")
+      }
+      setScores(choices)
+    })
+  }, [session])
+  const { height, width } = useWindowSize()
+  return (
+    <List itemData={scores} width={width / 3} itemCount={scores.length} height={height} itemSize={76}>
+      {ScoreView}
+    </List>
+  )
+})
+ScoresList.displayName = "ScoresList"
+
+interface ScoreViewProps extends ListChildComponentProps<("pass" | "smash")[]> {}
+
+function ScoreView({ data, index: pokemon, style }: ScoreViewProps) {
+  const { bgUrl, shiny } = usePokemonPicture(pokemon)
+  const { data: pokeInfo } = useSWR(`/api/pokemon/?id=${pokemon}`)
+  const choice = data[pokemon]
+
+  return (
+    <div style={style} className="flex flex-row items-center h-16 w-full justify-between py-2">
+      <div style={{ height: "100%" }}>
+        <img style={{ height: "100%" }} src={bgUrl} />
+      </div>
+      <div className="text-2xl text-green-400">{pokeInfo?.name}</div>
+      <Typography
+        sx={(theme) => ({
+          color: choice === "pass" ? theme.palette.pass.main : theme.palette.smash.main,
+        })}
+        fontSize={24}
+        fontWeight={700}>
+        {choice === "pass" ? "Pass" : "Smash"}
+      </Typography>
+    </div>
+  )
 }
