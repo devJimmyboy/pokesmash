@@ -57,9 +57,6 @@ This website is a means of making that trend have more mainstream accessibility.
 Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
           />
           <meta property="twitter:image" content="/meta.png" />
-
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-          <link href="https://fonts.googleapis.com/css?family=Lilita+One:regular&display=swap" rel="stylesheet" />
         </Head>
         <SmashProvider>
           <ThemeProvider theme={theme}>
