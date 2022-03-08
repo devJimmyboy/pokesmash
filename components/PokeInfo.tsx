@@ -33,14 +33,10 @@ const getBgByType: { [key in PokeType]: string[] } = {
 
 const PokeCard = styled(Card)`
   height: 100%;
-  @media screen and (max-width: 800px){
-     min-width:100%;
+  @media screen and (max-width: 800px) {
+    min-width: 100%;
   }
 
-
-
-  min-width: 450px;
-  max-height: 600px;
   border-radius: 1.5em;
   box-shadow: 2px 4px 4px -2px #000;
 
@@ -93,12 +89,7 @@ export default function PokeInfo({ cardRef }: Props) {
 
   if (!smashCtx || !pokeInfo) {
     return (
-      <div
-        className="cardContainer h-full"
-        style={{
-          minWidth: "450px",
-          maxHeight: "600px",
-        }}>
+      <div className="cardContainer h-full">
         <PokeCard>
           <CircularProgress />
         </PokeCard>
@@ -107,10 +98,7 @@ export default function PokeInfo({ cardRef }: Props) {
   }
 
   return (
-    <div
-      className="cardContainer h-full"
-      style={{
-      }}>
+    <div className="cardContainer h-full">
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: "left" | "right" | "up" | "down") => {

@@ -224,7 +224,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     <SmashContext.Provider
       value={{ currentId, setCurrentId, pokeInfo, style, error, score: { ...score, smash, pass }, shockRef, messages }}>
       {showStyleSwitch && (
-        <Box className="absolute top-2 left-2">
+        <Box className="absolute bottom-2 md:bottom-auto md:top-2 left-2">
           <FormControlLabel
             sx={{ fontWeight: "bold", fontSize: "48px" }}
             control={<StyleSwitch style={style} onSwitch={() => setStyle(style === "hd" ? "showdown" : "hd")} />}

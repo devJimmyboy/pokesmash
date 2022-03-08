@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui/base"
 import { Button, Stack, Typography } from "@mui/material"
-import { styled } from "@mui/material/styles"
+import { styled, css } from "@mui/material/styles"
 import { motion, useAnimation, Variants } from "framer-motion"
 import React from "react"
 import { useKey } from "react-use"
@@ -10,16 +10,23 @@ const MotionButton = motion(Button)
 const ChoiceButtonRoot = styled(MotionButton)`
   --bColor: ${({ theme }) => theme.palette.primary.main};
   display: flex;
-  gap: 6px;
-  @media screen and (max-width: 800px){
-    width: 40%;
-    height: calc(1.5em+5vh);
+  gap: 0.25em;
+  @media screen and (min-width: 800px) {
+    gap: 6px;
+    width: 250px;
+    height: 100px;
+    font-size: 2em;
   }
-  width: 250px;
-  height: 100px;
-  border-radius: 20px;
+  width: 45%;
+  height: calc(1.5em + 5vh);
+
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+
+  border-radius: 1.25rem;
   border: 4px solid var(--bColor);
-  font-size: 2em;
+  font-size: 1.5em;
+
   font-weight: bold;
   color: var(--bColor);
   transition: color 250ms linear;
@@ -53,7 +60,7 @@ const Kbd = styled("kbd")`
 `
 
 const ScoreDisplay = styled("div")`
-  font-size: 32px;
+  font-size: 1em;
   display: flex;
   padding: 0.75em;
   gap: 2px;
@@ -61,9 +68,12 @@ const ScoreDisplay = styled("div")`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
+  @media screen and (min-width: 800px) {
+    border-radius: 0.825rem;
+  }
+  font-weight: normal;
   font-family: "Lilita One", "Segoe UI", sans-serif;
-  border-radius: 15px;
+  border-radius: 0.5rem;
   vertical-align: bottom;
   width: 25px;
   height: 25px;
@@ -85,20 +95,21 @@ interface Props {
 
 export default function SmashPass({ onChoice, smashes, passes }: Props) {
   return (
-    <Stack direction="row" justifyContent="space-around" spacing={6} className="w-full" sx={{ mt: "2em" }}>
-      <Stack direction="column" justifyContent="center" spacing={2}>
-        <ChoiceButton choiceType="pass" onChoice={onChoice}>
-          <span className="flex-grow">Pass</span>
-          <ScoreDisplay className="passes mr-4">{passes}</ScoreDisplay>
-        </ChoiceButton>
-      </Stack>
+    <Stack
+      direction="row"
+      justifyContent="center"
+      spacing={{ md: 6 }}
+      className="w-screen max-w-lg gap-2"
+      sx={{ mt: { sm: "0.5em", xl: "2em" } }}>
+      <ChoiceButton choiceType="pass" onChoice={onChoice}>
+        <span className="flex-grow">Pass</span>
+        <ScoreDisplay className="passes md:mr-4">{passes}</ScoreDisplay>
+      </ChoiceButton>
       {/* <div className="flex-grow" /> */}
-      <Stack direction="column" justifyContent="center" spacing={2}>
-        <ChoiceButton choiceType="smash" onChoice={onChoice}>
-          <ScoreDisplay className="smashes ml-4">{smashes}</ScoreDisplay>
-          <span className="flex-grow">Smash</span>
-        </ChoiceButton>
-      </Stack>
+      <ChoiceButton choiceType="smash" onChoice={onChoice}>
+        <ScoreDisplay className="smashes md:ml-4">{smashes}</ScoreDisplay>
+        <span className="flex-grow">Smash</span>
+      </ChoiceButton>
     </Stack>
   )
 }

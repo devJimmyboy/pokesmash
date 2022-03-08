@@ -51,7 +51,7 @@ export default function UserStats({}: Props) {
   if (!prevPokemon) return null
   return (
     <div className="flex flex-col items-center gap-0.5">
-      <div className="flex flex-row w-full h-full items-center justify-center gap-2">
+      <div className="flex flex-row w-full h-full max-h-24 md:max-h-32 lg:max-h-screen items-center justify-center gap-2">
         <div className="flex flex-col items-end w-1/3">
           <span className="font-semibold text-lg">Passes</span>
           <motion.div
@@ -61,7 +61,7 @@ export default function UserStats({}: Props) {
           <span className="font-semibold text-lg">{pokeDoc?.passes || 0}</span>
         </div>
         <div
-          className="flex flex-col items-center justify-center h-32 aspect-square my-4 rounded-xl overflow-hidden"
+          className="flex flex-col items-center justify-center h-24 md:h-32 aspect-square my-4 rounded-xl overflow-hidden"
           style={{
             border: `4px solid ${theme.palette.primary.main}`,
             backgroundImage: `url(/backgrounds/bg.png)`,

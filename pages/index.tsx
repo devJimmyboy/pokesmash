@@ -82,8 +82,8 @@ const Home: NextPage = () => {
       <PokeInfo cardRef={cardRef} />
 
       {error && <div>Error! {error.message || "Please Reload"}</div>}
-      <Stack direction="column" sx={{ height: 400, mt: 6 }} spacing={4}>
-        <Typography fontSize={32} fontWeight="bold" align="center">
+      <Stack direction="column" sx={{ height: 400, mt: { sm: 2, md: 4, xl: 6 } }} spacing={4}>
+        <Typography fontSize={{ sm: 24, lg: 32 }} fontWeight="bold" align="center">
           Pokemon {currentId} of 898
         </Typography>
         <SmashPass
@@ -100,8 +100,8 @@ const Home: NextPage = () => {
         <LoginButton />
       </Box>
       <Footer>
-        <CreatedCard sx={{ fontSize: [12, 16, 24, 28] }}>
-          Created by{" "}
+        <CreatedCard className="h-8 md:h-auto" sx={{ fontSize: [16, 18, 24, 28] }}>
+          <div className="hidden md:visible">Created by </div>
           <Link
             href="https://jimmyboy.tv"
             target="_blank"
@@ -136,21 +136,35 @@ const Home: NextPage = () => {
 export default Home
 
 const Footer = styled("footer")`
+  @media screen and (min-width: 800px) {
+    bottom: 0;
+    top: unset;
+    width: 100%;
+    gap: unset;
+  }
+  left: 0;
+  top: 0;
+  gap: 0.25em;
   position: fixed;
   pointer-events: none;
-  bottom: 0;
-  width: 100%;
   display: flex;
   flex-direction: row;
 `
 
 const CreatedCard = styled("div")`
+  @media screen and (min-width: 800px) {
+    border-radius: 0.45em 0.45em 0 0;
+    padding: 0.325em 0.825em;
+    font-weight: bold;
+  }
   background: ${(props) => props.theme.palette.twitch.main};
   pointer-events: auto;
   user-select: none;
   font-size: 18px;
-  padding: 0.325em 0.825em;
-  border-radius: 0.45em 0.45em 0 0;
-  margin-left: 15px;
-  font-weight: bold;
+  padding: 0.125em 0.5em;
+
+  border-radius: 0 0 0.45em 0.45em;
+
+  margin-left: 1em;
+  font-weight: 600;
 `

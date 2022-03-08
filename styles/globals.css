@@ -33,11 +33,14 @@ a {
   text-decoration: none;
 }
 
-.cardContainer {
-  @media screen and (max-width: 800px){
-    width: 100%;
-    height: 100%;
+@media screen and (min-width: 800px) {
+  .cardContainer {
+    max-width: 28.125em;
+    max-height: 37.5em;
   }
-  max-width: 28.125em;
-  max-height: 37.5em;
+}
+
+.cardContainer {
+  width: 80vw;
+  height: 50vh;
 }
