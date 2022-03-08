@@ -40,25 +40,29 @@ export default function IdField({}: Props) {
 }
 const InputEditable = styled(InputUnstyled)`
   display: inline;
-  border-radius: 12px;
+  border: none;
+  border-radius: 0.625rem;
   overflow: hidden;
   background: transparent;
   border: 0;
   font-size: 1.5rem;
+  height: 100%;
 
   & .${inputUnstyledClasses.input} {
     border: 0;
-
+    height: 100%;
     outline: none;
     max-width: 4ch;
-    border-radius: 12px;
+    border-radius: 0.625rem;
     background: ${(props) => props.theme.palette.background.paper};
     &:focus-visible {
       outline-color: ${(props) => props.theme.palette.primary.main};
       outline-width: 2px;
       outline-style: auto;
     }
-
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
     text-align: center;
   }
   & .${inputUnstyledClasses.root} {
