@@ -20,25 +20,25 @@ export default function StyleForm({ value, onChange }: Props) {
     <CustomSelect value={value} onChange={onChange}>
       <StyledOption value="showdown">
         <ListItemIconStyled>
-          <img height="100%" src="/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" />
+          <img height="100%" src=" https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" />
         </ListItemIconStyled>
         <div className="opt-text">Showdown Style</div>
       </StyledOption>
       <StyledOption value="hd">
         <ListItemIconStyled>
-          <img height="100%" src="/sprites/pokemon/other/official-artwork/25.png" />
+          <img height="100%" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" />
         </ListItemIconStyled>
         <div className="opt-text">HD Style</div>
       </StyledOption>
       <StyledOption value="3d">
         <ListItemIconStyled>
-          <img height="100%" src="/sprites/pokemon/other/home/25.png" />
+          <img height="100%" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png" />
         </ListItemIconStyled>
         <div className="opt-text">3D Style (Home)</div>
       </StyledOption>
       <StyledOption value="clean">
         <ListItemIconStyled>
-          <img height="100%" src="/sprites/pokemon/other/dream-world/25.svg" />
+          <img height="100%" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/25.svg" />
         </ListItemIconStyled>
         <div className="opt-text">Clean Style</div>
       </StyledOption>
