@@ -75,7 +75,8 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
                 return (
                   <ToastBar
                     style={{
-                      backgroundColor: "#e2e2e2",
+                      backgroundColor: "#222222",
+                      outline: "solid 0.125rem " + theme.palette.twitch.accent.dragon,
                     }}
                     toast={t}>
                     {({ icon, message }) => (
@@ -86,7 +87,7 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
                           <Box
                             component="button"
                             sx={{ width: 20, height: 20, outlineColor: theme.palette.pass.main }}
-                            className="border-none p-0 ml-4 focus:ring rounded-md bg-transparent hover:bg-gray-50 hover:bg-opacity-50 flex flex-col items-center justify-center transition-colors outline-1 hover:outline-2 outline focus:outline-none"
+                            className="border-none p-1 ml-4 focus:ring rounded-md bg-transparent hover:bg-gray-50 hover:bg-opacity-50 flex flex-col items-center justify-center transition-colors outline-1 hover:outline-2 outline focus:outline-none"
                             onClick={() => toast.dismiss(t.id)}>
                             <Icon icon="fa6-solid:xmark" />
                           </Box>
