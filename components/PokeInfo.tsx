@@ -1,12 +1,17 @@
 import { Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material"
-import { styled } from "@mui/system"
+import { useKeyPressEvent } from "react-use"
+import { styled, css } from "@mui/system"
 import { Pokemon, PokemonSpecies } from "pokenode-ts"
-import React, { RefObject, useState } from "react"
+import React, { ReactElement, RefObject, useState } from "react"
 import useSWR from "swr"
 import { useSmash } from "../lib/SmashContext"
-import { capitalizeFirstLetter, hdBuilder, showdownBuilder } from "../lib/utils"
+import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils"
 import SwipeCards, { SwipeRef } from "./SwipeCards"
 import Type, { PokeType } from "./Type"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { useHotkeys } from "react-hotkeys-hook"
+import toast from "react-hot-toast"
 
 type Props = { cardRef: RefObject<SwipeRef> }
 
@@ -52,11 +57,15 @@ const PokeContent = styled(CardContent)`
   flex-direction: column;
   align-items: start;
   justify-content: end;
-  background: linear-gradient(to top, #000 -5%, transparent 25%);
+  background: linear-gradient(to top, #000 -5%, transparent 33%);
   width: 100%;
   height: 100%;
   padding: 20px;
   gap: 2;
+
+  & > #pokeName {
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
+  }
 `
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
@@ -66,33 +75,56 @@ const getBg = (pokeInfo: Pokemon) => {
     Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
   ]
 }
-const getSprite = (currentId: number, style: ReturnType<typeof useSmash>["style"]) => {
-  if (style === "hd") return hdBuilder(currentId)
-  else return showdownBuilder(currentId)
-}
 
 export default function PokeInfo({ cardRef }: Props) {
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const { currentId, pokeInfo, setCurrentId, style, score, shockRef } = smashCtx
   // const cardRef = useRef<any>(null)
   const { data } = useSWR<PokemonSpecies>(() => pokeInfo?.species.url, fetcher)
+  const { bgUrl, shiny } = usePokemonPicture()
 
-  const [bgUrl, setSprite] = useState(pokeInfo && getSprite(currentId, style))
+  useHotkeys(
+    "up",
+    (e) => {
+      console.debug("current id: ", currentId, "current id in score: ", score.currentId)
+      if (currentId > 898) return
+      if (currentId < score.currentId) {
+        setCurrentId((prev) => prev + 1)
+      } else {
+        toast("You haven't Smashed or Passed this Pokemon yet!", { id: "currentId-reached" })
+      }
+    },
+    {},
+    [currentId, score.currentId]
+  )
+  useHotkeys(
+    "down",
+    (e) => {
+      if (currentId > 898) return
+      if (currentId > 1) {
+        setCurrentId((prev) => prev - 1)
+      }
+    },
+    {},
+    [currentId]
+  )
 
   const [chosenBg, setBg] = useState(pokeInfo && getBg(pokeInfo))
   React.useEffect(() => {
     if (pokeInfo) {
       setBg(getBg(pokeInfo))
-      setSprite(getSprite(currentId, style))
     }
   }, [pokeInfo, style])
 
   if (!smashCtx || !pokeInfo) {
     return (
-      <div className="cardContainer h-full">
-        <PokeCard>
-          <CircularProgress />
-        </PokeCard>
+      <div
+        className="cardContainer h-full flex items-center justify-center"
+        style={{
+          minWidth: "450px",
+          maxHeight: "600px",
+        }}>
+        <CircularProgress />
       </div>
     )
   }
@@ -102,11 +134,18 @@ export default function PokeInfo({ cardRef }: Props) {
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: "left" | "right" | "up" | "down") => {
-          if (data?.is_baby && dir === "right") {
-            shockRef.current?.shocked(cardRef)
+          if (currentId === 898) {
+            return setCurrentId((id) => id + 1)
+          } else if (currentId > 898) {
+            return
+          }
+          const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
+          if (shockRef.current && amShocked) {
+            typeof amShocked !== "boolean"
+              ? shockRef.current.shocked(cardRef, amShocked)
+              : shockRef.current.shocked(cardRef)
           } else {
             if (!cardRef.current) console.error("CardRef not found!")
-            if (!window.setTimeout) console.error("window.setTimeout was overridden...")
 
             setTimeout(() => cardRef.current?.reset(), 500)
           }
@@ -118,19 +157,80 @@ export default function PokeInfo({ cardRef }: Props) {
           }
           setCurrentId((id) => id + 1)
         }}>
-        <PokeCard
-          sx={{
-            backgroundImage:
-              "url(" +
-              bgUrl +
-              ")," +
-              `url(/backgrounds/bg-${chosenBg || "beach"}.${chosenBg === "space" ? "jpg" : "png"})`,
-            backgroundSize: "80%, cover",
-            backgroundPosition: "center, left",
-            imageRendering: style === "hd" ? "auto" : "pixelated",
-          }}>
-          <PokeContent className="select-none">
-            <Typography variant="h4" fontWeight={700} component="h1">
+        <PokeCard className={""}>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              position: "absolute",
+              backgroundImage: `url(/backgrounds/bg-${chosenBg || "beach"}.${chosenBg === "space" ? "jpg" : "png"})`,
+              backgroundSize: "cover",
+              backgroundPosition: "left",
+            }}
+          />
+          <div
+            css={css`
+              height: 100%;
+              width: 100%;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+
+              ${style === "hd"
+                ? `image-rendering: auto;`
+                : `image-rendering: -moz-crisp-edges;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;`}
+            `}>
+            {bgUrl.includes("substitute") ? (
+              <>
+                <motion.div
+                  style={{ scale: 3 }}
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                  <img src={bgUrl} />
+                </motion.div>
+                <Typography fontWeight={600} color="HighlightText" mt={8}>
+                  Loading
+                </Typography>
+              </>
+            ) : (
+              <img
+                style={{ transform: style === "showdown" ? "scale(400%)" : "scale(85%)", minWidth: "75px" }}
+                src={bgUrl}
+              />
+            )}
+          </div>
+          {shiny && (
+            <div
+              style={{
+                width: "200%",
+                height: "125%",
+
+                transform: "translateX(-25%) rotate(60deg) ",
+                position: "absolute",
+              }}>
+              <motion.div
+                className={"is-shiny transform-gpu"}
+                animate={{ y: ["-150%", "1500%", "-150%"], rotate: [0, 5, 0], scaleY: [2, 1, 2] }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20,
+                  mass: 0.5,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  repeatDelay: 3,
+                }}></motion.div>
+            </div>
+          )}
+          <PokeContent className="select-none absolute w-full">
+            <Typography id="pokeName" variant="h4" fontWeight={700} component="h1">
               {capitalizeFirstLetter(pokeInfo.name)}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
@@ -146,4 +246,24 @@ export default function PokeInfo({ cardRef }: Props) {
       </SwipeCards>
     </div>
   )
+}
+
+interface ShockedProps {
+  data?: PokemonSpecies
+  pokeInfo: Pokemon
+  dir: "left" | "right" | "up" | "down"
+}
+
+function shouldIBeShocked({ data, pokeInfo, dir }: ShockedProps): boolean | string | ReactElement {
+  if (data?.is_baby && dir === "right") {
+    return true
+  }
+  if (pokeInfo.id === 428 && dir === "left") {
+    return (
+      <Typography className="text-center text-lg">
+        That was the <span className="text-red-600 font-extrabold">wrong fucking</span> move, kid.
+      </Typography>
+    )
+  }
+  return false
 }

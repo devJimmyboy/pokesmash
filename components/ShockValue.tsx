@@ -1,14 +1,22 @@
+import { Typography } from "@mui/material"
 import { motion, useAnimation } from "framer-motion"
 import Image from "next/image"
-import React, { RefObject, useEffect, useState } from "react"
+import React, { ReactElement, RefObject, useEffect, useState } from "react"
 import { SwipeRef } from "./SwipeCards"
 export type ShockRef = {
-  shocked: (cardRef?: RefObject<SwipeRef>) => void
+  shocked: (cardRef?: RefObject<SwipeRef>, text?: string | ReactElement) => void
 }
 type Props = {}
 
+const defaultShockText = (
+  <Typography className="text-center text-lg">
+    That was a <span className="text-red-600 font-extrabold">fucking</span> Child.
+  </Typography>
+)
+
 const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
   const [src, setSource] = useState("/sounds/thud.opus")
+  const [shockText, setShockText] = useState<string | ReactElement>(defaultShockText)
   const audio = React.useRef<HTMLAudioElement>(null)
   const api = useAnimation()
   useEffect(() => {
@@ -17,11 +25,12 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
     }
   }, [audio])
   React.useImperativeHandle(ref, () => ({
-    shocked: async (cardRef) => {
+    shocked: async (cardRef, text) => {
       if (audio.current) {
         if (audio.current.paused) audio.current.play()
         else audio.current.currentTime = 0
       }
+      if (text) setShockText(text)
       await api.start({
         opacity: 1,
         scale: 1.25,
@@ -51,14 +60,20 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
             position: "absolute",
             translateX: "-50%",
             translateY: "-50%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
             transformOrigin: "0.5 0.5",
             top: "50%",
             left: "50%",
             opacity: 0,
             scale: 0.75,
+            maxWidth: 128,
           }}
           animate={api}>
           <Image width={128} height={128} src="/img/HUH.png" alt="HUH" />
+          {shockText}
         </motion.div>
       </div>
     </>

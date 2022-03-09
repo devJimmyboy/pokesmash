@@ -52,7 +52,7 @@ type TypeToColor = {
   [t in PokeType]: string
 }
 
-const typeToColor: TypeToColor = {
+export const typeToColor: TypeToColor = {
   bug: "#A8B820",
   dark: "#705848",
   dragon: "#7038F8",

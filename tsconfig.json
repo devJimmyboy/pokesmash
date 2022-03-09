@@ -1,22 +1,37 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["types"],
+    "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
     "incremental": true,
-    "noEmit": true
+    "target": "es5"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "functions"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "pages/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "types/**/*",
+    "firebase/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "functions",
+    "scripts"
+  ]
 }

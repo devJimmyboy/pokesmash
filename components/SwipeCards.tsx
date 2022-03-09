@@ -1,8 +1,10 @@
 import React, { PropsWithChildren, PropsWithRef, useState } from "react"
 import { useSpring, animated, to as interpolate, SpringValue } from "@react-spring/web"
+import type { SpringRef } from "@react-spring/web"
+
 import { useDrag } from "@use-gesture/react"
 import styles from "../styles/Deck.module.css"
-import { motion, useAnimationFrame } from "framer-motion"
+import { useAnimationFrame } from "framer-motion"
 import { Icon } from "@iconify/react"
 import { useTheme } from "@mui/system"
 import { useWindowSize } from "react-use"
@@ -26,6 +28,7 @@ const trans = (r: number, s: number) => `  rotateZ(${r}deg) scale(${s})`
 export interface SwipeRef {
   x: SpringValue<number>
   y: SpringValue<number>
+  api: SpringRef<any>
 
   reset: () => Promise<void>
   swipe: (dir: "left" | "right" | "up" | "down") => Promise<void>
@@ -83,6 +86,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
   React.useImperativeHandle(
     ref,
     () => ({
+      api,
       x,
       y,
       async reset() {
@@ -94,7 +98,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
           xDir = direction === "left" ? -1 : direction === "right" ? 1 : 0
         api.start(() => ({
           x: windowWidth * xDir,
-          y: window.innerHeight * yDir,
+          y: windowHeight * yDir,
           rot: 45 * xDir,
           scale: 1.1,
           delay: undefined,
@@ -113,6 +117,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         <animated.div
           {...bind()}
           style={{
+            width: "100%",
             transform: interpolate([rot, scale], trans),
           }}>
           <animated.div className="absolute w-full h-full z-10 select-none" style={{ opacity }}>
