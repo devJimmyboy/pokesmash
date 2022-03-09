@@ -135,8 +135,8 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     passes: 0,
     currentId: 1,
   })
-  
-  const [seenMessages, setSeenMessages] = useSessionStorage("seenMessages", [])
+
+  const [seenMessages, setSeenMessages] = useSessionStorage<string[]>("seenMessages", [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
@@ -176,19 +176,16 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
             icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
             style: { color: msg?.color },
             id: msg.id,
-            duration: msg?.duration || 15000
+            duration: msg?.duration || 15000,
           })
         })
     }
   }, [messages])
 
   React.useEffect(() => {
-    
-
     const uid = session?.user.name.toLowerCase()
-    const forArr = [ "all"]
-    if(uid)
-      forArr.push(uid)
+    const forArr = ["all"]
+    if (uid) forArr.push(uid)
     const messages = query<FBMessage>(
       collection(fs, `messages`) as CollectionReference<FBMessage>,
       where("for", "in", forArr)
@@ -197,7 +194,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       if (payload.empty) return
       console.log("Messages received: ", payload.size)
       payload.forEach((msg) => {
-        setMessages.push({ ...msg.data(), id: msg.id})
+        setMessages.push({ ...msg.data(), id: msg.id })
       })
     })
     if (!session) return
