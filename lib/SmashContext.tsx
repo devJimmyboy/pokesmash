@@ -171,13 +171,20 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (messages[0] && messages.filter((msg) => !seenMessages.includes(msg?.id)).length > 0) {
       messages
         .filter((msg) => !seenMessages.includes(msg?.id))
-        .forEach((msg) => {
-          toast(msg.message, {
-            icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
-            style: { color: msg?.color },
-            id: msg.id,
-            duration: msg?.duration || 15000,
-          })
+        .forEach((msg, i) => {
+          function runMsgToast() {
+            toast(msg.message, {
+              icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
+              style: { color: msg?.color },
+              id: msg.id,
+              duration: msg?.duration || 15000,
+            })
+          }
+          if (i === 0) runMsgToast()
+          else {
+            setTimeout(runMsgToast, i * 1000)
+          }
+          setSeenMessages([...seenMessages, msg.id])
         })
     }
   }, [messages])
