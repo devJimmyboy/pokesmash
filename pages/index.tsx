@@ -27,7 +27,7 @@ const headerCSS = css`
 
 const Home: NextPage = () => {
   const theme = useTheme()
-  const { error, score } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
+  const { error, score, currentId} = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const cardRef = React.useRef<SwipeRef>(null)
 
   return (
@@ -91,6 +91,7 @@ const Home: NextPage = () => {
             smashes={score.smashes}
             passes={score.passes}
             onChoice={(ch) => {
+                if(currentId >898) return;
               cardRef.current?.swipe(ch === "smash" ? "right" : "left")
             }}
           />

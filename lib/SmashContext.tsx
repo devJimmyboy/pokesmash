@@ -62,8 +62,8 @@ export type FBMessage = {
   message: string
   icon?: string
   color?: string
+  duration?: number
   for: string
-  played?: boolean
   data?: {
     url?: string
   }
@@ -135,6 +135,8 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     passes: 0,
     currentId: 1,
   })
+  
+  const [seenMessages, setSeenMessages] = useSessionStorage("seenMessages", [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
@@ -168,32 +170,37 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   React.useEffect(() => {
     if (messages[0] && messages.filter((msg) => !msg.played).length > 0) {
       messages
-        .filter((msg) => !msg?.played)
+        .filter((msg) => !seenMessages.includes(msg?.id))
         .forEach((msg) => {
           toast(msg.message, {
             icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
             style: { color: msg?.color },
             id: msg.id,
+            duration: msg?.duration || 15000
           })
         })
     }
   }, [messages])
 
   React.useEffect(() => {
-    if (!session) return
+    
 
-    const uid = session.user.name.toLowerCase()
+    const uid = session?.user.name.toLowerCase()
+    const forArr = [ "all"]
+    if(uid)
+      forArr.push(uid)
     const messages = query<FBMessage>(
       collection(fs, `messages`) as CollectionReference<FBMessage>,
-      where("for", "in", [uid, "all"])
+      where("for", "in", forArr)
     )
     const unsubMessages = onSnapshot<FBMessage>(messages, (payload) => {
       if (payload.empty) return
       console.log("Messages received: ", payload.size)
       payload.forEach((msg) => {
-        setMessages.push({ ...msg.data(), id: msg.id, played: false })
+        setMessages.push({ ...msg.data(), id: msg.id})
       })
     })
+    if (!session) return
     const userRef = ref(db, `users/${uid}`)
     const unsub = onValue(userRef, (user) => {
       if (!user.exists()) return

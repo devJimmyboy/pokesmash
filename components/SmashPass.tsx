@@ -125,6 +125,7 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
     },
   }
   const onClick = async () => {
+
     await api.start("selected", { duration: 0.15 })
 
     onChoice(choiceType)

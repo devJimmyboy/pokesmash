@@ -84,8 +84,9 @@ export default function PokeInfo({ cardRef }: Props) {
 
   useHotkeys(
     "up",
-    (e) => {
-      console.log("current id: ", currentId, "current id in score: ", score.currentId)
+    (e) => { 
+      console.debug("current id: ", currentId, "current id in score: ", score.currentId)
+      if(currentId >898) return;
       if (currentId < score.currentId) {
         setCurrentId((prev) => prev + 1)
       } else {
@@ -98,6 +99,7 @@ export default function PokeInfo({ cardRef }: Props) {
   useHotkeys(
     "down",
     (e) => {
+      if(currentId >898) return;
       if (currentId > 1) {
         setCurrentId((prev) => prev - 1)
       }
