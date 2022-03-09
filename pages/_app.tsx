@@ -75,7 +75,7 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
                 return (
                   <ToastBar
                     style={{
-                      backgroundColor: theme.palette.background.paper,
+                      backgroundColor: "#e2e2e2",
                     }}
                     toast={t}>
                     {({ icon, message }) => (
