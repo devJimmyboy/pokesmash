@@ -1,15 +1,19 @@
 import { Icon } from "@iconify/react"
-import { Avatar, Button, ButtonProps, Card, CardContent, Stack } from "@mui/material"
+import { Avatar, Button, ButtonProps, Card, CardContent, IconButton, Stack } from "@mui/material"
 import { styled } from "@mui/system"
 import classNames from "classnames"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
 
-const SignInBtn = styled(Button)`
+const SignInBtn = styled(IconButton)`
   --twitchAlpha: 0.75;
   box-shadow: none;
   text-transform: none;
-  font-size: 16px;
+  font-size: 0.825rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.125rem;
   padding: 6px 12px;
   border: 3px solid;
   font-weight: 700;
@@ -38,8 +42,6 @@ const SignInBtn = styled(Button)`
 export default function LoginButton(props: ButtonProps) {
   const { data: session } = useSession()
   const router = useRouter()
-  const cardClasses = classNames("m-4")
-  const cardContentClasses = classNames("p-4")
   if (session) {
     return (
       <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
@@ -48,17 +50,15 @@ export default function LoginButton(props: ButtonProps) {
           onClick={() => router.push(`/users/${session.user.name}`)}
           src={session.user.profileImageUrl || ""}
         />
-        <SignInBtn startIcon={<Icon icon="mdi:logout" />} onClick={() => signOut()}>
-          Sign out
+        <SignInBtn onClick={() => signOut()}>
+          <Icon fontSize={24} icon="mdi:logout" />
         </SignInBtn>
       </Stack>
     )
   }
   return (
-    <SignInBtn
-      variant="outlined"
-      startIcon={<Icon fontSize={32} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />}
-      onClick={() => signIn("twitch")}>
+    <SignInBtn onClick={() => signIn("twitch")}>
+      <Icon fontSize={24} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
       Sign in with Twitch
     </SignInBtn>
   )

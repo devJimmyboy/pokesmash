@@ -27,7 +27,7 @@ const headerCSS = css`
 
 const Home: NextPage = () => {
   const theme = useTheme()
-  const { error, score, currentId} = useSmash() as NonNullable<ReturnType<typeof useSmash>>
+  const { error, score, currentId } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const cardRef = React.useRef<SwipeRef>(null)
 
   return (
@@ -78,11 +78,11 @@ const Home: NextPage = () => {
         <PokeInfo cardRef={cardRef} />
 
         {error && <div>Error! {error.message || "Please Reload"}</div>}
-        <Stack direction="column" sx={{ height: 400, mt: 6 }} spacing={[2, 4]}>
+        <Stack direction="column" sx={{ height: 400, mt: { sm: 2, md: 4, xl: 6 } }} spacing={4}>
           <Typography
             component="div"
             className="flex flex-row gap-2 justify-center items-center"
-            fontSize={[24, 32]}
+            fontSize={{ sm: 24, lg: 32 }}
             fontWeight="bold"
             align="center">
             Pokemon <IdField /> of 898
@@ -91,7 +91,7 @@ const Home: NextPage = () => {
             smashes={score.smashes}
             passes={score.passes}
             onChoice={(ch) => {
-                if(currentId >898) return;
+              if (currentId > 898) return
               cardRef.current?.swipe(ch === "smash" ? "right" : "left")
             }}
           />
@@ -103,8 +103,8 @@ const Home: NextPage = () => {
         </Box>
         <KeyBinds />
         <Footer>
-          <CreatedCard sx={{ fontSize: [16, 22, 22, 28] }}>
-            Created by{" "}
+          <CreatedCard className="h-8 md:h-auto" sx={{ fontSize: [16, 18, 24, 28] }}>
+            <div className="hidden md:inline">Created by </div>
             <Link
               href="https://jimmyboy.tv"
               target="_blank"
@@ -127,10 +127,7 @@ const Home: NextPage = () => {
             className="pointer-events-auto p-0 m-0 mr-12"
             title="Support me for more content like this!"
             placement="left-start">
-            <IconButton
-              className="w-10 h-10 p-0 m-0 fancy-bg"
-              target="_blank"
-              href="https://www.patreon.com/devJimmyboy">
+            <IconButton className="w-10 h-10 p-0 m-0" target="_blank" href="https://www.patreon.com/devJimmyboy">
               <Icon fontSize={18} icon="fa-brands:patreon" />
             </IconButton>
           </Tooltip>
@@ -142,21 +139,35 @@ const Home: NextPage = () => {
 
 export default Home
 const Footer = styled("footer")`
+  @media screen and (min-width: 800px) {
+    bottom: 0;
+    top: unset;
+    width: 100%;
+    gap: unset;
+  }
+  left: 0;
+  top: 0;
+  gap: 0.25em;
   position: fixed;
   pointer-events: none;
-  bottom: 0;
-  width: 100%;
   display: flex;
   flex-direction: row;
 `
 
 const CreatedCard = styled("div")`
+  @media screen and (min-width: 800px) {
+    border-radius: 0.45em 0.45em 0 0;
+    padding: 0.325em 0.825em;
+    font-weight: bold;
+  }
   background: ${(props) => props.theme.palette.twitch.main};
   pointer-events: auto;
   user-select: none;
   font-size: 18px;
-  padding: 0.325em 0.825em;
-  border-radius: 0.45em 0.45em 0 0;
-  margin-left: 15px;
-  font-weight: bold;
+  padding: 0.125em 0.5em;
+
+  border-radius: 0 0 0.45em 0.45em;
+
+  margin-left: 1em;
+  font-weight: 600;
 `

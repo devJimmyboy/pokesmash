@@ -255,7 +255,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       <Celebration ref={celebrateRef} />
       <div id="appControl">
         {showStyleSwitch && (
-          <Box className="absolute top-2 left-2">
+          <Box className="absolute bottom-2 md:bottom-auto md:top-2 left-2">
             <StyleForm value={style} onChange={(s) => setStyle(s as Styling)} />
           </Box>
         )}

@@ -7,6 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    screens: { md: "800px" },
   },
   corePlugins: { preflight: false },
   plugins: [],

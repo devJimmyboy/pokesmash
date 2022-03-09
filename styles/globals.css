@@ -56,3 +56,15 @@ kbd {
 .fancy-bg {
   background: linear-gradient(45deg, #fe6b8b 30%, #ff8e53 90%);
 }
+
+@media screen and (min-width: 800px) {
+  .cardContainer {
+    max-width: 28.125em;
+    max-height: 37.5em;
+  }
+}
+
+.cardContainer {
+  width: 80vw;
+  height: 50vh;
+}

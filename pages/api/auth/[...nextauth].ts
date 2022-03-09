@@ -1,5 +1,5 @@
 import NextAuth, { User } from "next-auth"
-import TwitchProvider from "next-auth/providers/twitch"
+import TwitchProvider from "next-auth/providers/twitch";
 import { FirebaseAdapter } from "../../../lib/FirebaseAdapter"
 import { ClientCredentialsAuthProvider } from "@twurple/auth"
 import { ApiClient, HelixUser } from "@twurple/api"
@@ -21,7 +21,7 @@ export default NextAuth({
         const userInfo = await api.users.getUserById(profile.sub) as HelixUser;
         const user: User = {
           id: profile.sub,
-          name: profile.preferred_username,
+          name: profile.preferred_username?.toLowerCase() || userInfo.name,
           email: profile.email,
           username: userInfo.name,
           displayName: userInfo.displayName,
