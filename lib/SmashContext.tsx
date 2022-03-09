@@ -168,7 +168,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   // In app messages
   React.useEffect(() => {
-    if (messages[0] && messages.filter((msg) => !msg.played).length > 0) {
+    if (messages[0] && messages.filter((msg) => !seenMessages.includes(msg?.id)).length > 0) {
       messages
         .filter((msg) => !seenMessages.includes(msg?.id))
         .forEach((msg) => {
