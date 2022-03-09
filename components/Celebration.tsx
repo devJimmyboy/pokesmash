@@ -62,6 +62,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
   const [started, start] = useBoolean(false)
 
   useEffect(() => {
+    if (!started) return
     gsap.set(ids.scoreText, { autoAlpha: 0 })
     gsap.set(ids.root, { autoAlpha: 0, scale: 0.01 })
   }, [started])
@@ -171,14 +172,6 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     sounds.music.mute(muted)
   }, [muted])
 
-  if (!started && process.env.NODE_ENV === "development")
-    return (
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)" }}>
-        <Button size="large" onClick={onStart}>
-          Start Celebration Sequence
-        </Button>
-      </div>
-    )
   if (!started) return null
 
   return (

@@ -27,22 +27,8 @@ const headerCSS = css`
 
 const Home: NextPage = () => {
   const theme = useTheme()
-  const { error, score, messages, setMessages } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
+  const { error, score } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const cardRef = React.useRef<SwipeRef>(null)
-
-  React.useEffect(() => {
-    if (messages[0] && messages.filter((msg) => !msg.played).length > 0) {
-      messages
-        .filter((msg) => !msg?.played)
-        .forEach((msg) => {
-          toast(msg.message, {
-            icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
-            style: { color: msg?.color },
-            id: msg.id,
-          })
-        })
-    }
-  }, [messages])
 
   return (
     <>

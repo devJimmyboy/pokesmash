@@ -14,6 +14,8 @@ import { ListActions } from "react-use/lib/useList"
 import gsap from "gsap"
 import Celebration, { CelebrationRef } from "../components/Celebration"
 import { collection, CollectionReference, getFirestore, onSnapshot, query, where } from "firebase/firestore"
+import toast from "react-hot-toast"
+import { Icon } from "@iconify/react"
 
 declare global {
   interface PokemonModel {
@@ -161,6 +163,22 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
     setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
   }, [currentId, session, pokeRef])
+
+  // In app messages
+  React.useEffect(() => {
+    if (messages[0] && messages.filter((msg) => !msg.played).length > 0) {
+      messages
+        .filter((msg) => !msg?.played)
+        .forEach((msg) => {
+          toast(msg.message, {
+            icon: <Icon icon={msg.icon || "fa-solid:comment"} />,
+            style: { color: msg?.color },
+            id: msg.id,
+          })
+        })
+    }
+  }, [messages])
+
   React.useEffect(() => {
     if (!session) return
 
