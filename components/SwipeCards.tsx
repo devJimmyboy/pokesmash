@@ -117,6 +117,7 @@ const SwipeCards = React.forwardRef<SwipeRef, PropsWithChildren<Props>>(({ child
         <animated.div
           {...bind()}
           style={{
+            width: "100%",
             transform: interpolate([rot, scale], trans),
           }}>
           <animated.div className="absolute w-full h-full z-10 select-none" style={{ opacity }}>

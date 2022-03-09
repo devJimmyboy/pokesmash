@@ -38,9 +38,10 @@ const getBgByType: { [key in PokeType]: string[] } = {
 
 const PokeCard = styled(Card)`
   height: 100%;
-  min-width: 450px;
-  max-height: 600px;
-  position: relative;
+  @media screen and (max-width: 800px) {
+    min-width: 100%;
+  }
+
   border-radius: 1.5em;
   box-shadow: 2px 4px 4px -2px #000;
 
@@ -84,9 +85,9 @@ export default function PokeInfo({ cardRef }: Props) {
 
   useHotkeys(
     "up",
-    (e) => { 
+    (e) => {
       console.debug("current id: ", currentId, "current id in score: ", score.currentId)
-      if(currentId >898) return;
+      if (currentId > 898) return
       if (currentId < score.currentId) {
         setCurrentId((prev) => prev + 1)
       } else {
@@ -99,7 +100,7 @@ export default function PokeInfo({ cardRef }: Props) {
   useHotkeys(
     "down",
     (e) => {
-      if(currentId >898) return;
+      if (currentId > 898) return
       if (currentId > 1) {
         setCurrentId((prev) => prev - 1)
       }
@@ -129,15 +130,15 @@ export default function PokeInfo({ cardRef }: Props) {
   }
 
   return (
-    <div
-      className="cardContainer h-full"
-      style={{
-        minWidth: "28.125em",
-        maxHeight: "37.5em",
-      }}>
+    <div className="cardContainer h-full">
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: "left" | "right" | "up" | "down") => {
+          if (currentId === 898) {
+            return setCurrentId((id) => id + 1)
+          } else if (currentId > 898) {
+            return
+          }
           const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
           if (shockRef.current && amShocked) {
             typeof amShocked !== "boolean"
@@ -192,7 +193,7 @@ export default function PokeInfo({ cardRef }: Props) {
                   style={{ scale: 3 }}
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
-                  <img src={`/sprites/pokemon/versions/generation-v/black-white/substitute.png`} />
+                  <img src={bgUrl} />
                 </motion.div>
                 <Typography fontWeight={600} color="HighlightText" mt={8}>
                   Loading
@@ -228,7 +229,7 @@ export default function PokeInfo({ cardRef }: Props) {
                 }}></motion.div>
             </div>
           )}
-          <PokeContent className="select-none absolute">
+          <PokeContent className="select-none absolute w-full">
             <Typography id="pokeName" variant="h4" fontWeight={700} component="h1">
               {capitalizeFirstLetter(pokeInfo.name)}
             </Typography>

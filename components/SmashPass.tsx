@@ -59,7 +59,7 @@ const Kbd = styled("kbd")`
   margin: 0 0.4em;
 `
 
-const ScoreDisplay = styled("div")`
+export const ScoreDisplay = styled("div")`
   font-size: 1em;
   display: flex;
   padding: 0.75em;

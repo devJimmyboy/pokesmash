@@ -5,6 +5,7 @@ import { ClientCredentialsAuthProvider } from "@twurple/auth"
 import { ApiClient, HelixUser } from "@twurple/api"
 
 import { createFirebaseApp } from "../../../firebase/clientApp"
+import admin from "../../../firebase/adminApp";
 
 const app = createFirebaseApp();
 
@@ -47,12 +48,35 @@ export default NextAuth({
       session.user = user;
       return session
     },
+
   },
   events: {
-    // async createUser({ user }) {
-    //   const client = await clientPromise;
-    //   const db = client.db();
-    //   const scores = db.collection<ScoreSchema>("scores");
-    // }
+    async signIn({ user }) {
+      const db = admin.database();
+      const userScoreRef = db.ref(`users/${user.name.toLowerCase()}`);
+      await userScoreRef.get().then(scores => {
+        if (!scores.exists()) {
+          userScoreRef.set({
+            currentId: 1,
+            passCount: 0,
+            smashCount: 0,
+            passes: {},
+            smashes: {}
+          })
+        }
+      })
+    },
+    async createUser({ user }) {
+      const db = admin.database();
+      const userScoreRef = db.ref(`users/${user.name.toLowerCase()}`);
+      await userScoreRef.set({
+        currentId: 1,
+        passCount: 0,
+        smashCount: 0,
+        passes: {},
+        smashes: {}
+      })
+
+    }
   }
 })

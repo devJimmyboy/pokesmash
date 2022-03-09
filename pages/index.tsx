@@ -18,11 +18,14 @@ import toast from "react-hot-toast"
 
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
-
   font-weight: bold;
   font-family: Pokemon;
   cursor: default;
   user-select: none;
+  font-size: 2rem;
+  @media screen and (min-width: 600px) {
+    font-size: calc(1rem + 4vh);
+  }
 `
 
 const Home: NextPage = () => {
@@ -42,7 +45,6 @@ const Home: NextPage = () => {
           height: "100vh",
         }}>
         <Typography
-          fontSize={{ sm: "2vh", md: "4vh", xl: "6vh" }}
           variant="h4"
           component="h1"
           css={headerCSS}
@@ -54,7 +56,6 @@ const Home: NextPage = () => {
           Poké
           <Typography
             display="inline"
-            fontSize={{ sm: "2vh", md: "4vh", xl: "6vh" }}
             css={css`
               margin-left: 8px;
               font-family: "Lilita One";
@@ -67,6 +68,10 @@ const Home: NextPage = () => {
               background-size: 120%;
               background-position: center;
               transition: color 0.4s ease-in-out;
+              font-size: 2rem;
+              @media screen and (min-width: 600px) {
+                font-size: calc(1rem + 4vh);
+              }
               &:hover {
                 color: transparent;
                 background-image: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/4x);
@@ -78,11 +83,10 @@ const Home: NextPage = () => {
         <PokeInfo cardRef={cardRef} />
 
         {error && <div>Error! {error.message || "Please Reload"}</div>}
-        <Stack direction="column" sx={{ height: 400, mt: { sm: 2, md: 4, xl: 6 } }} spacing={4}>
+        <Stack direction="column" sx={{ height: 400, mt: "1rem" }} spacing={4}>
           <Typography
             component="div"
-            className="flex flex-row gap-2 justify-center items-center"
-            fontSize={{ sm: 24, lg: 32 }}
+            className="flex flex-row gap-2 justify-center items-center text-lg md:text-xl lg:text-2xl xl:text-3xl"
             fontWeight="bold"
             align="center">
             Pokemon <IdField /> of 898
@@ -103,7 +107,7 @@ const Home: NextPage = () => {
         </Box>
         <KeyBinds />
         <Footer>
-          <CreatedCard className="h-8 md:h-auto" sx={{ fontSize: [16, 18, 24, 28] }}>
+          <CreatedCard sx={{ fontSize: [16, 18, 24, 28] }}>
             <div className="hidden md:inline">Created by </div>
             <Link
               href="https://jimmyboy.tv"
@@ -124,10 +128,13 @@ const Home: NextPage = () => {
           </CreatedCard>
           <div className="flex-grow" />
           <Tooltip
-            className="pointer-events-auto p-0 m-0 mr-12"
+            className="pointer-events-auto "
             title="Support me for more content like this!"
             placement="left-start">
-            <IconButton className="w-10 h-10 p-0 m-0" target="_blank" href="https://www.patreon.com/devJimmyboy">
+            <IconButton
+              className="fancy-bg w-10 h-10 m-2 mr-6 mb-6"
+              target="_blank"
+              href="https://www.patreon.com/devJimmyboy">
               <Icon fontSize={18} icon="fa-brands:patreon" />
             </IconButton>
           </Tooltip>
@@ -144,9 +151,11 @@ const Footer = styled("footer")`
     top: unset;
     width: 100%;
     gap: unset;
+    align-items: end;
   }
   left: 0;
   top: 0;
+  align-items: start;
   gap: 0.25em;
   position: fixed;
   pointer-events: none;

@@ -15,7 +15,7 @@ export const usePokemonPicture = (i?: number) => {
   const { chance, style, currentId, pokeInfo } = useSmash()
 
   const [shiny, setShiny] = React.useState(false);
-  const [sprite, setSprite] = React.useState("/sprites/pokemon/substitute.png");
+  const [sprite, setSprite] = React.useState(buildUrl("/substitute.png"));
   React.useEffect(() => {
 
     const id = i || currentId;
