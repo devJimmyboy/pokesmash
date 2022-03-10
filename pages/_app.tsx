@@ -34,12 +34,11 @@ export default function MyApp(props: MyAppProps) {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
           <link rel="icon" type="image/png" href="/favicon.png" />
           <title>Pokémon Smash or Pass</title>
-          <meta name="title" content="PokéSmash - Pokémon Smash or Pass" />
+          <meta name="title" content="PokeSmash - Pokémon Smash or Pass" />
           <meta
-            name="Description"
-            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon. This website is a means of making that trend have more mainstream accessibility.Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
+            name="description"
+            content="A website that's a means of making the Pokemon Smash or Pass trend have more mainstream accessibility.Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
           />
-          <meta name="robots" content="noindex,nofollow" />
 
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://pokesmash.xyz/" />
