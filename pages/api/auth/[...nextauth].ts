@@ -1,13 +1,13 @@
 import NextAuth, { User } from "next-auth"
 import TwitchProvider from "next-auth/providers/twitch";
+import { FirebaseAdapter } from "../../../lib/FirebaseAdapter"
 import { ClientCredentialsAuthProvider } from "@twurple/auth"
 import { ApiClient, HelixUser } from "@twurple/api"
 
 import admin from "../../../firebase/adminApp";
-//ts-ignore
-import { FirebaseAdminAdapter } from "../../../lib/FirebaseAdminAdapter";
+import { createFirebaseApp } from "../../../firebase/clientApp";
 
-const app = admin.app();
+const app = createFirebaseApp()
 
 const auth = new ClientCredentialsAuthProvider(process.env.TWITCH_ID as string, process.env.TWITCH_SECRET as string)
 const api = new ApiClient({ authProvider: auth })
@@ -39,7 +39,7 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  adapter: FirebaseAdminAdapter(app),
+  adapter: FirebaseAdapter(app),
   callbacks: {
     async session({ session, user }) {
       if (user.access_token)
