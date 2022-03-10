@@ -118,7 +118,10 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             </IconButton>
           </Tooltip>
           <div className="flex flex-row gap-6 items-center w-11/12 my-2 md:my-4 lg:my-6 ">
-            <div ref={pictureBgRef} className="rounded-full absolute w-24 border-purple-700" />
+            <div
+              ref={pictureBgRef}
+              className="rounded-full absolute w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 border-purple-700"
+            />
             <Avatar
               className=" w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 "
               alt={user?.name}

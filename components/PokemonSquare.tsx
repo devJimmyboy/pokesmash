@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function PokemonSquare({ i, style, choice }: Props) {
-  const { bgUrl, shiny } = usePokemonPicture(i + 1)
+  const { bgUrl, shiny } = usePokemonPicture(i)
 
   return (
     <Box
@@ -38,7 +38,7 @@ export default function PokemonSquare({ i, style, choice }: Props) {
           variant="h4"
           component="h4"
           fontWeight={600}>
-          {(i + 1).toString()}
+          {i.toString()}
         </Typography>
         <Typography className="hidden group-hover:inline text-lg" variant="h4" component="h4" fontWeight={700}>
           {choice as string}
