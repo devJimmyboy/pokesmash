@@ -16,6 +16,7 @@ import Celebration, { CelebrationRef } from "../components/Celebration"
 import { collection, CollectionReference, getFirestore, onSnapshot, query, where } from "firebase/firestore"
 import toast from "react-hot-toast"
 import { Icon } from "@iconify/react"
+import { useObjectVal } from "react-firebase-hooks/database"
 
 declare global {
   interface PokemonModel {
@@ -35,6 +36,9 @@ declare global {
 }
 
 interface Score {
+  choices: {
+    [id: string]: "smash" | "pass" | null
+  }
   smashes: number
   passes: number
   currentId: number
@@ -78,6 +82,7 @@ const SmashContext = React.createContext<CtxData>({
   error: undefined,
   shockRef: { current: null },
   score: {
+    choices: {},
     smashes: 0,
     passes: 0,
     currentId: 1,
@@ -134,7 +139,11 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     smashes: 0,
     passes: 0,
     currentId: 1,
+    choices: {},
   })
+  const [dbScore, loadingDbScore, errorDbStore] = useObjectVal(
+    session ? ref(db, `users/${session.user.name.toLowerCase()}`) : null
+  )
 
   const [seenMessages, setSeenMessages] = useSessionStorage<string[]>("seenMessages", [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
@@ -158,12 +167,24 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (currentId > 898) return
 
     fetch(`/api/choice?id=${currentId}&choice=smash`, { method: "POST" })
-    setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 , passes: prev.passes + (currentId < score.currentId ?  -1: 0)}))
+    setScore((prev) => {
+      prev.smashes++
+      if (!prev.choices) prev.choices = {}
+      prev.choices[`${currentId}`] = "smash"
+      if (prev.choices[`${currentId}`] === "pass") prev.passes--
+      return prev
+    })
   }, [currentId, session, pokeRef])
   const pass = React.useCallback(async () => {
     if (currentId > 898) return
     fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
-    setScore((prev) => ({ ...prev, passes: prev.passes + 1, smashes: prev.smashes + (currentId < score.currentId ?  -1: 0)}))
+    setScore((prev) => {
+      prev.passes++
+      if (!prev.choices) prev.choices = {}
+      prev.choices[`${currentId}`] = "pass"
+      if (prev.choices[`${currentId}`] === "smash") prev.smashes--
+      return prev
+    })
   }, [currentId, session, pokeRef])
 
   // In app messages
@@ -211,13 +232,13 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       const smashCount = user.child("smashCount").val()
       const passCount = user.child("passCount").val()
       const _id = user.child("currentId").val()
-      setScore({
+      setScore((prev) => ({
+        ...prev,
         smashes: smashCount || 0,
         passes: passCount || 0,
         currentId: _id || currentId,
-      })
-      if(_id)
-      setCurrentId(_id)
+      }))
+      if (_id) setCurrentId(_id)
     })
     return () => {
       unsub()

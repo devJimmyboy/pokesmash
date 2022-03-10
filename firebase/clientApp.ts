@@ -1,6 +1,7 @@
 import { initializeApp, getApps, FirebaseOptions, FirebaseApp, getApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getPerformance } from 'firebase/performance'
+import { enableLogging, getDatabase } from "firebase/database";
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -39,6 +40,7 @@ export const createFirebaseApp = () => {
     // const functions = getFunctions(app);
     // const firestore = getFirestore(app)
     // const db = getDatabase(app);
+    enableLogging(true)
     // connectFunctionsEmulator(functions, "localhost", 5001);
     // connectFirestoreEmulator(firestore, 'localhost', 8080);
     // // Point to the RTDB emulator running on localhost.

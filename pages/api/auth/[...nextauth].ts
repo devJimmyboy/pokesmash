@@ -6,8 +6,9 @@ import { ApiClient, HelixUser } from "@twurple/api"
 
 import { createFirebaseApp } from "../../../firebase/clientApp"
 import admin from "../../../firebase/adminApp";
+import { FirebaseAdminAdapter } from "../../../lib/FirebaseAdminAdapter";
 
-const app = createFirebaseApp();
+const app = admin.app();
 
 const auth = new ClientCredentialsAuthProvider(process.env.TWITCH_ID as string, process.env.TWITCH_SECRET as string)
 const api = new ApiClient({ authProvider: auth })
@@ -39,7 +40,7 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  adapter: FirebaseAdapter(app),
+  adapter: FirebaseAdminAdapter(app),
   callbacks: {
     async session({ session, user }) {
       if (user.access_token)

@@ -3,6 +3,7 @@ import { child, getDatabase, onValue, ref } from "firebase/database"
 import { motion, useAnimation, useMotionValue } from "framer-motion"
 import Image from "next/image"
 import { Pokemon } from "pokenode-ts"
+import { useObjectVal } from "react-firebase-hooks/database"
 import React, { useCallback, useEffect, useState } from "react"
 import { useInterval } from "react-use"
 import useSWR from "swr"
@@ -26,44 +27,25 @@ export default function UserStats({}: Props) {
     () => currentId > 1 && "/api/pokemon?id=" + `${currentId - 1}`,
     fetcher
   )
-  const [pokeDoc, setDoc] = useState<{ smashes: number; passes: number }>()
+  const [pokeSmashes, loadingS, errorS] = useObjectVal<number>(child(pokemon, `${currentId - 1}/smashCount`))
+  const [pokePasses, loadingP, errorP] = useObjectVal<number>(child(pokemon, `${currentId - 1}/passCount`))
+
   const { bgUrl: sprite, shiny } = usePokemonPicture(currentId - 1)
   const smashWidth = useAnimation()
   const passWidth = useAnimation()
-  useEffect(() => {
-    if (currentId >= 1) {
-      const unsub = [
-        onValue(child(pokemon, `${currentId - 1}/smashCount`), (snap) => {
-          if (snap.exists()) {
-            setDoc((prev) => (prev ? { ...prev, smashes: snap.val() } : { smashes: snap.val(), passes: 0 }))
-          }
-        }),
-        onValue(child(pokemon, `${currentId - 1}/passCount`), (snap) => {
-          if (snap.exists()) {
-            setDoc((prev) => (prev ? { ...prev, passes: snap.val() } : { passes: snap.val(), smashes: 0 }))
-          }
-        }),
-      ]
-      return () => {
-        unsub.forEach((list) => {
-          list()
-        })
-      }
-    }
-    return () => {}
-  }, [currentId])
 
   useEffect(() => {
     if (currentId <= 1) return
-    if (!pokeDoc) {
+    if (loadingP || loadingS || errorP || errorS) {
       smashWidth.set({ width: "0.1%" })
       passWidth.set({ width: "0.1%" })
     }
-    let smashes = pokeDoc?.smashes || 0
-    let passes = pokeDoc?.passes || 0
-    smashWidth.start({ width: `${((smashes === 0 ? 0.1 : smashes) / (smashes + passes)) * 100}%` })
-    passWidth.start({ width: `${((passes === 0 ? 0.1 : passes) / (smashes + passes)) * 100}%` })
-  }, [smashWidth, passWidth, pokeDoc])
+    let smashes = pokeSmashes || 0
+    let passes = pokePasses || 0
+    smashWidth.start({ width: `${((smashes === 0 ? 0.1 : smashes) / (smashes + passes + 0.01)) * 100}%` })
+    passWidth.start({ width: `${((passes === 0 ? 0.1 : passes) / (smashes + passes + 0.01)) * 100}%` })
+  }, [smashWidth, passWidth, pokePasses, pokeSmashes])
+  if (errorS || errorP) return null
 
   return (
     <div className={`flex-col items-center gap-0.5`} style={{ display: currentId === 1 ? "none" : "flex" }}>
@@ -84,7 +66,7 @@ export default function UserStats({}: Props) {
               style={{ borderRadius: 4, height: 32, backgroundColor: theme.palette.pass.main, width: "0.1%" }}
               animate={passWidth}
             />
-            <span className="font-semibold text-lg">{pokeDoc?.passes || 0}</span>
+            <span className="font-semibold text-lg">{pokePasses || 0}</span>
           </div>
           <div
             className="flex flex-col items-center justify-center h-24 md:h-32 aspect-square my-4 rounded-xl overflow-hidden"
@@ -110,7 +92,7 @@ export default function UserStats({}: Props) {
             <motion.div
               style={{ borderRadius: 4, height: 32, backgroundColor: theme.palette.smash.main, width: "0.1%" }}
               animate={smashWidth}></motion.div>
-            <span className="font-semibold text-lg">{pokeDoc?.smashes || 0}</span>
+            <span className="font-semibold text-lg">{pokeSmashes || 0}</span>
           </div>
         </div>
       </div>

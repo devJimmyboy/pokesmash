@@ -31,6 +31,7 @@ import PokemonSquare from "../../components/PokemonSquare"
 import Image from "next/image"
 import { ScoreDisplay } from "../../components/SmashPass"
 import Head from "next/head"
+import useSWR from "swr"
 
 const ScoreHolder = styled("div")`
   background-position: center;
@@ -50,52 +51,28 @@ interface Error {
 }
 
 type UserProp = User | string
-type ScoreProp = { [key: string]: "smash" | "pass" }
+type ScoreProp = { choices: { [key: string]: "smash" | "pass" }; smashCount: number; passCount: number }
+type ScoreError = string
 interface Props {
   user: UserProp
 }
 
 const tl = gsap.timeline({ repeat: -1 })
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const UserProfile: NextPage<Props> = ({ user }) => {
   const db = getDatabase(createFirebaseApp())
   const { style } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const { data: score, error: scoreError } = useSWR<ScoreProp, ScoreError>(
+    typeof user === "object" && `/api/user/score?user=${user.name.toLowerCase()}`,
+    fetcher
+  )
   const [tab, setTab] = React.useState<number>(1)
-  const [score, setScore] = React.useState<ScoreProp | string>("Loading...")
   const [numSmashed, setNum] = React.useState(0)
   useEffect(() => {
     if (typeof user === "string") {
       return
-    }
-    const id = `${user.name.toLowerCase()}`
-    const userScoreRef = ref(db, `users/${id}`)
-    const unsubscribe = onValue(userScoreRef, (userInfo) => {
-      let choices: ScoreProp = {}
-      let numSmashed = 0
-      let numPassed = 0
-      let i = 1
-      while (i <= 898) {
-        if (!userInfo.exists()) {
-          return
-        }
-        const smashesRef = userInfo.child(`smashes/${i}`)
-        const passesRef = userInfo.child(`passes/${i}`)
-        const userPasses = passesRef.exists() && passesRef.val()
-        const userSmashes = !userPasses && smashesRef.exists() && smashesRef.val()
-
-        if (userSmashes || userPasses) {
-          choices[`${i}`] = userSmashes ? "smash" : "pass"
-          userSmashes && numSmashed++
-          userPasses && numPassed++
-        }
-        i++
-      }
-
-      setScore(choices)
-    })
-    return () => {
-      unsubscribe()
     }
   }, [user])
   useEffect(() => {
@@ -111,10 +88,15 @@ const UserProfile: NextPage<Props> = ({ user }) => {
 
   if (typeof user === "string") {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
+  } else if (scoreError || !score) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        {scoreError || "Unknown Error Occured."}
+      </div>
+    )
   } else
     return (
       <>
-        {" "}
         <Head>
           <title>{`PokeSmash - ${user.name}'s Stats`}</title>
           <meta name="title" content={`PokeSmash - ${user.name}'s Stats`} />
@@ -157,7 +139,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             </Typography>
             <div className="flex-grow" />
             <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-              {(typeof score !== "string" && Object.values(score).length) || "?"} / 868
+              {score.passCount + score.smashCount || "?"} / 868
             </Typography>
           </div>
           <StyledTabs
@@ -189,12 +171,9 @@ const UserProfile: NextPage<Props> = ({ user }) => {
               border: "1px solid #55df55",
               borderTop: "none",
             }}>
-            {typeof score !== "string" ? (
+            {!scoreError ? (
               tab === 1 ? (
-                <StatsPage
-                  smashes={Object.keys(score).filter((val) => score[val] === "smash").length}
-                  passes={Object.keys(score).filter((val) => score[val] === "pass").length}
-                />
+                <StatsPage smashes={score.smashCount} passes={score.passCount} />
               ) : (
                 <Grid
                   container
@@ -208,18 +187,18 @@ const UserProfile: NextPage<Props> = ({ user }) => {
                     overflowY: "scroll",
                   }}
                   columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
-                  {Object.keys(score)
-                    .filter((val) => score[val] === (tab === 2 ? "smash" : "pass"))
+                  {Object.keys(score.choices)
+                    .filter((val) => score.choices[val] === (tab === 2 ? "smash" : "pass"))
                     .map((id) => (
                       <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
-                        <PokemonSquare i={Number(id)} choice={score[id]} style={style} />
+                        <PokemonSquare i={Number(id)} choice={tab === 2 ? "smash" : "pass"} style={style} />
                       </Grid>
                     ))}
                 </Grid>
               )
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-2xl font-semibold">
-                {score}
+                {scoreError}
               </div>
             )}
           </div>
