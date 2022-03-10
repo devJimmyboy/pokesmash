@@ -63,7 +63,7 @@ export default async function handler(
     if (current) {
       if (current[`${otherChoice}es`] && current[`${otherChoice}es`][id]) {
         current[`${otherChoice}Count`]--
-        current[`${otherChoice}es`][uid] = null
+        current[`${otherChoice}es`][id] = null
       }
       current[`${choice}Count`] = (current[`${choice}Count`] || 0) + 1
       if (current[`${choice}es`]) {
