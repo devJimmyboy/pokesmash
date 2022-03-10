@@ -158,12 +158,12 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (currentId > 898) return
 
     fetch(`/api/choice?id=${currentId}&choice=smash`, { method: "POST" })
-    setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 }))
+    setScore((prev) => ({ ...prev, smashes: prev.smashes + 1 , passes: prev.passes + (currentId < score.currentId ?  -1: 0)}))
   }, [currentId, session, pokeRef])
   const pass = React.useCallback(async () => {
     if (currentId > 898) return
     fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
-    setScore((prev) => ({ ...prev, passes: prev.passes + 1 }))
+    setScore((prev) => ({ ...prev, passes: prev.passes + 1, smashes: prev.smashes + (currentId < score.currentId ?  -1: 0)}))
   }, [currentId, session, pokeRef])
 
   // In app messages
