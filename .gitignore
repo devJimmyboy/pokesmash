@@ -36,9 +36,9 @@ yarn-error.log*
 !firebase
 
 .firebaserc
-firebase*
-firestore*
-database*
+/firebase*
+/firestore*
+/database*
 /*-debug.log
 functions
 /~

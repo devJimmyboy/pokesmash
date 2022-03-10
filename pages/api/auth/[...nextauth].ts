@@ -1,11 +1,10 @@
 import NextAuth, { User } from "next-auth"
 import TwitchProvider from "next-auth/providers/twitch";
-import { FirebaseAdapter } from "../../../lib/FirebaseAdapter"
 import { ClientCredentialsAuthProvider } from "@twurple/auth"
 import { ApiClient, HelixUser } from "@twurple/api"
 
-import { createFirebaseApp } from "../../../firebase/clientApp"
 import admin from "../../../firebase/adminApp";
+//ts-ignore
 import { FirebaseAdminAdapter } from "../../../lib/FirebaseAdminAdapter";
 
 const app = admin.app();
