@@ -216,6 +216,8 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         passes: passCount || 0,
         currentId: _id || currentId,
       })
+      if(_id)
+      setCurrentId(_id)
     })
     return () => {
       unsub()
