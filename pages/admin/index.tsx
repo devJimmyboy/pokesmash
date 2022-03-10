@@ -28,6 +28,7 @@ import { debounce } from "lodash"
 import { Icon } from "@iconify/react"
 import toast from "react-hot-toast"
 import CustomToast from "../../components/CustomToast"
+import Head from "next/head"
 
 const app = createFirebaseApp()
 
@@ -150,92 +151,102 @@ const MsgForm = () => {
     toast.success("Message added!")
   })
   return (
-    <Paper
-      component="form"
-      onSubmit={onSubmit}
-      className=" w-2/3 items-center p-4 flex flex-col gap-2"
-      sx={(theme) => ({
-        bgcolor: theme.palette.background.default,
-      })}>
-      <Typography variant="h4" component="h4" align="center">
-        Send Notification:
-      </Typography>
-      <Controller name="for" control={control} render={({ field }) => <TextField label="Send to..." {...field} />} />
-      <div className="flex flex-row gap-6 justify-around items-end">
-        <Controller
-          name="icon"
-          control={control}
-          render={({ field }) => {
-            const color = watch("color")
-            return (
-              <FormControl>
-                <FormHelperText>Icon</FormHelperText>
-
-                <Input
-                  {...field}
-                  type="text"
-                  placeholder="icon"
-                  endAdornment={
-                    <InputAdornment position="end" className="bg-gray-800 text-lg pointer-events-none">
-                      <Icon icon={field.value} color={color} />
-                    </InputAdornment>
-                  }></Input>
-              </FormControl>
-            )
-          }}
+    <>
+      <Head>
+        <title>PokeSmash - Admin Dashboard</title>
+        <meta name="title" content="PokeSmash - Admin Dashboard" />
+        <meta
+          name="description"
+          content={`Admin area for PokeSmash. Hey, wait! You shouldn't be seeing this! Why am I making a description for this page?`}
         />
+      </Head>
+      <Paper
+        component="form"
+        onSubmit={onSubmit}
+        className=" w-2/3 items-center p-4 flex flex-col gap-2"
+        sx={(theme) => ({
+          bgcolor: theme.palette.background.default,
+        })}>
+        <Typography variant="h4" component="h4" align="center">
+          Send Notification:
+        </Typography>
+        <Controller name="for" control={control} render={({ field }) => <TextField label="Send to..." {...field} />} />
+        <div className="flex flex-row gap-6 justify-around items-end">
+          <Controller
+            name="icon"
+            control={control}
+            render={({ field }) => {
+              const color = watch("color")
+              return (
+                <FormControl>
+                  <FormHelperText>Icon</FormHelperText>
+
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="icon"
+                    endAdornment={
+                      <InputAdornment position="end" className="bg-gray-800 text-lg pointer-events-none">
+                        <Icon icon={field.value} color={color} />
+                      </InputAdornment>
+                    }></Input>
+                </FormControl>
+              )
+            }}
+          />
+          <Controller
+            name="color"
+            control={control}
+            render={({ field }) => {
+              field.onChange = debounce(field.onChange, 200)
+              return (
+                <div>
+                  <ColorPreview onClick={openColor} color={field.value} />
+                  <Popper
+                    open={isColorOpen}
+                    anchorEl={() => document.querySelector("#colorSelect") as HTMLDivElement}
+                    placement="right-end">
+                    <div ref={field.ref}>
+                      <HexColorPicker {...{ ...field, ref: undefined }} />
+                    </div>
+                  </Popper>
+                </div>
+              )
+            }}
+          />
+        </div>
+        <Controller name="title" control={control} render={({ field }) => <TextField label="Title:" {...field} />} />
         <Controller
-          name="color"
+          name="message"
           control={control}
-          render={({ field }) => {
-            field.onChange = debounce(field.onChange, 200)
-            return (
-              <div>
-                <ColorPreview onClick={openColor} color={field.value} />
-                <Popper
-                  open={isColorOpen}
-                  anchorEl={() => document.querySelector("#colorSelect") as HTMLDivElement}
-                  placement="right-end">
-                  <div ref={field.ref}>
-                    <HexColorPicker {...{ ...field, ref: undefined }} />
-                  </div>
-                </Popper>
-              </div>
-            )
-          }}
+          render={({ field }) => <TextField label="Message to Send:" {...field} />}
         />
-      </div>
-      <Controller name="title" control={control} render={({ field }) => <TextField label="Title:" {...field} />} />
-      <Controller
-        name="message"
-        control={control}
-        render={({ field }) => <TextField label="Message to Send:" {...field} />}
-      />
 
-      <div className="flex flex-row gap-8">
-        <Button
-          variant="contained"
-          className="mt-2 border-2"
-          color="secondary"
-          onClick={(e) => {
-            const vals = getValues()
-            toast.dismiss("msg-test")
-            toast(vals.message, {
-              id: "msg-test",
-              style: { color: vals.color },
-              icon: <Icon icon={vals.icon} color={vals.color} />,
-              duration: 60000,
-            })
-          }}
-          type="button">
-          Test
-        </Button>
+        <div className="flex flex-row gap-8">
+          <Button
+            variant="contained"
+            className="mt-2 border-2"
+            color="secondary"
+            onClick={(e) => {
+              const vals = getValues()
+              toast.dismiss("msg-test")
+              toast(vals.message, {
+                id: "msg-test",
+                style: { color: vals.color },
+                icon: <Icon icon={vals.icon} color={vals.color} />,
+                duration: 60000,
+              })
+            }}
+            type="button">
+            Test
+          </Button>
 
-        <Button variant="outlined" className="mt-2 border-2" color="primary" type="submit">
-          Send
-        </Button>
-      </div>
-    </Paper>
+          <Button variant="outlined" className="mt-2 border-2" color="primary" type="submit">
+            Send
+          </Button>
+        </div>
+      </Paper>
+    </>
   )
 }
 const ColorPreview = ({ color, onClick }: { color: string; onClick: () => void }) => {

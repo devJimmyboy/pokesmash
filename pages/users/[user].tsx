@@ -30,6 +30,7 @@ import Link from "../../src/Link"
 import PokemonSquare from "../../components/PokemonSquare"
 import Image from "next/image"
 import { ScoreDisplay } from "../../components/SmashPass"
+import Head from "next/head"
 
 const ScoreHolder = styled("div")`
   background-position: center;
@@ -112,107 +113,118 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
   } else
     return (
-      <Stack
-        className="poke-scrollbar"
-        sx={{ overflowX: "hidden", maxHeight: "100vh", minHeight: "1080px" }}
-        direction="column"
-        p={6}
-        pb={2}
-        alignItems="center">
-        <Tooltip className="absolute top-24 left-4" title="Go Back">
-          <IconButton className="fancy-bg w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
-            <Icon icon="fa-solid:arrow-left" />
-          </IconButton>
-        </Tooltip>
-        <div className="flex flex-row gap-6 items-center w-11/12 my-2 md:my-4 lg:my-6 ">
-          <div ref={pictureBgRef} className="rounded-full absolute w-24 border-purple-700" />
-          <Avatar
-            className=" w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 "
-            alt={user?.name}
-            src={user?.profileImageUrl}
+      <>
+        {" "}
+        <Head>
+          <title>{`PokeSmash - ${user.name}'s Stats`}</title>
+          <meta name="title" content={`PokeSmash - ${user.name}'s Stats`} />
+          <meta
+            name="description"
+            content={`The user page for ${user.name}. Shows the Smashes and Passes they chose.`}
           />
+        </Head>
+        <Stack
+          className="poke-scrollbar"
+          sx={{ overflowX: "hidden", maxHeight: "100vh", minHeight: "1080px" }}
+          direction="column"
+          p={6}
+          pb={2}
+          alignItems="center">
+          <Tooltip className="absolute top-24 left-4" title="Go Back">
+            <IconButton className="fancy-bg w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
+              <Icon icon="fa-solid:arrow-left" />
+            </IconButton>
+          </Tooltip>
+          <div className="flex flex-row gap-6 items-center w-11/12 my-2 md:my-4 lg:my-6 ">
+            <div ref={pictureBgRef} className="rounded-full absolute w-24 border-purple-700" />
+            <Avatar
+              className=" w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 "
+              alt={user?.name}
+              src={user?.profileImageUrl}
+            />
 
-          <Typography
-            fontSize={32}
-            className="border-purple-500 border-4 select-none flex flex-row items-center gap-2 border-solid rounded-lg px-4 bg-purple-500 text-white"
-            fontWeight={600}>
-            <IconButton
-              className="p-0 m-0"
-              sx={{ fontSize: "inherit" }}
-              onClick={() => router.push(`https://twitch.tv/${user?.displayName}`, {}, { shallow: true })}>
-              <Icon icon="fa-brands:twitch" display="inline-block" />
-            </IconButton>{" "}
-            {user.displayName}
-          </Typography>
-          <div className="flex-grow" />
-          <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-            {(typeof score !== "string" && Object.values(score).length) || "?"} / 868
-          </Typography>
-        </div>
-        <StyledTabs
-          value={tab}
-          variant="fullWidth"
-          onChange={(e, nTab) => setTab(nTab)}
-          sx={{ width: "100%" }}
-          aria-label="User's Stats, Smash list, and Pass list.">
-          <StyledTab
-            icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" width={32} height={32} />}
-            label="Passes"
-            iconPosition="start"
-          />
-          <StyledTab
-            icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" width={32} height={32} />}
-            label="Stats"
-            iconPosition="start"
-          />
-          <StyledTab
-            icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" width={32} height={32} />}
-            label="Smashes"
-            iconPosition="start"
-          />
-        </StyledTabs>
-        <div
-          className="flex-grow w-full"
-          style={{
-            borderRadius: "0 0 0.625rem 0.625rem",
-            border: "1px solid #55df55",
-            borderTop: "none",
-          }}>
-          {typeof score !== "string" ? (
-            tab === 1 ? (
-              <StatsPage
-                smashes={Object.keys(score).filter((val) => score[val] === "smash").length}
-                passes={Object.keys(score).filter((val) => score[val] === "pass").length}
-              />
+            <Typography
+              fontSize={32}
+              className="border-purple-500 border-4 select-none flex flex-row items-center gap-2 border-solid rounded-lg px-4 bg-purple-500 text-white"
+              fontWeight={600}>
+              <IconButton
+                className="p-0 m-0"
+                sx={{ fontSize: "inherit" }}
+                onClick={() => router.push(`https://twitch.tv/${user?.displayName}`, {}, { shallow: true })}>
+                <Icon icon="fa-brands:twitch" display="inline-block" />
+              </IconButton>{" "}
+              {user.displayName}
+            </Typography>
+            <div className="flex-grow" />
+            <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
+              {(typeof score !== "string" && Object.values(score).length) || "?"} / 868
+            </Typography>
+          </div>
+          <StyledTabs
+            value={tab}
+            variant="fullWidth"
+            onChange={(e, nTab) => setTab(nTab)}
+            sx={{ width: "100%" }}
+            aria-label="User's Stats, Smash list, and Pass list.">
+            <StyledTab
+              icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" width={32} height={32} />}
+              label="Passes"
+              iconPosition="start"
+            />
+            <StyledTab
+              icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" width={32} height={32} />}
+              label="Stats"
+              iconPosition="start"
+            />
+            <StyledTab
+              icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" width={32} height={32} />}
+              label="Smashes"
+              iconPosition="start"
+            />
+          </StyledTabs>
+          <div
+            className="flex-grow w-full"
+            style={{
+              borderRadius: "0 0 0.625rem 0.625rem",
+              border: "1px solid #55df55",
+              borderTop: "none",
+            }}>
+            {typeof score !== "string" ? (
+              tab === 1 ? (
+                <StatsPage
+                  smashes={Object.keys(score).filter((val) => score[val] === "smash").length}
+                  passes={Object.keys(score).filter((val) => score[val] === "pass").length}
+                />
+              ) : (
+                <Grid
+                  container
+                  spacing={2}
+                  p={0}
+                  sx={{
+                    pt: 2,
+                    pl: 2,
+                    maxHeight: "100%",
+                    overflowX: "hidden",
+                    overflowY: "scroll",
+                  }}
+                  columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
+                  {Object.keys(score)
+                    .filter((val) => score[val] === (tab === 2 ? "smash" : "pass"))
+                    .map((id) => (
+                      <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
+                        <PokemonSquare i={Number(id)} choice={score[id]} style={style} />
+                      </Grid>
+                    ))}
+                </Grid>
+              )
             ) : (
-              <Grid
-                container
-                spacing={2}
-                p={0}
-                sx={{
-                  pt: 2,
-                  pl: 2,
-                  maxHeight: "100%",
-                  overflowX: "hidden",
-                  overflowY: "scroll",
-                }}
-                columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
-                {Object.keys(score)
-                  .filter((val) => score[val] === (tab === 2 ? "smash" : "pass"))
-                  .map((id) => (
-                    <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
-                      <PokemonSquare i={Number(id)} choice={score[id]} style={style} />
-                    </Grid>
-                  ))}
-              </Grid>
-            )
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-2xl font-semibold">
-              {score}
-            </div>
-          )}
-        </div>
-      </Stack>
+              <div className="w-full h-full flex flex-col items-center justify-center text-2xl font-semibold">
+                {score}
+              </div>
+            )}
+          </div>
+        </Stack>
+      </>
     )
 }
 export default UserProfile

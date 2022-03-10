@@ -22,7 +22,7 @@ import useSWR from "swr"
 // })
 
 var howler = Howler as unknown as HowlerGlobal
-howler.autoUnlock = true
+howler.autoUnlock = false
 
 howler.volume(0.5)
 const sounds: { [key: string]: Howl } = {
@@ -53,6 +53,7 @@ interface Props {}
 
 const text = ["", "Hello there. \nMy name is Professor $m0ak."]
 const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => {
+  const { score } = useSmash()
   const animRef = useRef<confetti.CreateTypes | null>(null)
   const listRef = useRef<number>(null)
 
@@ -69,6 +70,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
 
   useEffect(() => {
     if (!started) return
+    const totalScore = score.passes + score.smashes
 
     tlTxt
       .to(ids.root, { autoAlpha: 1, duration: 0.5, scale: 1, ease: "bounce" }, 0)
@@ -78,7 +80,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
         "#scroller",
         { top: "100%" },
         {
-          duration: 60,
+          duration: 0.6 * totalScore,
           top: "unset",
           bottom: "100%",
           ease: "linear",
