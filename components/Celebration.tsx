@@ -117,8 +117,8 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           autoAlpha: 0,
           ease: "easeInOut",
           onStart() {
+            setTimeScale(1)
             loopStop()
-            tlTxt.timeScale(1)
             sounds.music.fade(0.15, 0, 4000)
           },
         },
@@ -175,7 +175,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
 
     start(true)
     const audioId = sounds.crescendo.play()
-    await tl.play().then()
+    await tl.play(0).then()
     sounds.crescendo.stop(audioId)
     if (animRef.current) {
       sounds.confettiPop.play()
