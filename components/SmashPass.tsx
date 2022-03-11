@@ -3,8 +3,9 @@ import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui
 import { Button, Stack, Typography, useTheme } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { motion, useAnimation, Variants } from "framer-motion"
-import React from "react"
+import React, { useEffect } from "react"
 import { useKey } from "react-use"
+import { useSmash } from "../lib/SmashContext"
 
 const MotionButton = motion(Button)
 const ChoiceButtonRoot = styled(MotionButton)`
@@ -123,6 +124,13 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
   const api = useAnimation()
   const theme = useTheme()
   const variants: Variants = {
+    prevSelected: {
+      borderWidth: 6,
+      // @ts-ignore
+      "--bColor": theme.palette[choiceType].main,
+      // transition: { duration: 0.25 },
+      className: `${choiceType}`,
+    },
     selected: {
       scale: 1.1,
       borderWidth: 6,
@@ -139,6 +147,14 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
       className: `${choiceType}`,
     },
   }
+  const { score, currentId } = useSmash()
+  useEffect(() => {
+    if (score.choices[currentId] === choiceType) {
+      api.start("prevSelected")
+    } else {
+      api.start("idle")
+    }
+  }, [currentId])
   const onClick = async () => {
     await api.start("selected", { duration: 0.15 })
 

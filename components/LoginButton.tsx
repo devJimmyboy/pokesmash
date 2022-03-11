@@ -4,6 +4,7 @@ import { styled } from "@mui/system"
 import classNames from "classnames"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
+import Link from "../src/Link"
 
 const SignInBtn = styled(IconButton)`
   --twitchAlpha: 0.75;
@@ -57,9 +58,21 @@ export default function LoginButton(props: ButtonProps) {
     )
   }
   return (
-    <SignInBtn onClick={() => signIn("twitch")}>
-      <Icon fontSize={24} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
-      Sign in with Twitch
-    </SignInBtn>
+    <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
+      <Button
+        variant="contained"
+        sx={{
+          borderRadius: "0.5rem",
+        }}
+        LinkComponent={Link}
+        href="/me">
+        Stats
+      </Button>
+
+      <SignInBtn onClick={() => signIn("twitch")}>
+        <Icon fontSize={24} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
+        Sign in with Twitch
+      </SignInBtn>
+    </Stack>
   )
 }

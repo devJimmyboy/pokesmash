@@ -15,6 +15,7 @@ import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils"
 import { FixedSizeList as List, FixedSizeListProps, ListChildComponentProps } from "react-window"
 
 import useSWR from "swr"
+import { useHotkeys } from "react-hotkeys-hook"
 // import type { SimulatorRef } from "./Simulator/Simulator"
 // import dynamic from "next/dynamic"
 // const Simulator = dynamic(() => import("./Simulator/Simulator"), {
@@ -28,9 +29,9 @@ howler.volume(0.5)
 const sounds: { [key: string]: Howl } = {
   crescendo: new Howl({
     src: ["/sounds/crescendo.mp3"],
-    sprite: {
-      sound: [0, 6850],
-    },
+    // sprite: {
+    //   sound: [0, 6850],
+    // },
   }),
   confettiPop: new Howl({ src: ["/sounds/pop.mp3"] }),
   kidCheer: new Howl({ src: ["/sounds/kid-cheer.mp3"] }),
@@ -53,10 +54,13 @@ interface Props {}
 
 const text = ["", "Hello there. \nMy name is Professor $m0ak."]
 const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => {
-  const { score } = useSmash()
+  const {
+    score,
+    seenBefore: [seenBefore, setSeenBefore],
+  } = useSmash()
   const animRef = useRef<confetti.CreateTypes | null>(null)
   const listRef = useRef<number>(null)
-
+  const [timeScale, setTimeScale] = useState(1)
   const [tlTxt, setTlTxt] = useState<GSAPTimeline>(gsap.timeline({ paused: true }))
   // const simRef = useRef<SimulatorRef>(null)
   // const { width, height } = useWindowSize()
@@ -69,18 +73,37 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
   }, [started])
 
   useEffect(() => {
+    tlTxt.timeScale(timeScale)
+  }, [timeScale])
+
+  useEffect(() => {
     if (!started) return
-    const totalScore = score.passes + score.smashes
+    const totalScore = Object.keys(score.choices).length
+    console.log(totalScore)
 
     tlTxt
-      .to(ids.root, { autoAlpha: 1, duration: 0.5, scale: 1, ease: "bounce" }, 0)
+      .to(
+        ids.root,
+        {
+          autoAlpha: 1,
+          duration: 0.5,
+          scale: 1,
+          ease: "bounce",
+
+          onStart() {
+            gsap.set(ids.text, { scale: 1 })
+          },
+        },
+        0
+      )
+
       .to(ids.text, { duration: 1, y: -window.innerHeight / 3, ease: "bounce", delay: 5 })
       .to(ids.scoreText, { duration: 0.25, autoAlpha: 1, ease: "bounce" })
       .fromTo(
         "#scroller",
         { top: "100%" },
         {
-          duration: 0.6 * totalScore,
+          duration: totalScore,
           top: "unset",
           bottom: "100%",
           ease: "linear",
@@ -94,13 +117,19 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           autoAlpha: 0,
           ease: "easeInOut",
           onStart() {
+            loopStop()
+            tlTxt.timeScale(1)
             sounds.music.fade(0.15, 0, 4000)
           },
         },
         "+=1"
       )
-      .to("#appControl", { autoAlpha: 1, duration: 0.5, ease: "easeInOut" }, "+=0.5")
-      .call(() => start(false))
+      .to("#appControl", { autoAlpha: 1, duration: 0.5, ease: "easeInOut" }, "-=0.5")
+      .call(() => {
+        sounds.music.stop()
+        start(false)
+        setSeenBefore(true)
+      })
     sounds.confettiPop.once("play", (s) => {})
   }, [started, listRef.current])
 
@@ -145,8 +174,9 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     tl.to("body", { backgroundColor: "#101010", duration: 7.0 }, 0)
 
     start(true)
-    sounds.crescendo.play("sound")
-    await tl.play()
+    const audioId = sounds.crescendo.play()
+    await tl.play().then()
+    sounds.crescendo.stop(audioId)
     if (animRef.current) {
       sounds.confettiPop.play()
       if (tlTxt) tlTxt.play()
@@ -174,6 +204,18 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     sounds.music.mute(muted)
   }, [muted])
 
+  useHotkeys(
+    "space",
+    (e) => {
+      if (!started) return
+      if (tlTxt.isActive()) {
+        setTimeScale(timeScale * 2)
+      }
+    },
+    {},
+    [started, timeScale, setTimeScale]
+  )
+
   if (!started) return null
 
   return (
@@ -200,29 +242,42 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           top: 0,
           left: 0,
         }}>
-        <IconButton
-          className="fixed top-4 left-4 w-10 h-10"
-          sx={{
-            backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
-            "&:hover": {
-              backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
-              backgroundOpacity: 0.8,
-            },
-          }}
-          onClick={() => setMuted()}>
-          <Icon fontSize={24} icon={muted ? "fa-solid:volume-mute" : "fa-solid:volume"} />
-        </IconButton>
-
-        <div id="rootText" className="flex flex-col w-full h-full  items-center justify-center top-0 left-0">
+        <div
+          id="rootText"
+          style={{ backfaceVisibility: "hidden", transform: `translateZ(0)` }}
+          className="flex flex-col w-full h-full  items-center justify-center top-0 left-0">
           <div id="scoreText" className="absolute w-full h-full">
             <div className="relative w-full h-full flex flex-col items-center overflow-hidden">
-              <ScoresList ref={listRef} />
+              <ScoresList ref={listRef} score={score} />
             </div>
           </div>
-          <Typography id="celebrateText" variant="h1" style={{ fontSize: "10vw" }}>
+          <Typography
+            id="celebrateText"
+            variant="h1"
+            style={{
+              fontSize: "10vw",
+              transform: `translateZ(0)`,
+              MozOsxFontSmoothing: "grayscale",
+              WebkitFontSmoothing: "subpixel-antialiased",
+            }}>
             Congratulations!
           </Typography>
         </div>
+      </div>
+      <IconButton
+        className="fixed top-4 left-4 w-10 h-10"
+        sx={{
+          backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
+          "&:hover": {
+            backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
+            backgroundOpacity: 0.8,
+          },
+        }}
+        onClick={() => setMuted()}>
+        <Icon fontSize={24} icon={muted ? "fa-solid:volume-mute" : "fa-solid:volume"} />
+      </IconButton>
+      <div className="fixed bottom-2 left-1/2 transform-gpu -translate-x-1/2">
+        <Typography color="GrayText">Press space to speed up credits. Current Speed: {timeScale}x</Typography>
       </div>
     </>
   )
@@ -238,84 +293,33 @@ function randomInRange(min: number, max: number) {
 const app = createFirebaseApp()
 const db = getDatabase(app)
 
-const ScoresList = React.forwardRef<number, {}>((props, listRef) => {
-  const { score } = useSmash()
-  const { data: session } = useSession()
-  const [scores, setScores] = useState<("pass" | "smash")[]>([])
-  useEffect(() => {
-    if (!session) {
-      if (listRef && typeof listRef === "object") listRef.current = score.currentId
-      return
-    }
+const ScoresList = React.forwardRef<number, { score: ReturnType<typeof useSmash>["score"] }>(({ score }, listRef) => {
+  const scores = score.choices
 
-    const uid = session.user.name.toLowerCase()
-
-    let choices: ("pass" | "smash")[] = []
-    const userRef = ref(db, `users/${uid}`)
-    get(userRef).then((userData) => {
-      const passes = userData.child("passes").val()
-      const smashes = userData.child("smashes").val()
-      Object.keys(passes).forEach((key) => {
-        choices[Number(key)] = "pass"
-      })
-      Object.keys(smashes).forEach((key) => {
-        choices[Number(key)] = "smash"
-      })
-      if (choices.length < 898) {
-        console.log("??? Couldn't retrieve all scores.")
-      }
-      setScores(choices)
-      if (listRef && typeof listRef === "object") listRef.current = choices.length
-    })
-  }, [session])
   const { height, width } = useWindowSize()
-  if (!session) {
-    return (
-      <div className="w-full h-full flex flex-row items-center justify-center">
-        <Box
-          className="text-xl lg:text-2xl"
-          sx={(theme) => ({
-            color: theme.palette.pass.main,
-          })}>
-          <Typography variant="h1" style={{ fontSize: "10vw" }}>
-            Final Passes: {score.passes}
-          </Typography>
-        </Box>
-        <Box
-          className="text-xl lg:text-2xl"
-          sx={(theme) => ({
-            color: theme.palette.smash.main,
-          })}>
-          <Typography variant="h1" style={{ fontSize: "10vw" }}>
-            Final Smashes: {score.smashes}
-          </Typography>
-        </Box>
-      </div>
-    )
-  }
   return (
-    <div id="scroller" style={{ width: width / 2, height: scores.length * 76, position: "absolute" }}>
-      {scores.map((score, i) => (
-        <ScoreView key={`score-${i}`} index={i} data={scores} style={{ height: 76 }} />
+    <div id="scroller" style={{ width: width / 2, height: Object.keys(scores).length * 64, position: "absolute" }}>
+      {Object.keys(scores).map((id) => (
+        <ScoreView key={`score-${id}`} index={Number(id)} data={scores[id]} />
       ))}
     </div>
   )
 })
 ScoresList.displayName = "ScoresList"
 
-interface ScoreViewProps extends ListChildComponentProps<("pass" | "smash")[]> {}
+interface ScoreViewProps<T> {
+  data: T
+  index: number
+  style?: React.CSSProperties
+}
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
-function ScoreView({ data, index: pokemon, style }: ScoreViewProps) {
+function ScoreView({ data: choice, index: pokemon, style }: ScoreViewProps<"smash" | "pass" | null>) {
   const { bgUrl, shiny } = usePokemonPicture(pokemon)
   const { data: pokeInfo } = useSWR(`/api/pokemon/?id=${pokemon}`, fetcher)
-  const choice = data[pokemon]
   const scoreRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div
-      style={{ ...style }}
-      ref={scoreRef}
-      className="score-view flex flex-row items-center h-16 w-full justify-between py-2">
+    <div ref={scoreRef} className="score-view flex flex-row items-center h-16 w-full justify-between py-2">
       <div style={{ height: "100%" }}>
         <img style={{ height: "100%" }} src={bgUrl} />
       </div>

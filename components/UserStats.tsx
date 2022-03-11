@@ -40,10 +40,11 @@ export default function UserStats({}: Props) {
       smashWidth.set({ width: "0.1%" })
       passWidth.set({ width: "0.1%" })
     }
-    let smashes = pokeSmashes || 0
-    let passes = pokePasses || 0
-    smashWidth.start({ width: `${((smashes === 0 ? 0.1 : smashes) / (smashes + passes + 0.01)) * 100}%` })
-    passWidth.start({ width: `${((passes === 0 ? 0.1 : passes) / (smashes + passes + 0.01)) * 100}%` })
+    let smashes = pokeSmashes || 0.1
+    let passes = pokePasses || 0.1
+
+    smashWidth.start({ width: `${(smashes / (smashes + passes)) * 100}%` })
+    passWidth.start({ width: `${(passes / (smashes + passes)) * 100}%` })
   }, [smashWidth, passWidth, pokePasses, pokeSmashes])
   if (errorS || errorP) return null
 

@@ -1,4 +1,4 @@
-import { Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material"
+import { Button, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material"
 import { useKeyPressEvent } from "react-use"
 import { styled, css } from "@mui/system"
 import { Pokemon, PokemonSpecies } from "pokenode-ts"
@@ -14,6 +14,8 @@ import { useHotkeys } from "react-hotkeys-hook"
 import toast from "react-hot-toast"
 
 type Props = { cardRef: RefObject<SwipeRef> }
+
+const MotionText = motion(Typography)
 
 const getBgByType: { [key in PokeType]: string[] } = {
   bug: ["forest"],
@@ -78,7 +80,16 @@ const getBg = (pokeInfo: Pokemon) => {
 
 export default function PokeInfo({ cardRef }: Props) {
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
-  const { currentId, pokeInfo, setCurrentId, style, score, shockRef } = smashCtx
+  const {
+    currentId,
+    pokeInfo,
+    setCurrentId,
+    style,
+    score,
+    shockRef,
+    seenBefore: [seenBefore],
+    startCelebration,
+  } = smashCtx
   // const cardRef = useRef<any>(null)
   const { data } = useSWR<PokemonSpecies>(() => pokeInfo?.species.url, fetcher)
   const { bgUrl, shiny } = usePokemonPicture()
@@ -115,6 +126,27 @@ export default function PokeInfo({ cardRef }: Props) {
       setBg(getBg(pokeInfo))
     }
   }, [pokeInfo, style])
+
+  if (currentId === 899) {
+    return (
+      <div className="cardContainer h-full flex flex-col items-center justify-center">
+        <MotionText
+          className="select-none w-2/3 md:w-full text-2xl md:text-7xl"
+          variant="h2"
+          initial={{ scale: 0, rotate: -720, opacity: 0 }}
+          animate={{ scale: 1.5, opacity: 1, rotate: 0 }}
+          transition={{ duration: 1 }}
+          textAlign="center">
+          {"Nice! You're a Degenerate!"}
+        </MotionText>
+        {seenBefore && (
+          <Button size="large" variant="contained" className="mt-24" onClick={() => startCelebration(true)}>
+            Watch Ending Cutscene Again
+          </Button>
+        )}
+      </div>
+    )
+  }
 
   if (!smashCtx || !pokeInfo) {
     return (

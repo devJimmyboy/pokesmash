@@ -59,6 +59,8 @@ interface CtxData {
   shockRef: React.RefObject<ShockRef>
   messages: FBMessage[]
   setMessages: ListActions<FBMessage> | undefined
+  seenBefore: [boolean, (seen: boolean) => void]
+  startCelebration: (force?: boolean) => Promise<void>
 }
 export type FBMessage = {
   id: string
@@ -91,6 +93,8 @@ const SmashContext = React.createContext<CtxData>({
   },
   messages: [],
   setMessages: undefined,
+  seenBefore: [false, () => {}],
+  startCelebration: () => Promise.resolve(),
 })
 
 interface Props {}
@@ -105,15 +109,17 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const pokeRef = ref(db, `pokemon`)
   const [showStyleSwitch, setShowStyleSwitch] = React.useState(true)
   const celebrateRef = React.useRef<CelebrationRef>(null)
+  const seenBefore = useSessionStorage("seenCreditsBefore", false, true)
 
-  const startCelebration = async () => {
+  const startCelebration = async (force?: boolean) => {
+    if (seenBefore[0] && !force) return
     await gsap.to("#appControl", { autoAlpha: 0, duration: 7.5 })
     celebrateRef.current?.start()
   }
 
   useEffect(() => {
     const onRouteChange = (url: string, { shallow }: { shallow: boolean }) => {
-      const bool = url.toString().match(/\/?(users(\/.*?)?)?$/y)
+      const bool = url.toString().match(/\/?((users|me)(\/.*?)?)?$/y)
       console.log(url, bool)
 
       setShowStyleSwitch(!!bool)
@@ -226,22 +232,30 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       })
     })
     if (!session) return
-    const userRef = ref(db, `users/${uid}`)
-    const unsub = onValue(userRef, (user) => {
-      if (!user.exists()) return
-      const smashCount = user.child("smashCount").val()
-      const passCount = user.child("passCount").val()
-      const _id = user.child("currentId").val()
+    if (currentId === 1) {
+      get(ref(db, `users/${uid}/currentId`)).then((currentDbId) => setCurrentId(currentDbId.val()))
+    }
+
+    const userSmashRef = ref(db, `users/${uid}/smashCount`)
+    const userPassRef = ref(db, `users/${uid}/passCount`)
+
+    const unsubSmashCt = onValue(userSmashRef, (smashCount) => {
+      if (!smashCount.exists()) return
       setScore((prev) => ({
         ...prev,
-        smashes: smashCount || 0,
-        passes: passCount || 0,
-        currentId: _id || currentId,
+        smashes: smashCount.val() || 0,
       }))
-      if (_id) setCurrentId(_id)
+    })
+    const unsubPassCt = onValue(userPassRef, (passCount) => {
+      if (!passCount.exists()) return
+      setScore((prev) => ({
+        ...prev,
+        passCount: passCount.val() || 0,
+      }))
     })
     return () => {
-      unsub()
+      unsubPassCt()
+      unsubSmashCt()
       unsubMessages()
     }
   }, [session, setMessages])
@@ -274,6 +288,8 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         shockRef,
         messages,
         chance,
+        seenBefore,
+        startCelebration,
       }}>
       <Celebration ref={celebrateRef} />
       <div id="appControl">

@@ -76,6 +76,8 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
                     style={{
                       backgroundColor: "#222222",
                       outline: "solid 0.125rem " + theme.palette.twitch.accent.dragon,
+                      color: "whitesmoke",
+                      fontWeight: 600,
                     }}
                     toast={t}>
                     {({ icon, message }) => (
