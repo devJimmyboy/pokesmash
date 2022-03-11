@@ -261,27 +261,34 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [session, setMessages])
   useEffect(() => {
     async function setScoreFromDb(storageScore: Score) {
-      const newChoices: { [key: string]: "smash" | "pass" } = {}
+      var newChoices:
+        | { choices: { [key: string]: "smash" | "pass" }; smashCount: number; passCount: number; currentId: number }
+        | undefined = undefined
       if (session && Object.keys(storageScore.choices).length === 0) {
         const choices = await fetch(`/api/user/score?user=${session.user.name.toLowerCase()}`).then((v) => v.json())
-        if (choices !== "string")
-          Object.keys(choices).forEach((key) => {
-            newChoices[key] = choices[key]
-          })
+        if (choices !== "string") newChoices = choices
         else console.error("Error getting choices from db")
       }
-      setScore((prev) => ({
-        ...prev,
-        ...storageScore,
-      }))
-      setCurrentId(storageScore.currentId)
+      setScore((prev) => {
+        if (newChoices)
+          return {
+            ...prev,
+            ...storageScore,
+            choices: newChoices.choices,
+            smashes: newChoices.smashCount,
+            passes: newChoices.passCount,
+            currentId: newChoices.currentId,
+          }
+        else return { ...prev, ...storageScore }
+      })
+      setCurrentId(newChoices?.currentId || storageScore.currentId)
     }
     const raw = sessionStorage.getItem("score")
     const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
     if (storageScore) {
       setScoreFromDb(storageScore)
     }
-  }, [])
+  }, [session])
   useEffect(() => {
     sessionStorage.setItem("score", JSON.stringify(score))
   }, [score])

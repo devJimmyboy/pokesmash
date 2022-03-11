@@ -90,9 +90,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
   } else if (scoreError || !score) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        {scoreError || "Unknown Error Occured."}
-      </div>
+      <div className="w-full h-full flex flex-col items-center justify-center">{scoreError || "Loading Stats..."}</div>
     )
   } else
     return (
