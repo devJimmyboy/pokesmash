@@ -2,8 +2,8 @@ import { Box, FormControlLabel } from "@mui/material"
 import { child, get, getDatabase, onValue, ref, runTransaction, update } from "firebase/database"
 import { getSession, useSession } from "next-auth/react"
 import { Pokemon } from "pokenode-ts"
-import React, { PropsWithChildren, useEffect, useState } from "react"
-import { useList, useSessionStorage } from "react-use"
+import React, { Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react"
+import { useList, useLocalStorage } from "react-use"
 import useSWR, { mutate } from "swr"
 import ShockValue, { ShockRef } from "../components/ShockValue"
 import StyleForm from "../components/StyleForm"
@@ -53,13 +53,13 @@ interface CtxData {
   currentId: number
   setCurrentId: (id: number | ((id: number) => number)) => void
   pokeInfo: Pokemon | undefined
-  style: Styling
+  style: Styling | undefined
   error: any
   score: Score
   shockRef: React.RefObject<ShockRef>
   messages: FBMessage[]
   setMessages: ListActions<FBMessage> | undefined
-  seenBefore: [boolean, (seen: boolean) => void]
+  seenBefore: [boolean | undefined, Dispatch<SetStateAction<boolean | undefined>>, () => void]
   startCelebration: (force?: boolean) => Promise<void>
 }
 export type FBMessage = {
@@ -93,7 +93,7 @@ const SmashContext = React.createContext<CtxData>({
   },
   messages: [],
   setMessages: undefined,
-  seenBefore: [false, () => {}],
+  seenBefore: [false, () => {}, () => {}],
   startCelebration: () => Promise.resolve(),
 })
 
@@ -109,7 +109,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const pokeRef = ref(db, `pokemon`)
   const [showStyleSwitch, setShowStyleSwitch] = React.useState(true)
   const celebrateRef = React.useRef<CelebrationRef>(null)
-  const seenBefore = useSessionStorage("seenCreditsBefore", false, true)
+  const seenBefore = useLocalStorage<boolean>("seenCreditsBefore", false)
 
   const startCelebration = async (force?: boolean) => {
     if (seenBefore[0] && !force) return
@@ -131,7 +131,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [router.events])
 
   const { data: session, status } = useSession({ required: false })
-  const [style, setStyle] = useSessionStorage<Styling>("pokemonStyle", "showdown")
+  const [style, setStyle] = useLocalStorage<Styling>("pokemonStyle", "showdown")
   const [chance] = React.useState(new Chance())
   // useEffect(() => {
   //   if(session?.user?.id)
@@ -151,7 +151,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     session ? ref(db, `users/${session.user.name.toLowerCase()}`) : null
   )
 
-  const [seenMessages, setSeenMessages] = useSessionStorage<string[]>("seenMessages", [])
+  const [seenMessages, setSeenMessages] = useLocalStorage<string[]>("seenMessages", [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
@@ -172,7 +172,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const smash = React.useCallback(async () => {
     if (currentId > 898) return
 
-    fetch(`/api/choice?id=${currentId}&choice=smash`, { method: "POST" })
+    fetch(
+      `/api/choice?id=${currentId}&choice=smash${
+        !session && score.choices[`${currentId}`]
+          ? `&type=${score.choices[`${currentId}`] === "pass" ? "switch" : "same"}`
+          : ""
+      }`,
+      { method: "POST" }
+    )
     setScore((prev) => {
       if (!prev.choices) prev.choices = {}
       if (prev.choices[`${currentId}`] === "pass") prev.passes--
@@ -185,7 +192,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [currentId, session, pokeRef])
   const pass = React.useCallback(async () => {
     if (currentId > 898) return
-    fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
+    fetch(
+      `/api/choice?id=${currentId}&choice=pass${
+        !session && score.choices[`${currentId}`]
+          ? `&type=${score.choices[`${currentId}`] === "smash" ? "switch" : "same"}`
+          : ""
+      }`,
+      { method: "POST" }
+    )
     setScore((prev) => {
       if (!prev.choices) prev.choices = {}
 
@@ -196,11 +210,11 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       }
       return prev
     })
-  }, [currentId, session, pokeRef])
+  }, [currentId, session, pokeRef, score])
 
   // In app messages
   React.useEffect(() => {
-    if (messages[0] && messages.filter((msg) => !seenMessages.includes(msg?.id)).length > 0) {
+    if (seenMessages && messages[0] && messages.filter((msg) => !seenMessages.includes(msg?.id)).length > 0) {
       messages
         .filter((msg) => !seenMessages.includes(msg?.id))
         .forEach((msg, i) => {
@@ -269,10 +283,12 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       var newChoices:
         | { choices: { [key: string]: "smash" | "pass" }; smashCount: number; passCount: number; currentId: number }
         | undefined = undefined
-      if (session && Object.keys(storageScore.choices).length === 0) {
+      if (session) {
         const choices = await fetch(`/api/user/score?user=${session.user.name.toLowerCase()}`).then((v) => v.json())
-        if (choices !== "string") newChoices = choices
-        else console.error("Error getting choices from db")
+        if (storageScore.currentId < choices.currentId) {
+          if (choices !== "string") newChoices = choices
+          else console.error("Error getting choices from db")
+        }
       }
       setScore((prev) => {
         if (newChoices)
@@ -288,14 +304,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       })
       setCurrentId(newChoices?.currentId || storageScore.currentId)
     }
-    const raw = sessionStorage.getItem("score")
+    const raw = localStorage.getItem("score")
     const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
     if (storageScore) {
       setScoreFromDb(storageScore)
     }
   }, [session])
   useEffect(() => {
-    sessionStorage.setItem("score", JSON.stringify(score))
+    localStorage.setItem("score", JSON.stringify(score))
   }, [score])
 
   React.useEffect(() => {
@@ -322,7 +338,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       <div id="appControl">
         {showStyleSwitch && (
           <Box className="absolute bottom-2 md:bottom-auto md:top-2 left-2">
-            <StyleForm value={style} onChange={(s) => setStyle(s as Styling)} />
+            <StyleForm value={style || "showdown"} onChange={(s) => setStyle(s as Styling)} />
           </Box>
         )}
 

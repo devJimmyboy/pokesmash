@@ -44,101 +44,111 @@ const tasks = new Listr([{ title: `Reading old Pokemon Data`, task: main }, { ti
 async function main(ctx: ListrContext, task: ListrTaskWrapper) {
   const user = flags.user;
   task.output = `Reading ${user}'s data`
+  const pokemonSnap = await pokemon.get()
+
 
 
   if (flags.user && flags.user !== "all") {
-    const childSnapshot =
-    const id = childSnapshot.key;
-    task.title = `Reading ${user}'s data - ${(Number(id) / 898).toFixed(2)}%`
-    if (!id) return;
-    const childPasses = childSnapshot.child('passes');
-    const childSmashes = childSnapshot.child('smashes');
-    const userD = newUserData[user]
-
-    const passed = childPasses.child(user).val() as boolean | null;
-    const smashed = childSmashes.child(user).val() as boolean | null;
-    if (userD) {
-      if (passed) {
-        userD.passCount++;
-        userD.passes[id] = passed;
-      }
-      if (smashed) {
-        userD.smashCount++;
-        userD.smashes[id] = smashed;
-      }
-      if (Number(id) > userD.currentId && (smashed || passed)) userD.currentId = Number(id)
-    }
-    else {
-      newUserData[user] = {
-        currentId: Number(id),
-        passCount: passed ? 1 : 0,
-        smashCount: smashed ? 1 : 0,
-        passes: {
-          [id]: passed
-        },
-        smashes: {
-          [id]: smashed
-        }
-      }
-    }
-  }
-  else {
-    const pokemonSnap = await pokemon.get()
-
-    pokemonSnap.forEach(function (childSnapshot) {
+    var pokeId = 1;
+    pokemonSnap.forEach(childSnapshot => {
       const id = childSnapshot.key;
       task.title = `Reading ${user}'s data - ${(Number(id) / 898).toFixed(2)}%`
       if (!id) return;
       const childPasses = childSnapshot.child('passes');
       const childSmashes = childSnapshot.child('smashes');
-      childPasses.forEach(user => {
-        const userId = user.key;
-        if (userId && user.val()) {
-          const userD = newUserData[userId]
-          if (userD) {
-            if (Number(id) > userD.currentId) {
-              userD.currentId = Number(id)
-            }
-            userD.passCount += 1;
-            userD.passes[id] = true;
-          }
-          else {
-            newUserData[userId] = {
-              currentId: Number(id),
-              passCount: 1,
-              smashCount: 0,
-              passes: {
-                [id]: true
-              },
-              smashes: {}
-            }
+      const userD = newUserData[user]
+
+      const passed = childPasses.child(user).val() as boolean | null;
+      const smashed = childSmashes.child(user).val() as boolean | null;
+      if (userD) {
+        if (passed) {
+          userD.passCount++;
+          userD.passes[id] = passed;
+        }
+        if (smashed) {
+          userD.smashCount++;
+          userD.smashes[id] = smashed;
+        }
+        if (Number(id) > userD.currentId && (smashed || passed)) userD.currentId = Number(id)
+      }
+      else {
+        newUserData[user] = {
+          currentId: Number(id),
+          passCount: passed ? 1 : 0,
+          smashCount: smashed ? 1 : 0,
+          passes: {
+            [id]: passed
+          },
+          smashes: {
+            [id]: smashed
           }
         }
-      })
-      childSmashes.forEach(user => {
-        const userId = user.key;
-        if (userId && user.val()) {
-          const userD = newUserData[userId]
-          if (userD) {
-            if (Number(id) > userD.currentId) {
-              userD.currentId = Number(id)
+      }
+    })
+  }
+  else {
+
+    pokemonSnap.forEach(function (childSnapshot) {
+      try {
+        //@ts-expect-error
+        const id = parseInt(childSnapshot.key);
+        task.title = `Reading ${user}'s data - ${(id / 898).toFixed(2)}%`
+        if (!id) return;
+        const childPasses = childSnapshot.child('passes');
+        const childSmashes = childSnapshot.child('smashes');
+        childPasses.forEach(user => {
+          const userId = user.key;
+          if (userId && user.val()) {
+            const userD = newUserData[userId]
+            if (userD) {
+              if (id > userD.currentId) {
+                userD.currentId = id
+              }
+              userD.passCount += 1;
+              userD.passes[id] = true;
             }
-            userD.passCount += 1;
-            userD.passes[id] = true;
-          }
-          else {
-            newUserData[userId] = {
-              currentId: Number(id),
-              passCount: 1,
-              smashCount: 0,
-              passes: {
-                [id]: true
-              },
-              smashes: {}
+            else {
+              newUserData[userId] = {
+                currentId: id,
+                passCount: 1,
+                smashCount: 0,
+                passes: {
+                  [id]: true
+                },
+                smashes: {}
+              }
             }
           }
-        }
-      })
+        })
+        childSmashes.forEach(user => {
+          const userId = user.key;
+          if (userId && user.val()) {
+            const userD = newUserData[userId]
+            if (userD) {
+              if (id > userD.currentId) {
+                userD.currentId = id
+              }
+              userD.passCount += 1;
+              userD.passes[id] = true;
+            }
+            else {
+              newUserData[userId] = {
+                currentId: id,
+                passCount: 1,
+                smashCount: 0,
+                passes: {
+                  [id]: true
+                },
+                smashes: {}
+              }
+            }
+          }
+        })
+      }
+      catch (e) {
+        console.error(e)
+        console.log("Errored on " + childSnapshot.key)
+      }
     })
   }
 
@@ -151,9 +161,16 @@ function writeUserData(ctx: ListrContext, task: ListrTaskWrapper) {
   task.output = `Writing newUserData`
   const serializedUser = JSON.stringify(newUserData)
   fs.writeFileSync(path.join(__dirname, `data.json`), serializedUser)
-  if (user) {
+  if (user && user !== "all") {
     const userRef = db.ref(`users/${user}`)
-    userRef.set(newUserData[user])
+    userRef.update(newUserData[user])
+  }
+  else if (user === "all") {
+    const users = Object.keys(newUserData);
+    users.forEach(user => {
+      const userRef = db.ref(`users/${user}`)
+      userRef.update(newUserData[user])
+    })
   }
   task.title = `Writing ${user}'s data - 100%`
   task.output = ''

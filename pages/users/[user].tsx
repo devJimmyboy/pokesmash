@@ -192,7 +192,11 @@ const UserProfile: NextPage<Props> = ({ user }) => {
                     .filter((val) => score.choices[val] === (tab === 2 ? "smash" : "pass"))
                     .map((id) => (
                       <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
-                        <PokemonSquare i={Number(id)} choice={tab === 2 ? "smash" : "pass"} style={style} />
+                        <PokemonSquare
+                          i={Number(id)}
+                          choice={tab === 2 ? "smash" : "pass"}
+                          style={style || "showdown"}
+                        />
                       </Grid>
                     ))}
                 </Grid>

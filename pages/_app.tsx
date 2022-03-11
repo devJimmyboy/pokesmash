@@ -82,7 +82,7 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
                     toast={t}>
                     {({ icon, message }) => (
                       <div className="flex flex-row items-center px-1 py-1">
-                        {icon}
+                        <div className="w-4 h-4">{icon}</div>
                         {message}
                         {t.type !== "loading" && (
                           <Box

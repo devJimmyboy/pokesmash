@@ -12,7 +12,7 @@ export default async function handler(
 ) {
 
   const {
-    query: { id: _id, choice: _choice },
+    query: { id: _id, choice: _choice, type: _type },
     method,
   } = req
   if (method !== "POST") {
@@ -20,6 +20,9 @@ export default async function handler(
     return res.status(405).end(`Method ${method} not allowed`)
   }
   if (_choice !== "smash" && _choice !== "pass") {
+    return res.status(400).json({ error: "Invalid choice" })
+  }
+  if (_type && _type !== "switch" && _type !== "same") {
     return res.status(400).json({ error: "Invalid choice" })
   }
 
@@ -35,15 +38,22 @@ export default async function handler(
   const id = Number(_id as string)
   const choice = _choice as "smash" | "pass"
   const otherChoice = choice === "smash" ? "pass" : "smash"
+  const type: "switch" | "same" = _type as "switch" | "same"
 
   const session = await getSession({ req })
   const db = admin.database()
   const ref = db.ref(`/pokemon/${id}`);
 
   if (!session) {
+    if (type === "same")
+      return res.status(200).end()
     ref.transaction((current) => {
       if (current) {
-        current[`${choice}Count`] = (current[`${choice}Count`] || 0) + 1
+        current[`${choice}Count`] = (current[`${choice}Count`] || 0) + 1;
+        if (type === "switch") {
+          current[`${otherChoice
+            }Count`] = (current[`${otherChoice}Count`] || 0) - 1;
+        }
       } else {
         current = {
           [`${choice}es`]: {}, [`${otherChoice
