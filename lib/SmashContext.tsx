@@ -263,7 +263,10 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     const raw = sessionStorage.getItem("score")
     const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
     if (storageScore) {
-      setScore(storageScore)
+      setScore((prev) => ({
+        ...prev,
+        ...storageScore,
+      }))
       setCurrentId(storageScore.currentId)
     }
   }, [])
