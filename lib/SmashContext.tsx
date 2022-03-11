@@ -260,14 +260,26 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     }
   }, [session, setMessages])
   useEffect(() => {
-    const raw = sessionStorage.getItem("score")
-    const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
-    if (storageScore) {
+    async function setScoreFromDb(storageScore: Score) {
+      const newChoices: { [key: string]: "smash" | "pass" } = {}
+      if (session && Object.keys(storageScore.choices).length === 0) {
+        const choices = await fetch(`/api/user/score?user=${session.user.name.toLowerCase()}`).then((v) => v.json())
+        if (choices !== "string")
+          Object.keys(choices).forEach((key) => {
+            newChoices[key] = choices[key]
+          })
+        else console.error("Error getting choices from db")
+      }
       setScore((prev) => ({
         ...prev,
         ...storageScore,
       }))
       setCurrentId(storageScore.currentId)
+    }
+    const raw = sessionStorage.getItem("score")
+    const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
+    if (storageScore) {
+      setScoreFromDb(storageScore)
     }
   }, [])
   useEffect(() => {

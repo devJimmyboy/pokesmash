@@ -96,7 +96,6 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
         },
         0
       )
-
       .to(ids.text, { duration: 1, y: -window.innerHeight / 3, ease: "bounce", delay: 5 })
       .to(ids.scoreText, { duration: 0.25, autoAlpha: 1, ease: "bounce" })
       .fromTo(
@@ -142,8 +141,6 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
   const [loopStop, loopStart, isActive] = useRafLoop((time) => {
     if (time < 500) console.log("Rendering")
     if (!animRef.current) {
-      console.log("No animation")
-
       return
     }
     if (skew > 0) skew = Math.max(0.8, skew - 0.001)
