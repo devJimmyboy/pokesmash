@@ -174,10 +174,12 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
     fetch(`/api/choice?id=${currentId}&choice=smash`, { method: "POST" })
     setScore((prev) => {
-      prev.smashes++
       if (!prev.choices) prev.choices = {}
-      prev.choices[`${currentId}`] = "smash"
       if (prev.choices[`${currentId}`] === "pass") prev.passes--
+      if (prev.choices[`${currentId}`] !== "smash") {
+        prev.smashes++
+        prev.choices[`${currentId}`] = "smash"
+      }
       return prev
     })
   }, [currentId, session, pokeRef])
@@ -185,10 +187,13 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (currentId > 898) return
     fetch(`/api/choice?id=${currentId}&choice=pass`, { method: "POST" })
     setScore((prev) => {
-      prev.passes++
       if (!prev.choices) prev.choices = {}
-      prev.choices[`${currentId}`] = "pass"
+
       if (prev.choices[`${currentId}`] === "smash") prev.smashes--
+      if (prev.choices[`${currentId}`] !== "pass") {
+        prev.passes++
+        prev.choices[`${currentId}`] = "pass"
+      }
       return prev
     })
   }, [currentId, session, pokeRef])
