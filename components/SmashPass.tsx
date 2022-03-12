@@ -3,7 +3,7 @@ import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui
 import { Button, Stack, Typography, useTheme } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { motion, useAnimation, Variants } from "framer-motion"
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { useKey } from "react-use"
 import { useSmash } from "../lib/SmashContext"
 
@@ -149,18 +149,18 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
   }
   const { score, currentId } = useSmash()
   useEffect(() => {
-    if (score.choices[currentId] === choiceType) {
-      api.start("prevSelected")
-    } else {
-      api.start("idle")
-    }
+    const anims: string[] = []
+    if (score.choices[currentId] === choiceType) anims.push("prevSelected")
+    api.start(["idle", ...anims], { delay: 0.05, duration: 0.15 })
   }, [currentId])
-  const onClick = async () => {
-    await api.start("selected", { duration: 0.15 })
+  const onClick = useCallback(async () => {
+    const anims: string[] = []
+    if (score.choices[currentId] === choiceType) anims.push("prevSelected")
+
+    await api.start([...anims, "selected"], { duration: 0.15 })
 
     onChoice(choiceType)
-    await api.start("idle", { delay: 0.05, duration: 0.15 })
-  }
+  }, [api, choiceType, currentId, onChoice, score])
   useKey(choiceType === "pass" ? "ArrowLeft" : "ArrowRight", onClick)
   return (
     <ButtonUnstyled
