@@ -261,21 +261,28 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           </Typography>
         </div>
       </div>
-      <IconButton
-        className="fixed top-4 left-4 w-10 h-10"
-        sx={{
-          backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
-          "&:hover": {
+      <Portal container={() => document.getElementById("__next")}>
+        <IconButton
+          className="fixed top-4 left-4 w-10 h-10"
+          sx={{
+            zIndex: 1000,
             backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
-            backgroundOpacity: 0.8,
-          },
-        }}
-        onClick={() => setMuted()}>
-        <Icon fontSize={24} icon={muted ? "fa-solid:volume-mute" : "fa-solid:volume"} />
-      </IconButton>
-      <div className="fixed bottom-2 left-1/2 transform-gpu -translate-x-1/2">
-        <Typography color="GrayText">Press space to speed up credits. Current Speed: {timeScale}x</Typography>
-      </div>
+            "&:hover": {
+              backgroundColor: muted ? theme.palette.pass.main : theme.palette.smash.main,
+              backgroundOpacity: 0.8,
+            },
+          }}
+          onClick={() => setMuted()}>
+          <Icon fontSize={24} icon={muted ? "fa-solid:volume-mute" : "fa-solid:volume"} />
+        </IconButton>
+        <div
+          className="fixed bottom-2 left-1/2 transform-gpu -translate-x-1/2"
+          style={{
+            zIndex: 1000,
+          }}>
+          <Typography color="GrayText">Press space to speed up credits. Current Speed: {timeScale}x</Typography>
+        </div>
+      </Portal>
     </>
   )
 })
@@ -296,9 +303,11 @@ const ScoresList = React.forwardRef<number, { score: ReturnType<typeof useSmash>
   const { height, width } = useWindowSize()
   return (
     <div id="scroller" style={{ width: width / 2, height: Object.keys(scores).length * 64, position: "absolute" }}>
-      {Object.keys(scores).map((id) => (
-        <ScoreView key={`score-${id}`} index={Number(id)} data={scores[id]} />
-      ))}
+      {Object.keys(scores)
+        .filter((id) => scores[id] === "smash")
+        .map((id) => (
+          <ScoreView key={`score-${id}`} index={Number(id)} data={scores[id]} />
+        ))}
     </div>
   )
 })
