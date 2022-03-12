@@ -56,6 +56,9 @@ kbd {
 .fancy-bg {
   background: linear-gradient(45deg, #fe6b8b 30%, #ff8e53 90%);
 }
+.discord-bg {
+  background: linear-gradient(45deg, #7289da 50%, #869adf 70%);
+}
 
 @media screen and (min-width: 800px) {
   .cardContainer {

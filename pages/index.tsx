@@ -127,17 +127,24 @@ const Home: NextPage = () => {
             </Link>
           </CreatedCard>
           <div className="flex-grow" />
-          <Tooltip
-            className="pointer-events-auto "
-            title="Support me for more content like this!"
-            placement="left-start">
-            <IconButton
-              className="fancy-bg w-10 h-10 m-2 mr-6 mb-6"
-              target="_blank"
-              href="https://www.patreon.com/devJimmyboy">
-              <Icon fontSize={18} icon="fa-brands:patreon" />
-            </IconButton>
-          </Tooltip>
+          <div className="flex flex-col items-start h-32 gap-4 mx-6 my-6">
+            <Tooltip
+              className="pointer-events-auto "
+              title="Join our Discord for future projects and updates!"
+              placement="left-start">
+              <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/KA49N8H">
+                <Icon fontSize={18} icon="fa-brands:discord" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              className="pointer-events-auto "
+              title="Support me for more content like this!"
+              placement="left-start">
+              <IconButton className="fancy-bg w-10 h-10" target="_blank" href="https://www.patreon.com/devJimmyboy">
+                <Icon fontSize={18} icon="fa-brands:patreon" />
+              </IconButton>
+            </Tooltip>
+          </div>
         </Footer>
       </Box>
     </>
@@ -152,6 +159,7 @@ const Footer = styled("footer")`
     width: 100%;
     gap: unset;
     align-items: end;
+    flex-direction: row;
   }
   left: 0;
   top: 0;
@@ -160,7 +168,7 @@ const Footer = styled("footer")`
   position: fixed;
   pointer-events: none;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 `
 
 const CreatedCard = styled("div")`
