@@ -214,6 +214,8 @@ const UserProfile: NextPage<Props> = ({ user }) => {
 export default UserProfile
 
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  const res = context.res
+  res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59")
   const { user } = context.query as { user: string }
   const firestore = admin.firestore()
   const users = firestore.collection("users")
