@@ -1,11 +1,11 @@
-import { Icon } from "@iconify/react"
-import { ButtonUnstyled, buttonUnstyledClasses, ButtonUnstyledProps } from "@mui/base"
-import { Button, Stack, Typography, useTheme } from "@mui/material"
-import { styled } from "@mui/material/styles"
-import { motion, useAnimation, Variants } from "framer-motion"
-import React, { useCallback, useEffect } from "react"
-import { useKey } from "react-use"
-import { useSmash } from "../lib/SmashContext"
+import { ButtonUnstyled, ButtonUnstyledProps } from "@mui/base";
+import { Button, Stack, useTheme } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { motion, useAnimation, Variants } from "framer-motion";
+import React, { useCallback, useEffect } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+
+import { useSmash } from "../lib/SmashContext";
 
 const MotionButton = motion(Button)
 const ChoiceButtonRoot = styled(MotionButton)`
@@ -47,7 +47,7 @@ const ChoiceButtonRoot = styled(MotionButton)`
   }
 `
 
-const Kbd = styled("kbd")`
+const Kbd = styled('kbd')`
   background-color: transparent;
   border-radius: 3px;
   border: 2px solid ${(props) => props.theme.palette.primary.main};
@@ -60,7 +60,7 @@ const Kbd = styled("kbd")`
   margin: 0 0.4em;
 `
 
-export const ScoreDisplay = styled("div")`
+export const ScoreDisplay = styled('div')`
   font-size: 1em;
   display: flex;
   padding: 0.75em;
@@ -73,7 +73,7 @@ export const ScoreDisplay = styled("div")`
     border-radius: 0.825rem;
   }
   font-weight: normal;
-  font-family: "Lilita One", "Segoe UI", sans-serif;
+  font-family: 'Lilita One', 'Segoe UI', sans-serif;
   border-radius: 0.5rem;
   vertical-align: bottom;
   width: 25px;
@@ -91,17 +91,12 @@ export const ScoreDisplay = styled("div")`
 interface Props {
   smashes: number
   passes: number
-  onChoice: (choice: "smash" | "pass" | undefined) => void
+  onChoice: (choice: 'smash' | 'pass' | undefined) => void
 }
 
 export default function SmashPass({ onChoice, smashes, passes }: Props) {
   return (
-    <Stack
-      direction="row"
-      justifyContent="center"
-      spacing={{ md: 6 }}
-      className="w-screen max-w-lg gap-2"
-      sx={{ mt: { sm: "0.5em", xl: "2em" } }}>
+    <Stack direction="row" justifyContent="center" spacing={{ md: 6 }} className="w-screen max-w-lg gap-2" sx={{ mt: { sm: '0.5em', xl: '2em' } }}>
       <ChoiceButton choiceType="pass" onChoice={onChoice}>
         <span className="flex-grow">Pass</span>
         <ScoreDisplay className="passes md:mr-4">{passes}</ScoreDisplay>
@@ -116,62 +111,45 @@ export default function SmashPass({ onChoice, smashes, passes }: Props) {
 }
 
 interface ChoiceButtonProps extends ButtonUnstyledProps {
-  choiceType: "smash" | "pass"
-  onChoice: (type?: "smash" | "pass") => void
+  choiceType: 'smash' | 'pass'
+  onChoice: (type?: 'smash' | 'pass') => void
 }
 
 function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
   const api = useAnimation()
   const theme = useTheme()
   const variants: Variants = {
-    prevSelected: {
-      borderWidth: 6,
-      // @ts-ignore
-      "--bColor": theme.palette[choiceType].main,
-      // transition: { duration: 0.25 },
-      className: `${choiceType}`,
-    },
     selected: {
       scale: 1.1,
-      borderWidth: 6,
+    },
+    prevSelected: {
+      borderWidth: '6px',
       // @ts-ignore
-      "--bColor": theme.palette[choiceType].main,
-      // transition: { duration: 0.25 },
-      className: `${choiceType}`,
+      '--bColor': theme.palette[choiceType].main,
     },
     idle: {
       scale: 1,
       // @ts-ignore
-      "--bColor": theme.palette.primary.main,
-      // transition: { duration: 0.25 },
-      className: `${choiceType}`,
+      '--bColor': theme.palette.primary.main,
     },
   }
+
   const { score, currentId } = useSmash()
+
   useEffect(() => {
     const anims: string[] = []
-    if (score.choices[currentId] === choiceType) anims.push("prevSelected")
-    api.start(["idle", ...anims], { delay: 0.05, duration: 0.15 })
-  }, [currentId])
-  const onClick = useCallback(async () => {
+    if (score.choices[currentId] === choiceType) anims.push('prevSelected')
+    const tm = setTimeout(() => api.start(['idle', ...anims], { duration: 0.15 }), 150)
+    return () => clearTimeout(tm)
+  }, [currentId, score, api])
+  const onClick = useCallback(() => {
     const anims: string[] = []
-    if (score.choices[currentId] === choiceType) anims.push("prevSelected")
+    if (score.choices[currentId] === choiceType) anims.push('prevSelected')
 
-    await api.start([...anims, "selected"], { duration: 0.15 })
+    api.start([...anims, 'selected'], { duration: 0.15 })
 
     onChoice(choiceType)
-  }, [api, choiceType, currentId, onChoice, score])
-  useKey(choiceType === "pass" ? "ArrowLeft" : "ArrowRight", onClick)
-  return (
-    <ButtonUnstyled
-      {...props}
-      className={`${choiceType}`}
-      onClick={onClick}
-      variants={variants}
-      animate={api}
-      component={ChoiceButtonRoot}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
-    />
-  )
+  }, [api, currentId, onChoice, score])
+  useHotkeys(choiceType === 'pass' ? 'left' : 'right', onClick, [onClick])
+  return <ButtonUnstyled {...props} className={`${choiceType}`} onClick={onClick} variants={variants} animate={api} component={ChoiceButtonRoot} whileHover="selected" whileTap={{ scale: 0.95 }} />
 }

@@ -1,10 +1,11 @@
-import { Icon } from "@iconify/react"
-import { Avatar, Button, ButtonProps, Card, CardContent, IconButton, Stack } from "@mui/material"
-import { styled } from "@mui/system"
-import classNames from "classnames"
-import { useSession, signIn, signOut } from "next-auth/react"
-import { useRouter } from "next/router"
-import Link from "../src/Link"
+import { Icon } from '@iconify/react'
+import { Avatar, Button, ButtonProps, Card, CardContent, IconButton, Stack } from '@mui/material'
+import { styled } from '@mui/system'
+import classNames from 'classnames'
+import { signIn, signOut } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { useSmash } from '../lib/SmashContext'
+import Link from '../src/Link'
 
 const SignInBtn = styled(IconButton)`
   --twitchAlpha: 0.75;
@@ -21,7 +22,7 @@ const SignInBtn = styled(IconButton)`
   background-color: transparent;
   color: var(--twitchColor);
   border-color: var(--twitchColor);
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
   transition: border color 0.15s ease-in-out;
 
   &:hover {
@@ -41,16 +42,12 @@ const SignInBtn = styled(IconButton)`
 `
 
 export default function LoginButton(props: ButtonProps) {
-  const { data: session } = useSession()
+  const { session } = useSmash()
   const router = useRouter()
   if (session) {
     return (
       <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
-        <Avatar
-          sx={{ height: "100%", border: "2px white solid", cursor: "pointer" }}
-          onClick={() => router.push(`/users/${session.user.name}`)}
-          src={session.user.profileImageUrl || ""}
-        />
+        <Avatar sx={{ height: '100%', border: '2px white solid', cursor: 'pointer' }} onClick={() => router.push(`/users/${session.user.name}`)} src={session.user.profileImageUrl || ''} />
         <SignInBtn onClick={() => signOut()}>
           <Icon fontSize={24} icon="mdi:logout" />
         </SignInBtn>
@@ -62,14 +59,14 @@ export default function LoginButton(props: ButtonProps) {
       <Button
         variant="contained"
         sx={{
-          borderRadius: "0.5rem",
+          borderRadius: '0.5rem',
         }}
         LinkComponent={Link}
         href="/me">
         Stats
       </Button>
 
-      <SignInBtn onClick={() => signIn("twitch")}>
+      <SignInBtn onClick={() => signIn('twitch')}>
         <Icon fontSize={24} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
         Sign in with Twitch
       </SignInBtn>

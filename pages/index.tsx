@@ -1,21 +1,21 @@
-import * as React from "react"
-import type { NextPage } from "next"
-import Typography from "@mui/material/Typography"
-import Box from "@mui/material/Box"
-import Link from "../src/Link"
-import PokeInfo from "../components/PokeInfo"
-import SmashPass from "../components/SmashPass"
-import { css, IconButton, Stack, Tooltip, useTheme } from "@mui/material"
-import { useSmash } from "../lib/SmashContext"
-import LoginButton from "../components/LoginButton"
-import { styled } from "@mui/material/styles"
-import UserStats from "../components/UserStats"
-import { Icon } from "@iconify/react"
-import { SwipeRef } from "../components/SwipeCards"
-import IdField from "../components/IdField"
-import KeyBinds from "../components/KeyBinds"
-import toast from "react-hot-toast"
+import { Icon } from "@iconify/react";
+import { css, IconButton, Stack, Tooltip, useTheme } from "@mui/material";
+import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
 
+import IdField from "../components/IdField";
+import KeyBinds from "../components/KeyBinds";
+import LoginButton from "../components/LoginButton";
+import PokeInfo from "../components/PokeInfo";
+import SmashPass from "../components/SmashPass";
+import { SwipeRef } from "../components/SwipeCards";
+import UserStats from "../components/UserStats";
+import { useSmash } from "../lib/SmashContext";
+import Link from "../src/Link";
+
+import type { NextPage } from 'next'
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
   font-weight: bold;
@@ -32,17 +32,24 @@ const Home: NextPage = () => {
   const theme = useTheme()
   const { error, score, currentId } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const cardRef = React.useRef<SwipeRef>(null)
+  const onButtonPress = React.useCallback(
+    (ch: 'smash' | 'pass' | undefined) => {
+      if (currentId > 898) return
+      cardRef.current?.swipe(ch === 'smash' ? 'right' : 'left')
+    },
+    [currentId, cardRef]
+  )
 
   return (
     <>
       <Box
         sx={{
           py: { md: 0, lg: 2, xl: 4 },
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
         }}>
         <Typography
           variant="h4"
@@ -50,15 +57,15 @@ const Home: NextPage = () => {
           css={headerCSS}
           gutterBottom
           sx={{
-            color: "#FFDE00",
-            mt: { sm: 0, "2xl": 5 },
+            color: '#FFDE00',
+            mt: { sm: 0, '2xl': 5 },
           }}>
           Poké
           <Typography
             display="inline"
             css={css`
               margin-left: 8px;
-              font-family: "Lilita One";
+              font-family: 'Lilita One';
               font-weight: 600;
               color: ${theme.palette.error.main};
               background-clip: text;
@@ -82,27 +89,16 @@ const Home: NextPage = () => {
         </Typography>
         <PokeInfo cardRef={cardRef} />
 
-        {error && <div>Error! {error.message || "Please Reload"}</div>}
-        <Stack direction="column" sx={{ height: 400, mt: "1rem" }} spacing={4}>
-          <Typography
-            component="div"
-            className="flex flex-row gap-2 justify-center items-center text-lg md:text-xl lg:text-2xl xl:text-3xl"
-            fontWeight="bold"
-            align="center">
+        {error && <div>Error! {error.message || 'Please Reload'}</div>}
+        <Stack direction="column" sx={{ height: 400, mt: '1rem' }} spacing={4}>
+          <Typography component="div" className="flex flex-row gap-2 justify-center items-center text-lg md:text-xl lg:text-2xl xl:text-3xl" fontWeight="bold" align="center">
             Pokemon <IdField /> of 898
           </Typography>
-          <SmashPass
-            smashes={score.smashes}
-            passes={score.passes}
-            onChoice={(ch) => {
-              if (currentId > 898) return
-              cardRef.current?.swipe(ch === "smash" ? "right" : "left")
-            }}
-          />
+          <SmashPass smashes={score.smashes} passes={score.passes} onChoice={onButtonPress} />
 
           <UserStats />
         </Stack>
-        <Box sx={{ position: "absolute", right: 4, top: 4 }}>
+        <Box sx={{ position: 'absolute', right: 4, top: 4 }}>
           <LoginButton />
         </Box>
         <KeyBinds />
@@ -113,14 +109,14 @@ const Home: NextPage = () => {
               href="https://jimmyboy.tv"
               target="_blank"
               sx={(theme) => ({
-                fontFamily: "Lilita One",
-                textDecoration: "none",
+                fontFamily: 'Lilita One',
+                textDecoration: 'none',
                 color: theme.palette.twitch.muted.widow,
                 fontWeight: 400,
-                textShadow: "2px 2px 1px #000",
-                transition: "text-shadow 200ms ease-in-out",
-                "div:hover > &": {
-                  textShadow: "4px 4px 2px #000",
+                textShadow: '2px 2px 1px #000',
+                transition: 'text-shadow 200ms ease-in-out',
+                'div:hover > &': {
+                  textShadow: '4px 4px 2px #000',
                 },
               })}>
               Jimmyboy
@@ -128,18 +124,12 @@ const Home: NextPage = () => {
           </CreatedCard>
           <div className="flex-grow" />
           <div className="flex flex-col items-start h-32 gap-4 mx-6 my-6">
-            <Tooltip
-              className="pointer-events-auto "
-              title="Join our Discord for future projects and updates!"
-              placement="left-start">
+            <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
               <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/KA49N8H">
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
             </Tooltip>
-            <Tooltip
-              className="pointer-events-auto "
-              title="Support me for more content like this!"
-              placement="left-start">
+            <Tooltip className="pointer-events-auto " title="Support me for more content like this!" placement="left-start">
               <IconButton className="fancy-bg w-10 h-10" target="_blank" href="https://www.patreon.com/devJimmyboy">
                 <Icon fontSize={18} icon="fa-brands:patreon" />
               </IconButton>
@@ -152,7 +142,7 @@ const Home: NextPage = () => {
 }
 
 export default Home
-const Footer = styled("footer")`
+const Footer = styled('footer')`
   @media screen and (min-width: 800px) {
     bottom: 0;
     top: unset;
@@ -171,7 +161,7 @@ const Footer = styled("footer")`
   flex-direction: column;
 `
 
-const CreatedCard = styled("div")`
+const CreatedCard = styled('div')`
   @media screen and (min-width: 800px) {
     border-radius: 0.45em 0.45em 0 0;
     padding: 0.325em 0.825em;

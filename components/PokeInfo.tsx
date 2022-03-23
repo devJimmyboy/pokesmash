@@ -1,41 +1,40 @@
-import { Button, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material"
-import { useKeyPressEvent } from "react-use"
-import { styled, css } from "@mui/system"
-import { Pokemon, PokemonSpecies } from "pokenode-ts"
-import React, { ReactElement, RefObject, useState } from "react"
-import useSWR from "swr"
-import { useSmash } from "../lib/SmashContext"
-import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils"
-import SwipeCards, { SwipeRef } from "./SwipeCards"
-import Type, { PokeType } from "./Type"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { useHotkeys } from "react-hotkeys-hook"
-import toast from "react-hot-toast"
+import { Button, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material";
+import { css, styled } from "@mui/system";
+import { motion } from "framer-motion";
+import { Pokemon, PokemonSpecies } from "pokenode-ts";
+import React, { ReactElement, RefObject, useState } from "react";
+import toast from "react-hot-toast";
+import { useHotkeys } from "react-hotkeys-hook";
+import useSWR from "swr";
+
+import { pokeClient, useSmash } from "../lib/SmashContext";
+import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils";
+import SwipeCards, { SwipeRef } from "./SwipeCards";
+import Type, { PokeType } from "./Type";
 
 type Props = { cardRef: RefObject<SwipeRef> }
 
 const MotionText = motion(Typography)
 
 const getBgByType: { [key in PokeType]: string[] } = {
-  bug: ["forest"],
-  dark: ["city"],
-  dragon: ["space"],
-  electric: ["thunderplains"],
-  fairy: ["space"],
-  fighting: ["city", "meadow"],
-  fire: ["volcanocave", "desert"],
-  flying: ["mountain", "route"],
-  ghost: ["earthycave"],
-  grass: ["meadow"],
-  ground: ["mountain", "earthycave", "route"],
-  ice: ["icecave"],
-  normal: ["route", "city"],
-  poison: ["earthycave"],
-  psychic: ["city", "spl"],
-  rock: ["mountain", "earthycave"],
-  steel: ["mountain"],
-  water: ["beach", "beachshore", "river", "deepsea"],
+  bug: ['forest'],
+  dark: ['city'],
+  dragon: ['space'],
+  electric: ['thunderplains'],
+  fairy: ['space'],
+  fighting: ['city', 'meadow'],
+  fire: ['volcanocave', 'desert'],
+  flying: ['mountain', 'route'],
+  ghost: ['earthycave'],
+  grass: ['meadow'],
+  ground: ['mountain', 'earthycave', 'route'],
+  ice: ['icecave'],
+  normal: ['route', 'city'],
+  poison: ['earthycave'],
+  psychic: ['city', 'spl'],
+  rock: ['mountain', 'earthycave'],
+  steel: ['mountain'],
+  water: ['beach', 'beachshore', 'river', 'deepsea'],
 }
 
 const PokeCard = styled(Card)`
@@ -70,12 +69,8 @@ const PokeContent = styled(CardContent)`
   }
 `
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
-
 const getBg = (pokeInfo: Pokemon) => {
-  return getBgByType[pokeInfo.types[0].type.name as PokeType][
-    Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)
-  ]
+  return getBgByType[pokeInfo.types[0].type.name as PokeType][Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)]
 }
 
 export default function PokeInfo({ cardRef }: Props) {
@@ -90,26 +85,27 @@ export default function PokeInfo({ cardRef }: Props) {
     seenBefore: [seenBefore],
     startCelebration,
   } = smashCtx
-  // const cardRef = useRef<any>(null)
-  const { data } = useSWR<PokemonSpecies>(() => pokeInfo?.species.url, fetcher)
+
+  const { data } = useSWR<PokemonSpecies>(
+    () => pokeInfo?.species?.name,
+    (name: string) => pokeClient.getPokemonSpeciesByName(name)
+  )
   const { bgUrl, shiny } = usePokemonPicture()
 
   useHotkeys(
-    "up",
-    (e) => {
-      console.debug("current id: ", currentId, "current id in score: ", score.currentId)
+    'up',
+    () => {
       if (currentId > 898) return
       if (currentId < score.currentId) {
         setCurrentId((prev) => prev + 1)
       } else {
-        toast("You haven't Smashed or Passed this Pokemon yet!", { id: "currentId-reached" })
+        toast("You haven't Smashed or Passed this Pokemon yet!", { id: 'currentId-reached' })
       }
     },
-    {},
-    [currentId, score.currentId]
+    [currentId]
   )
   useHotkeys(
-    "down",
+    'down',
     (e) => {
       if (currentId > 898) return
       if (currentId > 1) {
@@ -153,8 +149,8 @@ export default function PokeInfo({ cardRef }: Props) {
       <div
         className="cardContainer h-full flex items-center justify-center"
         style={{
-          minWidth: "450px",
-          maxHeight: "600px",
+          minWidth: '450px',
+          maxHeight: '600px',
         }}>
         <CircularProgress />
       </div>
@@ -165,7 +161,7 @@ export default function PokeInfo({ cardRef }: Props) {
     <div className="cardContainer h-full">
       <SwipeCards
         ref={cardRef}
-        onSwipe={async (dir: "left" | "right" | "up" | "down") => {
+        onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
           if (currentId === 898) {
             return setCurrentId((id) => id + 1)
           } else if (currentId > 898) {
@@ -173,31 +169,29 @@ export default function PokeInfo({ cardRef }: Props) {
           }
           const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
           if (shockRef.current && amShocked) {
-            typeof amShocked !== "boolean"
-              ? shockRef.current.shocked(cardRef, amShocked)
-              : shockRef.current.shocked(cardRef)
+            typeof amShocked !== 'boolean' ? shockRef.current.shocked(cardRef, amShocked) : shockRef.current.shocked(cardRef)
           } else {
-            if (!cardRef.current) console.error("CardRef not found!")
+            if (!cardRef.current) console.error('CardRef not found!')
 
             setTimeout(() => cardRef.current?.reset(), 500)
           }
-          if (process.env.NODE_ENV === "development") console.log(dir)
-          if (dir === "left") {
+          if (process.env.NODE_ENV === 'development') console.log(dir)
+          if (dir === 'left') {
             score.pass()
-          } else if (dir === "right") {
+          } else if (dir === 'right') {
             score.smash()
           }
           setCurrentId((id) => id + 1)
         }}>
-        <PokeCard className={""}>
+        <PokeCard className={''}>
           <div
             style={{
-              height: "100%",
-              width: "100%",
-              position: "absolute",
-              backgroundImage: `url(/backgrounds/bg-${chosenBg || "beach"}.${chosenBg === "space" ? "jpg" : "png"})`,
-              backgroundSize: "cover",
-              backgroundPosition: "left",
+              height: '100%',
+              width: '100%',
+              position: 'absolute',
+              backgroundImage: `url(/backgrounds/bg-${chosenBg || 'beach'}.${chosenBg === 'space' ? 'jpg' : 'png'})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'left',
             }}
           />
           <div
@@ -213,18 +207,15 @@ export default function PokeInfo({ cardRef }: Props) {
               align-items: center;
               justify-content: center;
 
-              ${style === "hd"
+              ${style === 'hd'
                 ? `image-rendering: auto;`
                 : `image-rendering: -moz-crisp-edges;
             image-rendering: pixelated;
             -ms-interpolation-mode: nearest-neighbor;`}
             `}>
-            {bgUrl.includes("substitute") ? (
+            {bgUrl.includes('substitute') ? (
               <>
-                <motion.div
-                  style={{ scale: 3 }}
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                <motion.div style={{ scale: 3 }} animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
                   <img src={bgUrl} />
                 </motion.div>
                 <Typography fontWeight={600} color="HighlightText" mt={8}>
@@ -232,31 +223,28 @@ export default function PokeInfo({ cardRef }: Props) {
                 </Typography>
               </>
             ) : (
-              <img
-                style={{ transform: style === "showdown" ? "scale(400%)" : "scale(85%)", minWidth: "75px" }}
-                src={bgUrl}
-              />
+              <img style={{ transform: style === 'showdown' ? 'scale(400%)' : 'scale(85%)', minWidth: '75px' }} src={bgUrl} />
             )}
           </div>
           {shiny && (
             <div
               style={{
-                width: "200%",
-                height: "125%",
+                width: '200%',
+                height: '125%',
 
-                transform: "translateX(-25%) rotate(60deg) ",
-                position: "absolute",
+                transform: 'translateX(-25%) rotate(60deg) ',
+                position: 'absolute',
               }}>
               <motion.div
-                className={"is-shiny transform-gpu"}
-                animate={{ y: ["-150%", "1500%", "-150%"], rotate: [0, 5, 0], scaleY: [2, 1, 2] }}
+                className={'is-shiny transform-gpu'}
+                animate={{ y: ['-150%', '1500%', '-150%'], rotate: [0, 5, 0], scaleY: [2, 1, 2] }}
                 transition={{
-                  type: "spring",
+                  type: 'spring',
                   stiffness: 200,
                   damping: 20,
                   mass: 0.5,
                   repeat: Infinity,
-                  repeatType: "mirror",
+                  repeatType: 'mirror',
                   repeatDelay: 3,
                 }}></motion.div>
             </div>
@@ -270,9 +258,7 @@ export default function PokeInfo({ cardRef }: Props) {
                 <Type type={type.type.name as any} key={i} />
               ))}
             </Stack>
-            <Typography>
-              {data?.flavor_text_entries.find((v) => v.language.name === "en")?.flavor_text || "Succelent, Beautiful."}
-            </Typography>
+            <Typography>{data?.flavor_text_entries.find((v) => v.language.name === 'en')?.flavor_text || 'Succelent, Beautiful.'}</Typography>
           </PokeContent>
         </PokeCard>
       </SwipeCards>
@@ -283,14 +269,14 @@ export default function PokeInfo({ cardRef }: Props) {
 interface ShockedProps {
   data?: PokemonSpecies
   pokeInfo: Pokemon
-  dir: "left" | "right" | "up" | "down"
+  dir: 'left' | 'right' | 'up' | 'down'
 }
 
 function shouldIBeShocked({ data, pokeInfo, dir }: ShockedProps): boolean | string | ReactElement {
-  if (data?.is_baby && dir === "right") {
+  if (data?.is_baby && dir === 'right') {
     return true
   }
-  if (pokeInfo.id === 428 && dir === "left") {
+  if (pokeInfo.id === 428 && dir === 'left') {
     return (
       <Typography className="text-center text-lg">
         That was the <span className="text-red-600 font-extrabold">wrong fucking</span> move, kid.

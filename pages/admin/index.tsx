@@ -1,34 +1,20 @@
-import {
-  FormHelperText,
-  Box,
-  Button,
-  Card,
-  Fade,
-  FormControl,
-  Input,
-  Paper,
-  Popper,
-  TextField,
-  Typography,
-  useTheme,
-  InputAdornment,
-} from "@mui/material"
-import { get, getDatabase, onValue, ref } from "firebase/database"
-import { addDoc, collection, getFirestore } from "firebase/firestore"
-import type { NextPage } from "next"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
-import React, { useCallback, useEffect } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
-import { createFirebaseApp } from "../../firebase/clientApp"
-import { HexColorPicker } from "react-colorful"
-import { useBoolean } from "react-use"
-import { debounce } from "lodash"
-import { Icon } from "@iconify/react"
-import toast from "react-hot-toast"
-import CustomToast from "../../components/CustomToast"
-import Head from "next/head"
+import { FormHelperText, Box, Button, Card, Fade, FormControl, Input, Paper, Popper, TextField, Typography, useTheme, InputAdornment } from '@mui/material'
+import { get, getDatabase, onValue, ref } from 'firebase/database'
+import { addDoc, collection, getFirestore } from 'firebase/firestore'
+import type { NextPage } from 'next'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import React, { useCallback, useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts'
+import { createFirebaseApp } from '../../firebase/clientApp'
+import { HexColorPicker } from 'react-colorful'
+import { useBoolean } from 'react-use'
+import { debounce } from 'lodash'
+import { Icon } from '@iconify/react'
+import toast from 'react-hot-toast'
+import CustomToast from '../../components/CustomToast'
+import Head from 'next/head'
 
 const app = createFirebaseApp()
 
@@ -37,7 +23,7 @@ const Admin: NextPage = (props) => {
   const { status, data: session } = useSession({
     required: true,
     onUnauthenticated() {
-      router.push("/")
+      router.push('/')
       // The user is not authenticated, handle it here.
     },
   })
@@ -45,14 +31,14 @@ const Admin: NextPage = (props) => {
 
   React.useEffect(() => {
     if (!session) return
-    if (session.user.name.toLowerCase() === "devjimmyboy") {
+    if (session.user.name.toLowerCase() === 'devjimmyboy') {
       setAllowed(true)
     } else {
       setAllowed(false)
-      router.push("/")
+      router.push('/')
     }
   }, [session, router])
-  if (status === "loading") {
+  if (status === 'loading') {
     return <div>Loading or not authenticated...</div>
   }
   if (!allowed) {
@@ -80,7 +66,7 @@ const PokemonData: React.FC<PokemonDataProps> = ({}) => {
   const db = getDatabase(app)
   const [pokeData, setPokeData] = React.useState<{ smashCount: number; passCount: number; id: number }[]>([])
   useEffect(() => {
-    get(ref(db, "pokemon")).then((snap) => {
+    get(ref(db, 'pokemon')).then((snap) => {
       const data = snap.val()
       const pokeData = Object.keys(data).map((key) => {
         return {
@@ -95,9 +81,7 @@ const PokemonData: React.FC<PokemonDataProps> = ({}) => {
   }, [])
   const theme = useTheme()
   return (
-    <Paper
-      className="flex flex-col items-center justify-center"
-      sx={{ width: 500, height: 400, bgcolor: theme.palette.background.default, color: theme.palette.info.dark }}>
+    <Paper className="flex flex-col items-center justify-center" sx={{ width: 500, height: 400, bgcolor: theme.palette.background.default, color: theme.palette.info.dark }}>
       <Typography variant="h5" component="h5">
         Pokemon
       </Typography>
@@ -134,31 +118,28 @@ const MsgForm = () => {
     formState: { errors },
   } = useForm<MsgFormData>({
     defaultValues: {
-      for: "all",
-      title: "",
-      color: "#f2f2f2",
-      url: "",
-      icon: "fa-solid:comment",
-      message: "",
+      for: 'all',
+      title: '',
+      color: '#f2f2f2',
+      url: '',
+      icon: 'fa-solid:comment',
+      message: '',
     },
   })
 
   const onSubmit = handleSubmit(async (data) => {
     const db = getFirestore(app)
     console.log(data)
-    const msgCollection = collection(db, "messages")
+    const msgCollection = collection(db, 'messages')
     const docRef = await addDoc(msgCollection, data)
-    toast.success("Message added!")
+    toast.success('Message added!')
   })
   return (
     <>
       <Head>
         <title>PokeSmash - Admin Dashboard</title>
         <meta name="title" content="PokeSmash - Admin Dashboard" />
-        <meta
-          name="description"
-          content={`Admin area for PokeSmash. Hey, wait! You shouldn't be seeing this! Why am I making a description for this page?`}
-        />
+        <meta name="description" content={`Admin area for PokeSmash. Hey, wait! You shouldn't be seeing this! Why am I making a description for this page?`} />
       </Head>
       <Paper
         component="form"
@@ -176,7 +157,7 @@ const MsgForm = () => {
             name="icon"
             control={control}
             render={({ field }) => {
-              const color = watch("color")
+              const color = watch('color')
               return (
                 <FormControl>
                   <FormHelperText>Icon</FormHelperText>
@@ -202,10 +183,7 @@ const MsgForm = () => {
               return (
                 <div>
                   <ColorPreview onClick={openColor} color={field.value} />
-                  <Popper
-                    open={isColorOpen}
-                    anchorEl={() => document.querySelector("#colorSelect") as HTMLDivElement}
-                    placement="right-end">
+                  <Popper open={isColorOpen} anchorEl={() => document.querySelector('#colorSelect') as HTMLDivElement} placement="right-end">
                     <div ref={field.ref}>
                       <HexColorPicker {...{ ...field, ref: undefined }} />
                     </div>
@@ -216,11 +194,7 @@ const MsgForm = () => {
           />
         </div>
         <Controller name="title" control={control} render={({ field }) => <TextField label="Title:" {...field} />} />
-        <Controller
-          name="message"
-          control={control}
-          render={({ field }) => <TextField label="Message to Send:" {...field} />}
-        />
+        <Controller name="message" control={control} render={({ field }) => <TextField label="Message to Send:" {...field} />} />
 
         <div className="flex flex-row gap-8">
           <Button
@@ -229,9 +203,9 @@ const MsgForm = () => {
             color="secondary"
             onClick={(e) => {
               const vals = getValues()
-              toast.dismiss("msg-test")
+              toast.dismiss('msg-test')
               toast(vals.message, {
-                id: "msg-test",
+                id: 'msg-test',
                 style: { color: vals.color },
                 icon: <Icon icon={vals.icon} color={vals.color} />,
                 duration: 60000,
@@ -250,11 +224,5 @@ const MsgForm = () => {
   )
 }
 const ColorPreview = ({ color, onClick }: { color: string; onClick: () => void }) => {
-  return (
-    <div
-      id="colorSelect"
-      className=" rounded-lg w-12 h-9 shadow-lg"
-      style={{ backgroundColor: color }}
-      onClick={onClick}></div>
-  )
+  return <div id="colorSelect" className=" rounded-lg w-12 h-9 shadow-lg" style={{ backgroundColor: color }} onClick={onClick}></div>
 }
