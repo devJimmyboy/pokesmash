@@ -47,6 +47,7 @@
     "react-spring": "^9.4.4",
     "react-use": "^17.3.2",
     "react-window": "^1.8.6",
+    "reactfire": "^4.2.1",
     "recharts": "^2.1.9",
     "swr": "^1.2.2",
     "uuid": "^8.3.2",

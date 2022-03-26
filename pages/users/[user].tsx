@@ -46,7 +46,7 @@ const tl = gsap.timeline({ repeat: -1 })
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const UserProfile: NextPage<Props> = ({ user }) => {
   const db = getDatabase(createFirebaseApp())
-  const { style } = useSmash()
+  const { style, session } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: score, error: scoreError } = useSWR<ScoreProp, ScoreError>(typeof user === 'object' && `/api/user/score?user=${user.name.toLowerCase()}`, fetcher)
@@ -114,7 +114,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
               tab === 1 ? (
                 <StatsPage smashes={score.smashCount} passes={score.passCount} />
               ) : (
-                <div className="absolute h-full overflow-y-auto">
+                <div className="absolute h-full w-full overflow-y-auto">
                   <Grid
                     container
                     alignItems="center"

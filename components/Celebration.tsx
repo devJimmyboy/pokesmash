@@ -75,7 +75,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
 
   useEffect(() => {
     if (!started) return
-    const totalScore = Object.keys(score.choices).length
+    const totalScore = Object.values(score.choices).filter((v) => v === 'smash').length
     console.log(totalScore)
 
     tlTxt
@@ -292,7 +292,7 @@ const ScoresList = React.forwardRef<number, { score: ReturnType<typeof useSmash>
 
   const { height, width } = useWindowSize()
   return (
-    <div id="scroller" style={{ width: width / 2, height: Object.keys(scores).length * 64, position: 'absolute' }}>
+    <div id="scroller" style={{ width: width / 2, height: Object.values(scores).filter((v) => v === 'smash').length * 64, position: 'absolute' }}>
       {Object.keys(scores)
         .filter((id) => scores[id] === 'smash')
         .map((id) => (

@@ -32,16 +32,15 @@ export default function UserStats({}: Props) {
   const passWidth = useAnimation()
 
   useEffect(() => {
-    if (currentId <= 1) return
-    if (loadingP || loadingS || errorP || errorS) {
-      smashWidth.set({ width: '0.1%' })
-      passWidth.set({ width: '0.1%' })
-    }
-    let smashes = pokeSmashes || 0.1
-    let passes = pokePasses || 0.1
+    if (pokeSmashes && pokePasses) {
+      let smashes = pokeSmashes
+      let passes = pokePasses
+      let smashNum = ((smashes / (smashes + passes)) * 100).toFixed(3)
+      let passNum = ((passes / (smashes + passes)) * 100).toFixed(3)
 
-    smashWidth.start({ width: `${(smashes / (smashes + passes)) * 100}%` })
-    passWidth.start({ width: `${(passes / (smashes + passes)) * 100}%` })
+      if (!smashNum.match('Infinity')) smashWidth.start({ width: `${smashNum}%` })
+      if (!passNum.match('Infinity')) passWidth.start({ width: `${passNum}%` })
+    }
   }, [smashWidth, passWidth, pokePasses, pokeSmashes])
   if (errorS || errorP) return null
 

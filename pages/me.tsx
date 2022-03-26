@@ -100,7 +100,7 @@ const UserProfile: NextPage<Props> = ({}) => {
             {tab === 1 ? (
               <StatsPage smashes={score.smashes} passes={score.passes} />
             ) : (
-              <div className="absolute h-full overflow-y-auto">
+              <div className="absolute h-full w-full overflow-y-auto">
                 <Grid
                   container
                   alignItems="center"

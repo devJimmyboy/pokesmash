@@ -112,7 +112,6 @@ export default function PokeInfo({ cardRef }: Props) {
         setCurrentId((prev) => prev - 1)
       }
     },
-    {},
     [currentId]
   )
 
@@ -162,11 +161,8 @@ export default function PokeInfo({ cardRef }: Props) {
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
-          if (currentId === 898) {
-            return setCurrentId((id) => id + 1)
-          } else if (currentId > 898) {
-            return
-          }
+          if (currentId > 898) return
+
           const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
           if (shockRef.current && amShocked) {
             typeof amShocked !== 'boolean' ? shockRef.current.shocked(cardRef, amShocked) : shockRef.current.shocked(cardRef)

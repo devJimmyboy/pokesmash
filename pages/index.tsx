@@ -103,15 +103,14 @@ const Home: NextPage = () => {
         </Box>
         <KeyBinds />
         <Footer>
-          <CreatedCard sx={{ fontSize: [16, 18, 24, 28] }}>
-            <div className="hidden md:inline">Created by </div>
+          <CreatedCard sx={{ fontSize: [16, 18, 24, 28], fontFamily: 'Lilita One' }}>
+            <div className="hidden md:inline">A </div>
             <Link
-              href="https://jimmyboy.tv"
-              target="_blank"
+              href="https://twitch.tv/devJimmyboy"
+              target="TwitchLink"
               sx={(theme) => ({
-                fontFamily: 'Lilita One',
                 textDecoration: 'none',
-                color: theme.palette.twitch.muted.widow,
+                color: theme.palette.twitch.muted.jiggle,
                 fontWeight: 400,
                 textShadow: '2px 2px 1px #000',
                 transition: 'text-shadow 200ms ease-in-out',
@@ -121,6 +120,7 @@ const Home: NextPage = () => {
               })}>
               Jimmyboy
             </Link>
+            <div className="hidden md:inline"> app</div>
           </CreatedCard>
           <div className="flex-grow" />
           <div className="flex flex-col items-start h-32 gap-4 mx-6 my-6">
@@ -165,7 +165,6 @@ const CreatedCard = styled('div')`
   @media screen and (min-width: 800px) {
     border-radius: 0.45em 0.45em 0 0;
     padding: 0.325em 0.825em;
-    font-weight: bold;
   }
   background: ${(props) => props.theme.palette.twitch.main};
   pointer-events: auto;
@@ -176,5 +175,4 @@ const CreatedCard = styled('div')`
   border-radius: 0 0 0.45em 0.45em;
 
   margin-left: 1em;
-  font-weight: 600;
 `

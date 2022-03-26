@@ -11,7 +11,7 @@ import { Pokemon, PokemonClient } from "pokenode-ts";
 import React, { Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react";
 import { useObjectVal } from "react-firebase-hooks/database";
 import toast from "react-hot-toast";
-import { useList, useLocalStorage } from "react-use";
+import { useList, useLocalStorage, useSessionStorage } from "react-use";
 import { ListActions } from "react-use/lib/useList";
 import useSWR, { mutate } from "swr";
 
@@ -19,6 +19,7 @@ import Celebration, { CelebrationRef } from "../components/Celebration";
 import ShockValue, { ShockRef } from "../components/ShockValue";
 import StyleForm from "../components/StyleForm";
 import { createFirebaseApp } from "../firebase/clientApp";
+import { onChoice } from "../firebase/utils";
 
 export const pokeClient = new PokemonClient({
   cacheOptions: { maxAge: 60 * 60 * 1000, exclude: { query: false } },
@@ -158,7 +159,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   })
   const [dbScore, loadingDbScore, errorDbStore] = useObjectVal(session ? ref(db, `users/${session.user.name.toLowerCase()}`) : null)
 
-  const [seenMessages, setSeenMessages] = useLocalStorage<string[]>('seenMessages', [])
+  const [seenMessages, setSeenMessages] = useSessionStorage<string[]>('seenMessages', [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
@@ -174,8 +175,13 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   const smash = React.useCallback(async () => {
     if (currentId > 898) return
+    const props = {
+      id: currentId,
+      choice: 'smash' as 'smash' | 'pass',
+      type: (score.choices[`${currentId}`] ? (score.choices[`${currentId}`] === 'pass' ? 'switch' : 'same') : undefined) as 'switch' | 'same' | undefined,
+      session,
+    }
 
-    fetch(`/api/choice?id=${currentId}&choice=smash${!session && score.choices[`${currentId}`] ? `&type=${score.choices[`${currentId}`] === 'pass' ? 'switch' : 'same'}` : ''}`, { method: 'POST' })
     setScore((prev) => {
       if (!prev.choices) prev.choices = {}
       if (prev.choices[`${currentId}`] === 'pass') prev.passes--
@@ -185,10 +191,16 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       }
       return prev
     })
-  }, [currentId, session, pokeRef])
+    onChoice(props)
+  }, [currentId, session, pokeRef, score])
   const pass = React.useCallback(async () => {
     if (currentId > 898) return
-    fetch(`/api/choice?id=${currentId}&choice=pass${!session && score.choices[`${currentId}`] ? `&type=${score.choices[`${currentId}`] === 'smash' ? 'switch' : 'same'}` : ''}`, { method: 'POST' })
+    const props = {
+      id: currentId,
+      choice: 'pass' as 'smash' | 'pass',
+      type: (score.choices[`${currentId}`] ? (score.choices[`${currentId}`] === 'smash' ? 'switch' : 'same') : undefined) as 'switch' | 'same' | undefined,
+      session,
+    }
     setScore((prev) => {
       if (!prev.choices) prev.choices = {}
 
@@ -199,6 +211,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       }
       return prev
     })
+    onChoice(props)
   }, [currentId, session, pokeRef, score])
 
   // In app messages

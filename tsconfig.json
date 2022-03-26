@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,18 +16,6 @@
     "incremental": true,
     "target": "es5"
   },
-  "include": [
-    "next-env.d.ts",
-    "src/**/*.ts",
-    "pages/**/*",
-    "components/**/*",
-    "lib/**/*",
-    "types/**/*",
-    "firebase/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "functions",
-    "scripts"
-  ]
+  "include": ["next-env.d.ts", "src/**/*", "pages/**/*", "components/**/*", "lib/**/*", "types/**/*", "firebase/**/*"],
+  "exclude": ["node_modules", "functions", "scripts"]
 }
