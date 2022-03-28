@@ -1,14 +1,30 @@
-import { Button, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material";
-import { css, styled } from "@mui/system";
+import LoadingButton from "@mui/lab/LoadingButton";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Modal,
+  Stack,
+  TextField,
+  Theme,
+  Typography,
+} from "@mui/material";
+import { css, styled, SxProps } from "@mui/system";
 import { motion } from "framer-motion";
 import { Pokemon, PokemonSpecies } from "pokenode-ts";
-import React, { ReactElement, RefObject, useState } from "react";
+import React, { ReactElement, RefObject, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useBoolean } from "react-use";
 import useSWR from "swr";
 
 import { pokeClient, useSmash } from "../lib/SmashContext";
 import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils";
+import Fade from "./Fade";
 import SwipeCards, { SwipeRef } from "./SwipeCards";
 import Type, { PokeType } from "./Type";
 
@@ -35,6 +51,22 @@ const getBgByType: { [key in PokeType]: string[] } = {
   rock: ['mountain', 'earthycave'],
   steel: ['mountain'],
   water: ['beach', 'beachshore', 'river', 'deepsea'],
+}
+
+const modalStyle: SxProps<Theme> = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  backgroundColor: '#222222',
+  boxShadow: 24,
+  borderRadius: 2,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.25rem',
+  alignItems: 'start',
+  p: 4,
 }
 
 const PokeCard = styled(Card)`
@@ -85,6 +117,7 @@ export default function PokeInfo({ cardRef }: Props) {
     seenBefore: [seenBefore],
     startCelebration,
   } = smashCtx
+  const [modalShown, toggleConfirm] = useBoolean(false)
 
   const { data } = useSWR<PokemonSpecies>(
     () => pokeInfo?.species?.name,
@@ -135,9 +168,15 @@ export default function PokeInfo({ cardRef }: Props) {
           {"Nice! You're a Degenerate!"}
         </MotionText>
         {seenBefore && (
-          <Button size="large" variant="contained" className="mt-24" onClick={() => startCelebration(true)}>
-            Watch Ending Cutscene Again
-          </Button>
+          <>
+            <Button size="large" variant="contained" className="mt-24" onClick={() => startCelebration(true)}>
+              Watch Ending Cutscene Again
+            </Button>
+            <Button size="large" variant="contained" className="mt-12" onClick={() => toggleConfirm(true)}>
+              Reset Account
+            </Button>
+            <ConfirmModal open={modalShown} onClose={() => toggleConfirm(false)} />
+          </>
         )}
       </div>
     )
@@ -280,4 +319,91 @@ function shouldIBeShocked({ data, pokeInfo, dir }: ShockedProps): boolean | stri
     )
   }
   return false
+}
+
+function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { session } = useSmash()
+  const { control, handleSubmit, formState, watch } = useForm({
+    defaultValues: {
+      confirm: '',
+    },
+  })
+  useEffect(() => {
+    const unsubscribe = watch((vals) => {
+      console.log('watch', vals, formState)
+    })
+    return () => {
+      unsubscribe.unsubscribe()
+    }
+  }, [watch])
+
+  const { errors } = formState
+
+  const onSubmit = handleSubmit((data) => {
+    if (session)
+      return fetch('/api/user/wipe', { method: 'DELETE' }).then((v) => {
+        if (v.status === 200) {
+          localStorage.setItem('score', JSON.stringify({}))
+          window.location.reload()
+        } else throw new Error('Failed to wipe data')
+      })
+    else {
+      localStorage.removeItem('score')
+      window.location.reload()
+      return Promise.resolve()
+    }
+  })
+  return (
+    <Modal
+      aria-labelledby="confirm-wipe-modal-title"
+      aria-describedby="confirm-wipe-modal-description"
+      open={open}
+      onClose={onClose}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500,
+      }}>
+      <Fade in={open}>
+        <Box component="form" onSubmit={onSubmit} sx={modalStyle}>
+          <Typography id="confirm-wipe-modal-title" variant="h4" component="h2">
+            Hold Up! Let's make sure you understand what you're doing!
+          </Typography>
+          <Typography id="confirm-wipe-modal-description" variant="h6" align="center">
+            You're about to wipe <strong className="text-red-400 font-extrabold">all your choices</strong> and <strong className="text-red-400 font-extrabold">start over</strong>. Are you sure you
+            want to do this?
+          </Typography>
+          <Controller
+            name="confirm"
+            control={control}
+            rules={{
+              required: true,
+              validate: {
+                positive: (v) => v.toLowerCase() === 'confirm',
+              },
+            }}
+            render={({ field: { onBlur, onChange, ref, value }, fieldState }) => (
+              <TextField
+                id="confirm-wipe-modal-field"
+                type="other"
+                sx={{ '& > label': { fontWeight: '700' } }}
+                variant="outlined"
+                fullWidth
+                error={fieldState.invalid}
+                label="Type CONFIRM to Wipe Your Account"
+                helperText={fieldState.error && "You didn't type CONFIRM. Try again."}
+                onChange={(e) => onChange(e.target.value)}
+                InputProps={{ onBlur }}
+                inputRef={ref}
+                value={value}
+              />
+            )}
+          />
+          <LoadingButton type="submit" sx={{ alignSelf: 'flex-end' }} variant="contained" color="warning" loading={formState.isSubmitting}>
+            Wipe Choices
+          </LoadingButton>
+        </Box>
+      </Fade>
+    </Modal>
+  )
 }

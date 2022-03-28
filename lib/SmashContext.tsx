@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Box } from "@mui/material";
 import Chance from "chance";
-import { get, getDatabase, onValue, ref } from "firebase/database";
+import { get, getDatabase, ref } from "firebase/database";
 import { collection, CollectionReference, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 import gsap from "gsap";
 import { Session } from "next-auth";
@@ -163,7 +163,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
-  const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(currentId > 898 ? null : currentId.toString(), (id) => pokeClient.getPokemonById(Number(id)))
+  const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(!currentId || currentId > 898 ? null : currentId.toString(), (id) => pokeClient.getPokemonById(Number(id)))
 
   useEffect(() => {
     if (currentId < score.currentId) return
@@ -257,14 +257,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     const userSmashRef = ref(db, `users/${uid}/smashCount`)
     const userPassRef = ref(db, `users/${uid}/passCount`)
 
-    const unsubSmashCt = onValue(userSmashRef, (smashCount) => {
+    get(userSmashRef).then((smashCount) => {
       if (!smashCount.exists()) return
       setScore((prev) => ({
         ...prev,
         smashes: smashCount.val() || 0,
       }))
     })
-    const unsubPassCt = onValue(userPassRef, (passCount) => {
+    get(userPassRef).then((passCount) => {
       if (!passCount.exists()) return
       setScore((prev) => ({
         ...prev,
@@ -272,8 +272,6 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       }))
     })
     return () => {
-      unsubPassCt()
-      unsubSmashCt()
       unsubMessages()
     }
   }, [session, setMessages])

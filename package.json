@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.8.1",
     "@iconify/react": "^3.2.0",
     "@inlet/react-pixi": "^6.6.5",
+    "@mui/lab": "^5.0.0-alpha.74",
     "@mui/material": "^5.5.2",
     "@next-auth/mongodb-adapter": "^1.0.3",
     "@twurple/api": "^5.0.18",
@@ -70,6 +71,7 @@
     "@types/react": "^17.0.43",
     "@types/tailwindcss": "^3.0.9",
     "@types/tar": "^6.1.1",
+    "@types/yargs": "^17.0.10",
     "args": "^5.0.1",
     "autoprefixer": "^10.4.4",
     "babel-loader": "^8.2.4",
@@ -94,6 +96,7 @@
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "tslib": "^2.3.1",
     "typescript": "^4.6.3",
-    "webpack": "5"
+    "webpack": "5",
+    "yargs": "^17.4.0"
   }
 }

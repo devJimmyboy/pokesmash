@@ -1,7 +1,8 @@
-import { InputUnstyled, inputUnstyledClasses } from "@mui/base"
-import { styled } from "@mui/material"
-import React, { useEffect, useState } from "react"
-import { useSmash } from "../lib/SmashContext"
+import { InputUnstyled, inputUnstyledClasses } from "@mui/base";
+import { styled } from "@mui/material";
+import React, { useEffect, useState } from "react";
+
+import { useSmash } from "../lib/SmashContext";
 
 interface Props {}
 
@@ -28,7 +29,7 @@ export default function IdField({}: Props) {
 
   return (
     <InputEditable
-      value={currentId}
+      value={currentId || 1}
       type="other"
       onChange={updateId}
       onKeyDown={(e: React.KeyboardEvent<HTMLSpanElement>) => {
@@ -62,7 +63,7 @@ const InputEditable = styled(InputUnstyled)`
     }
     font-weight: 700;
     font-size: 1.5rem;
-    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
     text-align: center;
   }
   & .${inputUnstyledClasses.root} {
