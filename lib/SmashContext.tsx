@@ -9,7 +9,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Pokemon, PokemonClient } from "pokenode-ts";
 import React, { Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react";
-import { useObjectVal } from "react-firebase-hooks/database";
 import toast from "react-hot-toast";
 import { useList, useLocalStorage, useSessionStorage } from "react-use";
 import { ListActions } from "react-use/lib/useList";
@@ -157,7 +156,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     currentId: 1,
     choices: {},
   })
-  const [dbScore, loadingDbScore, errorDbStore] = useObjectVal(session ? ref(db, `users/${session.user.name.toLowerCase()}`) : null)
+  // const [dbScore, loadingDbScore, errorDbStore] = useObjectVal(session ? ref(db, `users/${session.user.name.toLowerCase()}`) : null)
 
   const [seenMessages, setSeenMessages] = useSessionStorage<string[]>('seenMessages', [])
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
@@ -268,7 +267,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       if (!passCount.exists()) return
       setScore((prev) => ({
         ...prev,
-        passCount: passCount.val() || 0,
+        passes: passCount.val() || 0,
       }))
     })
     return () => {
@@ -276,6 +275,11 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     }
   }, [session, setMessages])
   useEffect(() => {
+    if (!session && localStorage.getItem('offlineScore') === null && localStorage.getItem('score') !== null) {
+      localStorage.setItem('offlineScore', localStorage.getItem('score') as string)
+      localStorage.removeItem('score')
+    }
+
     async function setScoreFromDb(storageScore: Score) {
       var newChoices: { choices: { [key: string]: 'smash' | 'pass' }; smashCount: number; passCount: number; currentId: number } | undefined = undefined
       if (session) {
@@ -299,14 +303,17 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       })
       setCurrentId(newChoices?.currentId || storageScore.currentId)
     }
-    const raw = localStorage.getItem('score')
+    const storageKey = session ? 'score' : 'offlineScore'
+    const raw = localStorage.getItem(storageKey)
     const storageScore = raw ? (JSON.parse(raw) as Score | null) : null
     if (storageScore) {
       setScoreFromDb(storageScore)
     }
   }, [session])
   useEffect(() => {
-    localStorage.setItem('score', JSON.stringify(score))
+    const storageKey = session ? 'score' : 'offlineScore'
+
+    localStorage.setItem(storageKey, JSON.stringify(score))
   }, [score])
 
   React.useEffect(() => {

@@ -328,14 +328,14 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
       confirm: '',
     },
   })
-  useEffect(() => {
-    const unsubscribe = watch((vals) => {
-      console.log('watch', vals, formState)
-    })
-    return () => {
-      unsubscribe.unsubscribe()
-    }
-  }, [watch])
+  // useEffect(() => {
+  //   const unsubscribe = watch((vals) => {
+  //     console.log('watch', vals, formState)
+  //   })
+  //   return () => {
+  //     unsubscribe.unsubscribe()
+  //   }
+  // }, [watch])
 
   const { errors } = formState
 
@@ -343,7 +343,7 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
     if (session)
       return fetch('/api/user/wipe', { method: 'DELETE' }).then((v) => {
         if (v.status === 200) {
-          localStorage.setItem('score', JSON.stringify({}))
+          localStorage.setItem('score', JSON.stringify({ choices: {}, currentId: 1, smashes: 0, passes: 0 }))
           window.location.reload()
         } else throw new Error('Failed to wipe data')
       })
