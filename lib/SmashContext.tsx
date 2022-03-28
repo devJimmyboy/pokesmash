@@ -312,8 +312,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [session])
   useEffect(() => {
     const storageKey = session ? 'score' : 'offlineScore'
-
-    localStorage.setItem(storageKey, JSON.stringify(score))
+    if (status !== 'loading') localStorage.setItem(storageKey, JSON.stringify(score))
   }, [score])
 
   React.useEffect(() => {
