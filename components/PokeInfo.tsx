@@ -348,7 +348,7 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
         } else throw new Error('Failed to wipe data')
       })
     else {
-      localStorage.removeItem('score')
+      localStorage.removeItem('offlineScore')
       window.location.reload()
       return Promise.resolve()
     }
