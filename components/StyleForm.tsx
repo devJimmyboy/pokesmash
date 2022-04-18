@@ -1,17 +1,10 @@
-import { ListItemIcon, Switch } from "@mui/material"
-import SwitchUnstyled, { switchUnstyledClasses } from "@mui/base/SwitchUnstyled"
-import { css, styled } from "@mui/system"
-import React from "react"
-import { blue, grey } from "@mui/material/colors"
-import {
-  selectUnstyledClasses,
-  OptionUnstyled,
-  optionUnstyledClasses,
-  PopperUnstyled,
-  SelectUnstyledProps,
-  SelectUnstyled,
-} from "@mui/base"
-import Image from "next/image"
+import { ListItemIcon, Switch } from '@mui/material'
+import SwitchUnstyled, { switchUnstyledClasses } from '@mui/base/SwitchUnstyled'
+import { css, styled } from '@mui/system'
+import React from 'react'
+import { blue, grey } from '@mui/material/colors'
+import { selectUnstyledClasses, OptionUnstyled, optionUnstyledClasses, PopperUnstyled, SelectUnstyledProps, SelectUnstyled } from '@mui/base'
+import Image from 'next/image'
 
 type Props = { value: string; onChange: (value: string | null) => void }
 
@@ -47,10 +40,10 @@ export default function StyleForm({ value, onChange }: Props) {
 }
 
 const CustomSelect = (props: SelectUnstyledProps<string>) => {
-  const components: SelectUnstyledProps<string>["components"] = {
+  const components: SelectUnstyledProps<string>['components'] = {
     Root: StyledButton,
     Listbox: StyledListbox,
-    Popper: StyledPopper,
+    Popper: StyledPopper as any,
     ...props.components,
   }
   return <SelectUnstyled {...props} components={components} />
@@ -65,10 +58,10 @@ const ListItemIconStyled = styled(ListItemIcon)`
 const PokeSwitch = styled(SwitchUnstyled)`
   &::before {
     display: block;
-    content: "";
+    content: '';
     width: 100%;
     height: 100%;
-    background: url("/sprites/pokemon/other/official-artwork/25.png") center center no-repeat;
+    background: url('/sprites/pokemon/other/official-artwork/25.png') center center no-repeat;
     background-size: 100%;
   }
 
@@ -78,11 +71,11 @@ const PokeSwitch = styled(SwitchUnstyled)`
     transform: translateX(18px);
 
     &::before {
-      background-image: url("/sprites/pokemon/versions/generation-v/black-white/animated/25.gif");
+      background-image: url('/sprites/pokemon/versions/generation-v/black-white/animated/25.gif');
     }
   }
 `
-const StyledButton = styled("button")(
+const StyledButton = styled('button')(
   ({ theme }) => `
   font-family: DM Sans, sans-serif;
   font-size: 0.875rem;
@@ -101,12 +94,12 @@ const StyledButton = styled("button")(
   color: ${grey[300]};
 
   &:hover {
-    background: ${theme.palette.mode === "dark" ? "" : grey[100]};
-    border-color: ${theme.palette.mode === "dark" ? grey[700] : grey[400]};
+    background: ${theme.palette.mode === 'dark' ? '' : grey[100]};
+    border-color: ${theme.palette.mode === 'dark' ? grey[700] : grey[400]};
   }
 
   &.${selectUnstyledClasses.focusVisible} {
-    outline: 3px solid ${theme.palette.mode === "dark" ? blue[600] : blue[100]};
+    outline: 3px solid ${theme.palette.mode === 'dark' ? blue[600] : blue[100]};
   }
 
   & .MuiListItemIcon-root {
@@ -131,7 +124,7 @@ const StyledButton = styled("button")(
   `
 )
 
-const StyledListbox = styled("ul")(
+const StyledListbox = styled('ul')(
   ({ theme }) => `
   font-family: DM Sans, sans-serif;
   font-size: 0.875rem;
@@ -139,10 +132,10 @@ const StyledListbox = styled("ul")(
   padding: 5px;
   margin: 10px 0;
   min-width: 150px;
-  background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-  border: 1px solid ${theme.palette.mode === "dark" ? grey[800] : grey[300]};
+  background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+  border: 1px solid ${theme.palette.mode === 'dark' ? grey[800] : grey[300]};
   border-radius: 0.75em;
-  color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
+  color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
   overflow: auto;
   outline: 0px;
   `
@@ -160,28 +153,28 @@ const StyledOption = styled(OptionUnstyled)(
     }
 
     &.${optionUnstyledClasses.selected} {
-      background-color: ${theme.palette.mode === "dark" ? blue[900] : blue[100]};
+      background-color: ${theme.palette.mode === 'dark' ? blue[900] : blue[100]};
       
-      color: ${theme.palette.mode === "dark" ? blue[100] : blue[900]};
+      color: ${theme.palette.mode === 'dark' ? blue[100] : blue[900]};
     }
 
     &.${optionUnstyledClasses.highlighted} {
-      background-color: ${theme.palette.mode === "dark" ? grey[800] : grey[100]};
-      color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
+      background-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[100]};
+      color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
     }
 
     &.${optionUnstyledClasses.highlighted}.${optionUnstyledClasses.selected} {
-      background-color: ${theme.palette.mode === "dark" ? blue[900] : blue[100]};
-      color: ${theme.palette.mode === "dark" ? blue[100] : blue[900]};
+      background-color: ${theme.palette.mode === 'dark' ? blue[900] : blue[100]};
+      color: ${theme.palette.mode === 'dark' ? blue[100] : blue[900]};
     }
 
     &.${optionUnstyledClasses.disabled} {
-      color: ${theme.palette.mode === "dark" ? grey[700] : grey[400]};
+      color: ${theme.palette.mode === 'dark' ? grey[700] : grey[400]};
     }
 
     &:hover:not(.${optionUnstyledClasses.disabled}) {
-      background-color: ${theme.palette.mode === "dark" ? grey[800] : grey[100]};
-      color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
+      background-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[100]};
+      color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
     }
   `
 )
@@ -190,11 +183,11 @@ const StyledPopper = styled(PopperUnstyled)`
   z-index: 10;
 `
 
-const Paragraph = styled("p")(
+const Paragraph = styled('p')(
   ({ theme }) => `
   font-family: IBM Plex Sans, sans-serif;
   font-size: 1.3rem;
   margin: 10px 0;
-  color: ${theme.palette.mode === "dark" ? grey[200] : grey[800]};
+  color: ${theme.palette.mode === 'dark' ? grey[200] : grey[800]};
   `
 )
