@@ -1,7 +1,7 @@
-import { getDatabase, increment, ref, runTransaction, update } from "firebase/database";
-import { Session } from "next-auth";
+import { getDatabase, increment, ref, runTransaction, update } from 'firebase/database'
+import { Session } from 'next-auth'
 
-import { createFirebaseApp } from "./clientApp";
+import { createFirebaseApp } from './clientApp'
 
 const app = createFirebaseApp()
 const db = getDatabase(app)
@@ -12,22 +12,12 @@ export const onChoice = async ({ id, choice, type, session }: { id: number; choi
 
   if (type === 'same') return
   if (!session) {
-    runTransaction(pokemonRef, (current) => {
-      if (current) {
-        current[`${choice}Count`] = (current[`${choice}Count`] || 0) + 1
-        if (type === 'switch') {
-          current[`${otherChoice}Count`] = (current[`${otherChoice}Count`] || 0) - 1
-        }
-      } else {
-        current = {
-          [`${choice}es`]: {},
-          [`${otherChoice}es`]: {},
-          [`${choice}Count`]: 1,
-          [`${otherChoice}Count`]: 0,
-        }
-      }
-      return current
-    })
+    const updates: { [key: string]: any } = {}
+    updates[`${choice}Count`] = increment(1)
+    if (type === 'switch') {
+      updates[`${otherChoice}Count`] = increment(-1)
+    }
+    await update(pokemonRef, updates)
 
     return
   }

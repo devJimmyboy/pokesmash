@@ -1,32 +1,20 @@
-import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  Backdrop,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Modal,
-  Stack,
-  TextField,
-  Theme,
-  Typography,
-} from "@mui/material";
-import { css, styled, SxProps } from "@mui/system";
-import { motion } from "framer-motion";
-import { Pokemon, PokemonSpecies } from "pokenode-ts";
-import React, { ReactElement, RefObject, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useBoolean } from "react-use";
-import useSWR from "swr";
+import LoadingButton from '@mui/lab/LoadingButton'
+import { Backdrop, Box, Button, Card, CardContent, CircularProgress, Modal, Stack, TextField, Theme, Typography } from '@mui/material'
+import { css, styled, SxProps } from '@mui/system'
+import { motion } from 'framer-motion'
+import { Pokemon, PokemonSpecies } from 'pokenode-ts'
+import React, { ReactElement, RefObject, useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { useBoolean } from 'react-use'
+import useSWR from 'swr'
 
-import { pokeClient, useSmash } from "../lib/SmashContext";
-import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils";
-import Fade from "./Fade";
-import SwipeCards, { SwipeRef } from "./SwipeCards";
-import Type, { PokeType } from "./Type";
+import { pokeClient, useSmash } from '../lib/SmashContext'
+import { capitalizeFirstLetter, usePokemonPicture } from '../lib/utils'
+import Fade from './Fade'
+import SwipeCards, { SwipeRef } from './SwipeCards'
+import Type, { PokeType } from './Type'
 
 type Props = { cardRef: RefObject<SwipeRef> }
 
@@ -248,18 +236,7 @@ export default function PokeInfo({ cardRef }: Props) {
             image-rendering: pixelated;
             -ms-interpolation-mode: nearest-neighbor;`}
             `}>
-            {bgUrl.includes('substitute') ? (
-              <>
-                <motion.div style={{ scale: 3 }} animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
-                  <img src={bgUrl} />
-                </motion.div>
-                <Typography fontWeight={600} color="HighlightText" mt={8}>
-                  Loading
-                </Typography>
-              </>
-            ) : (
-              <img style={{ transform: style === 'showdown' ? 'scale(400%)' : 'scale(85%)', minWidth: '75px' }} src={bgUrl} />
-            )}
+            <img style={{ minWidth: '15rem', minHeight: '20rem', objectFit: 'contain', maxHeight: '75%', maxWidth: '90%' }} src={bgUrl} />
           </div>
           {shiny && (
             <div

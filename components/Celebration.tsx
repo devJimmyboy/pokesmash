@@ -1,17 +1,18 @@
-import { Icon } from "@iconify/react";
-import { IconButton, Portal, Typography, useTheme } from "@mui/material";
-import { getDatabase } from "firebase/database";
-import { gsap } from "gsap";
-import { Howl, Howler } from "howler";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import ReactCanvasConfetti from "react-canvas-confetti";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useBoolean, useRafLoop, useWindowSize } from "react-use";
-import useSWR from "swr";
+import { Icon } from '@iconify/react'
+import { debounce, IconButton, Portal, Typography, useTheme } from '@mui/material'
+import { getDatabase } from 'firebase/database'
+import { gsap } from 'gsap'
+import { Howl, Howler } from 'howler'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import ReactCanvasConfetti from 'react-canvas-confetti'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { useBoolean, useRafLoop, useWindowSize } from 'react-use'
+import useSWR from 'swr'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
-import { createFirebaseApp } from "../firebase/clientApp";
-import { pokeClient, useSmash } from "../lib/SmashContext";
-import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils";
+import { createFirebaseApp } from '../firebase/clientApp'
+import { pokeClient, useSmash } from '../lib/SmashContext'
+import { capitalizeFirstLetter, usePokemonPicture } from '../lib/utils'
 
 // import type { SimulatorRef } from "./Simulator/Simulator"
 // import dynamic from "next/dynamic"
@@ -49,8 +50,9 @@ const ids = {
 
 interface Props {}
 
-const text = ['', 'Hello there. \nMy name is Professor $m0ak.']
+// const text = ['', 'Hello there. \nMy name is Professor $m0ak.']
 const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => {
+  const theme = useTheme()
   const {
     score,
     seenBefore: [seenBefore, setSeenBefore],
@@ -62,6 +64,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
   // const simRef = useRef<SimulatorRef>(null)
   // const { width, height } = useWindowSize()
   const [started, start] = useBoolean(false)
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
     if (!started) return
@@ -133,8 +136,6 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     animRef.current = instance
   }, [])
 
-  const theme = useTheme()
-
   const [loopStop, loopStart, isActive] = useRafLoop((time) => {
     if (time < 500) console.log('Rendering')
     if (!animRef.current) {
@@ -194,17 +195,13 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
     sounds.music.mute(muted)
   }, [muted])
 
-  useHotkeys(
-    'space',
-    (e) => {
-      if (!started) return
-      if (tlTxt.isActive()) {
-        setTimeScale(timeScale * 2)
-      }
-    },
-    {},
-    [started, timeScale, setTimeScale]
-  )
+  const timeScaleShift = useCallback(() => {
+    if (!started) return
+    if (tlTxt.isActive()) {
+      setTimeScale(timeScale * 2)
+    }
+  }, [started, timeScale, tlTxt, setTimeScale])
+  useHotkeys('space', timeScaleShift, {}, [started, timeScale, setTimeScale])
 
   if (!started) return null
 
@@ -252,6 +249,8 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
         </div>
       </div>
       <Portal container={() => document.getElementById('__next')}>
+        {isMobile && <div style={{ zIndex: 1000 }} className="w-screen h-screen absolute top-0 left-0 pointer-events-auto" onClick={timeScaleShift} />}
+
         <IconButton
           className="fixed top-4 left-4 w-10 h-10"
           sx={{
@@ -270,7 +269,9 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(({}: Props, ref) => 
           style={{
             zIndex: 1000,
           }}>
-          <Typography color="GrayText">Press space to speed up credits. Current Speed: {timeScale}x</Typography>
+          <Typography color="GrayText" align="center" fontSize={{ md: 16, xs: 20 }}>
+            {isMobile ? 'Tap the Screen' : 'Press space'} to speed up credits. Current Speed: {timeScale}x
+          </Typography>
         </div>
       </Portal>
     </>

@@ -1,6 +1,6 @@
-import "@mui/lab/themeAugmentation";
+import '@mui/lab/themeAugmentation'
 
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles'
 
 const twitchColors = {
   main: '#9146FF',
@@ -70,6 +70,15 @@ const theme = createTheme({
     background: {
       default: '#161816',
       paper: '#4e4e4e',
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 800,
+      lg: 1200,
+      xl: 1536,
     },
   },
 
