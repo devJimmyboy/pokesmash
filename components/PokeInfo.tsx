@@ -64,8 +64,9 @@ const PokeCard = styled(Card)`
   }
 
   border-radius: 1.5em;
+  overflow: hidden;
   box-shadow: 2px 4px 4px -2px #000;
-
+  transform: translateZ(0);
   background-color: transparent;
   background-position: center;
   background-repeat: no-repeat;

@@ -30,6 +30,7 @@ const headerCSS = css`
 `
 
 const Home: NextPage = () => {
+  const [timeout, setTm] = React.useState<NodeJS.Timeout>()
   const theme = useTheme()
   const { error, score, currentId } = useSmash() as NonNullable<ReturnType<typeof useSmash>>
   const cardRef = React.useRef<SwipeRef>(null)
@@ -43,11 +44,13 @@ const Home: NextPage = () => {
   const [seenSupport, setSeenSupport] = React.useState(false)
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   React.useEffect(() => {
-    if (isMobile)
-      setTimeout(() => {
-        setSeenSupport(true)
-      }, 5000)
-  }, [])
+    if (isMobile && !timeout)
+      setTm(
+        setTimeout(() => {
+          setSeenSupport(true)
+        }, 5000)
+      )
+  }, [isMobile])
 
   return (
     <>
@@ -135,8 +138,8 @@ const Home: NextPage = () => {
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
             </Tooltip>
-            <div className="pointer-events-auto flex flex-row-reverse md:flex-row items-center relative">
-              <Blurb className={`absolute text-xs md:text-sm pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 ' : ''}`}>
+            <div className="pointer-events-auto flex flex-row-reverse  md:flex-row items-center relative group">
+              <Blurb className={`absolute text-xs md:text-sm pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 group-focus-within:opacity-100' : ''}`}>
                 Support me
                 <br />
                 for more sites like this!
