@@ -1,19 +1,19 @@
-import { Icon } from "@iconify/react";
-import { css, IconButton, Stack, Tooltip, useTheme } from "@mui/material";
-import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import * as React from "react";
+import { Icon } from '@iconify/react'
+import { css, IconButton, Stack, Tooltip, useTheme } from '@mui/material'
+import Box from '@mui/material/Box'
+import { styled } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+import * as React from 'react'
 
-import IdField from "../components/IdField";
-import KeyBinds from "../components/KeyBinds";
-import LoginButton from "../components/LoginButton";
-import PokeInfo from "../components/PokeInfo";
-import SmashPass from "../components/SmashPass";
-import { SwipeRef } from "../components/SwipeCards";
-import UserStats from "../components/UserStats";
-import { useSmash } from "../lib/SmashContext";
-import Link from "../src/Link";
+import IdField from '../components/IdField'
+import KeyBinds from '../components/KeyBinds'
+import LoginButton from '../components/LoginButton'
+import PokeInfo from '../components/PokeInfo'
+import SmashPass from '../components/SmashPass'
+import { SwipeRef } from '../components/SwipeCards'
+import UserStats from '../components/UserStats'
+import { useSmash } from '../lib/SmashContext'
+import Link from '../src/Link'
 
 import type { NextPage } from 'next'
 const headerCSS = css`
@@ -22,8 +22,9 @@ const headerCSS = css`
   font-family: Pokemon;
   cursor: default;
   user-select: none;
-  font-size: 2rem;
-  @media screen and (min-width: 600px) {
+  /* font-size: 2rem; */
+  font-size: 4vh;
+  @media screen and (min-width: 800px) {
     font-size: calc(1rem + 4vh);
   }
 `
@@ -39,6 +40,7 @@ const Home: NextPage = () => {
     },
     [currentId, cardRef]
   )
+  const [seenSupport, setSeenSupport] = React.useState(false)
 
   return (
     <>
@@ -54,11 +56,11 @@ const Home: NextPage = () => {
         <Typography
           variant="h4"
           component="h1"
+          className="mt-4"
           css={headerCSS}
           gutterBottom
           sx={{
             color: '#FFDE00',
-            mt: { sm: 0, '2xl': 5 },
           }}>
           Poké
           <Typography
@@ -75,10 +77,7 @@ const Home: NextPage = () => {
               background-size: 120%;
               background-position: center;
               transition: color 0.4s ease-in-out;
-              font-size: 2rem;
-              @media screen and (min-width: 600px) {
-                font-size: calc(1rem + 4vh);
-              }
+              font-size: inherit;
               &:hover {
                 color: transparent;
                 background-image: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/4x);
@@ -98,7 +97,7 @@ const Home: NextPage = () => {
 
           <UserStats />
         </Stack>
-        <Box sx={{ position: 'absolute', right: 4, top: 4 }}>
+        <Box className="pointer-events-none fixed right-0 top-0 h-full md:h-auto">
           <LoginButton />
         </Box>
         <KeyBinds />
@@ -123,17 +122,27 @@ const Home: NextPage = () => {
             <div className="hidden md:inline"> app</div>
           </CreatedCard>
           <div className="flex-grow" />
-          <div className="flex flex-col items-start h-32 gap-4 mx-6 my-6">
+          <div className="flex flex-col items-start md:items-end h-32 gap-4 mx-6 my-6 w-24">
             <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
               <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/KA49N8H">
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
             </Tooltip>
-            <Tooltip className="pointer-events-auto " title="Support me for more content like this!" placement="left-start">
-              <IconButton className="fancy-bg w-10 h-10" target="_blank" href="https://www.patreon.com/devJimmyboy">
+            <div className="pointer-events-auto flex flex-row-reverse md:flex-row items-center relative">
+              <Blurb className={`absolute text-xs md:text-sm pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 ' : ''}`}>
+                Support me
+                <br />
+                for more sites like this!
+              </Blurb>
+              <IconButton
+                className={`fancy-bg w-10 h-10 ${seenSupport ? '' : 'animate-pulse'}`}
+                target="_blank"
+                href="https://www.patreon.com/devJimmyboy"
+                onMouseLeave={() => setSeenSupport(true)}
+                onMouseEnter={() => setSeenSupport(false)}>
                 <Icon fontSize={18} icon="fa-brands:patreon" />
               </IconButton>
-            </Tooltip>
+            </div>
           </div>
         </Footer>
       </Box>
@@ -175,4 +184,44 @@ const CreatedCard = styled('div')`
   border-radius: 0 0 0.45em 0.45em;
 
   margin-left: 1em;
+`
+
+const Blurb = styled('span')`
+  user-select: none;
+  display: flex;
+  position: relative;
+  padding: 0.25rem;
+  @media screen and (min-width: 800px) {
+    right: calc(15px + 3rem);
+    left: unset;
+  }
+  width: max-content;
+
+  left: calc(15px + 3rem);
+  background: linear-gradient(45deg, #fe6b8b 30%, #ff8e53 90%);
+  border-radius: 0.45em;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  &:after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    z-index: 1;
+    border-style: solid;
+    border-width: 10px 15px 10px 0;
+    top: 50%;
+    @media screen and (min-width: 800px) {
+      right: -15px;
+      left: unset;
+      border-width: 10px 0 10px 15px;
+      border-color: transparent #ff8e53;
+    }
+    left: -15px;
+    margin-top: -10px;
+    border-color: transparent #fe6b8b;
+  }
 `

@@ -1,22 +1,22 @@
-import "../styles/globals.css";
+import '../styles/globals.css'
 
-import { CacheProvider, EmotionCache } from "@emotion/react";
-import { Icon } from "@iconify/react";
-import { Box } from "@mui/material";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
-import { SessionProvider } from "next-auth/react";
-import { AppProps } from "next/app";
-import Head from "next/head";
-import * as React from "react";
-import toast, { ToastBar, Toaster } from "react-hot-toast";
-import { FirebaseAppProvider } from "reactfire";
+import { CacheProvider, EmotionCache } from '@emotion/react'
+import { Icon } from '@iconify/react'
+import { Box } from '@mui/material'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
+import { SessionProvider } from 'next-auth/react'
+import { AppProps } from 'next/app'
+import Head from 'next/head'
+import * as React from 'react'
+import toast, { ToastBar, Toaster } from 'react-hot-toast'
+import { FirebaseAppProvider } from 'reactfire'
 
-import { createFirebaseApp } from "../firebase/clientApp";
-import FirebaseComponents from "../firebase/FirebaseComponents";
-import SmashProvider from "../lib/SmashContext";
-import createEmotionCache from "../src/createEmotionCache";
-import theme from "../src/theme";
+import { createFirebaseApp } from '../firebase/clientApp'
+import FirebaseComponents from '../firebase/FirebaseComponents'
+import SmashProvider from '../lib/SmashContext'
+import createEmotionCache from '../src/createEmotionCache'
+import theme from '../src/theme'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -77,7 +77,7 @@ Even if you have done a Pokémon Smash or Pass, this site will show you how far 
               <SmashProvider>
                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                 <CssBaseline enableColorScheme />
-                <div className="h-screen ">
+                <div className="h-screen overflow-y-auto overflow-x-hidden">
                   <Component {...pageProps} />
                 </div>
                 <Toaster position="top-center" gutter={5} toastOptions={{}}>

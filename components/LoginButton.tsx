@@ -46,7 +46,7 @@ export default function LoginButton(props: ButtonProps) {
   const router = useRouter()
   if (session) {
     return (
-      <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
+      <Stack direction={{ sx: 'column', md: 'row' }} padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
         <Avatar sx={{ height: '100%', border: '2px white solid', cursor: 'pointer' }} onClick={() => router.push(`/users/${session.user.name}`)} src={session.user.profileImageUrl || ''} />
         <SignInBtn onClick={() => signOut()}>
           <Icon fontSize={24} icon="mdi:logout" />
@@ -55,8 +55,9 @@ export default function LoginButton(props: ButtonProps) {
     )
   }
   return (
-    <Stack direction="row" padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
+    <Stack className="flex-col-reverse justify-between mr-2 py-2 md:m-6 md:justify-center md:py-0 md:gap-4 items-end md:items-start md:flex-row h-full" justifyContent="center">
       <Button
+        className="pointer-events-auto"
         variant="contained"
         sx={{
           borderRadius: '0.5rem',
@@ -66,9 +67,9 @@ export default function LoginButton(props: ButtonProps) {
         Stats
       </Button>
 
-      <SignInBtn onClick={() => signIn('twitch')}>
-        <Icon fontSize={24} height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
-        Sign in with Twitch
+      <SignInBtn className="pointer-events-auto w-20 h-12 md:w-auto md:h-auto" onClick={() => signIn('twitch')}>
+        <Icon className="text-4xl md:text-2xl" height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
+        <span className="hidden md:inline">Sign in with Twitch</span>
       </SignInBtn>
     </Stack>
   )

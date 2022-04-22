@@ -1,20 +1,19 @@
-@import url("https://fonts.googleapis.com/css?family=Lilita+One:regular&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Lilita+One:regular&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @font-face {
-  font-family: "Pokemon";
-  src: url("/fonts/Pokemon Solid.ttf");
+  font-family: 'Pokemon';
+  src: url('/fonts/Pokemon Solid.ttf');
 }
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
-    "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, 'Helvetica Neue', sans-serif;
   --twitchAlpha: 1;
   --twitchColor: rgba(145, 70, 255, var(--twitchAlpha));
 }
@@ -68,8 +67,10 @@ kbd {
 }
 
 .cardContainer {
-  width: 80vw;
-  height: 50vh;
+  max-width: 90vw;
+  min-height: 300px;
+  height: 52.5vh;
+  aspect-ratio: 0.75;
 }
 
 .poke-scrollbar {
