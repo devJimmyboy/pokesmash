@@ -7,7 +7,8 @@
     "dev:fb": "cross-env FIRESTORE_EMULATOR_HOST='localhost:8080' FIREBASE_DATABASE_EMULATOR_HOST='localhost:9000' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",
@@ -82,7 +83,10 @@
     "degit": "^2.8.4",
     "eslint": "8.13.0",
     "eslint-config-next": "12.1.5",
+    "eslint-config-prettier": "^8.5.0",
     "html2canvas": "^1.4.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.4.0",
     "listr": "^0.14.3",
     "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.2.3",
@@ -99,5 +103,8 @@
     "typescript": "^4.6.3",
     "webpack": "5",
     "yargs": "^17.4.1"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }

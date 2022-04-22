@@ -1,61 +1,73 @@
-import LoadingButton from '@mui/lab/LoadingButton'
-import { Backdrop, Box, Button, Card, CardContent, CircularProgress, Modal, Stack, TextField, Theme, Typography } from '@mui/material'
-import { css, styled, SxProps } from '@mui/system'
-import { motion } from 'framer-motion'
-import { Pokemon, PokemonSpecies } from 'pokenode-ts'
-import React, { ReactElement, RefObject, useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { useHotkeys } from 'react-hotkeys-hook'
-import { useBoolean } from 'react-use'
-import useSWR from 'swr'
+import LoadingButton from "@mui/lab/LoadingButton";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Modal,
+  Stack,
+  TextField,
+  Theme,
+  Typography,
+} from "@mui/material";
+import { css, styled, SxProps } from "@mui/system";
+import { motion } from "framer-motion";
+import { Pokemon, PokemonSpecies } from "pokenode-ts";
+import React, { ReactElement, RefObject, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useBoolean } from "react-use";
+import useSWR from "swr";
 
-import { pokeClient, useSmash } from '../lib/SmashContext'
-import { capitalizeFirstLetter, usePokemonPicture } from '../lib/utils'
-import Fade from './Fade'
-import SwipeCards, { SwipeRef } from './SwipeCards'
-import Type, { PokeType } from './Type'
+import { pokeClient, useSmash } from "../lib/SmashContext";
+import { capitalizeFirstLetter, usePokemonPicture } from "../lib/utils";
+import Fade from "./Fade";
+import SwipeCards, { SwipeRef } from "./SwipeCards";
+import Type, { PokeType } from "./Type";
 
-type Props = { cardRef: RefObject<SwipeRef> }
+type Props = { cardRef: RefObject<SwipeRef> };
 
-const MotionText = motion(Typography)
+const MotionText = motion(Typography);
 
 const getBgByType: { [key in PokeType]: string[] } = {
-  bug: ['forest'],
-  dark: ['city'],
-  dragon: ['space'],
-  electric: ['thunderplains'],
-  fairy: ['space'],
-  fighting: ['city', 'meadow'],
-  fire: ['volcanocave', 'desert'],
-  flying: ['mountain', 'route'],
-  ghost: ['earthycave'],
-  grass: ['meadow'],
-  ground: ['mountain', 'earthycave', 'route'],
-  ice: ['icecave'],
-  normal: ['route', 'city'],
-  poison: ['earthycave'],
-  psychic: ['city', 'spl'],
-  rock: ['mountain', 'earthycave'],
-  steel: ['mountain'],
-  water: ['beach', 'beachshore', 'river', 'deepsea'],
-}
+  bug: ["forest"],
+  dark: ["city"],
+  dragon: ["space"],
+  electric: ["thunderplains"],
+  fairy: ["space"],
+  fighting: ["city", "meadow"],
+  fire: ["volcanocave", "desert"],
+  flying: ["mountain", "route"],
+  ghost: ["earthycave"],
+  grass: ["meadow"],
+  ground: ["mountain", "earthycave", "route"],
+  ice: ["icecave"],
+  normal: ["route", "city"],
+  poison: ["earthycave"],
+  psychic: ["city", "spl"],
+  rock: ["mountain", "earthycave"],
+  steel: ["mountain"],
+  water: ["beach", "beachshore", "river", "deepsea"],
+};
 
 const modalStyle: SxProps<Theme> = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 600,
-  backgroundColor: '#222222',
+  backgroundColor: "#222222",
   boxShadow: 24,
   borderRadius: 2,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1.25rem',
-  alignItems: 'start',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1.25rem",
+  alignItems: "start",
   p: 4,
-}
+};
 
 const PokeCard = styled(Card)`
   height: 100%;
@@ -73,7 +85,7 @@ const PokeCard = styled(Card)`
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
-`
+`;
 const PokeContent = styled(CardContent)`
   display: flex;
   flex-direction: column;
@@ -88,14 +100,19 @@ const PokeContent = styled(CardContent)`
   & > #pokeName {
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
   }
-`
+`;
 
 const getBg = (pokeInfo: Pokemon) => {
-  return getBgByType[pokeInfo.types[0].type.name as PokeType][Math.floor(Math.random() * getBgByType[pokeInfo.types[0].type.name as PokeType].length)]
-}
+  return getBgByType[pokeInfo.types[0].type.name as PokeType][
+    Math.floor(
+      Math.random() *
+        getBgByType[pokeInfo.types[0].type.name as PokeType].length
+    )
+  ];
+};
 
 export default function PokeInfo({ cardRef }: Props) {
-  const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
+  const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>;
   const {
     currentId,
     pokeInfo,
@@ -105,44 +122,46 @@ export default function PokeInfo({ cardRef }: Props) {
     shockRef,
     seenBefore: [seenBefore],
     startCelebration,
-  } = smashCtx
-  const [modalShown, toggleConfirm] = useBoolean(false)
+  } = smashCtx;
+  const [modalShown, toggleConfirm] = useBoolean(false);
 
   const { data } = useSWR<PokemonSpecies>(
     () => pokeInfo?.species?.name,
     (name: string) => pokeClient.getPokemonSpeciesByName(name)
-  )
-  const { bgUrl, shiny } = usePokemonPicture()
+  );
+  const { bgUrl, shiny } = usePokemonPicture();
 
   useHotkeys(
-    'up',
+    "up",
     () => {
-      if (currentId > 898) return
+      if (currentId > 898) return;
       if (currentId < score.currentId) {
-        setCurrentId((prev) => prev + 1)
+        setCurrentId((prev) => prev + 1);
       } else {
-        toast("You haven't Smashed or Passed this Pokemon yet!", { id: 'currentId-reached' })
+        toast("You haven't Smashed or Passed this Pokemon yet!", {
+          id: "currentId-reached",
+        });
       }
     },
     [currentId]
-  )
+  );
   useHotkeys(
-    'down',
+    "down",
     (e) => {
-      if (currentId > 898) return
+      if (currentId > 898) return;
       if (currentId > 1) {
-        setCurrentId((prev) => prev - 1)
+        setCurrentId((prev) => prev - 1);
       }
     },
     [currentId]
-  )
+  );
 
-  const [chosenBg, setBg] = useState(pokeInfo && getBg(pokeInfo))
+  const [chosenBg, setBg] = useState(pokeInfo && getBg(pokeInfo));
   React.useEffect(() => {
     if (pokeInfo) {
-      setBg(getBg(pokeInfo))
+      setBg(getBg(pokeInfo));
     }
-  }, [pokeInfo, style])
+  }, [pokeInfo, style]);
 
   if (currentId === 899) {
     return (
@@ -153,22 +172,36 @@ export default function PokeInfo({ cardRef }: Props) {
           initial={{ scale: 0, rotate: -720, opacity: 0 }}
           animate={{ scale: 1.5, opacity: 1, rotate: 0 }}
           transition={{ duration: 1 }}
-          textAlign="center">
+          textAlign="center"
+        >
           {"Nice! You're a Degenerate!"}
         </MotionText>
         {seenBefore && (
           <>
-            <Button size="large" variant="contained" className="mt-24" onClick={() => startCelebration(true)}>
+            <Button
+              size="large"
+              variant="contained"
+              className="mt-24"
+              onClick={() => startCelebration(true)}
+            >
               Watch Ending Cutscene Again
             </Button>
-            <Button size="large" variant="contained" className="mt-12" onClick={() => toggleConfirm(true)}>
+            <Button
+              size="large"
+              variant="contained"
+              className="mt-12"
+              onClick={() => toggleConfirm(true)}
+            >
               Reset Account
             </Button>
-            <ConfirmModal open={modalShown} onClose={() => toggleConfirm(false)} />
+            <ConfirmModal
+              open={modalShown}
+              onClose={() => toggleConfirm(false)}
+            />
           </>
         )}
       </div>
-    )
+    );
   }
 
   if (!smashCtx || !pokeInfo) {
@@ -176,46 +209,52 @@ export default function PokeInfo({ cardRef }: Props) {
       <div
         className="cardContainer h-full flex items-center justify-center"
         style={{
-          minWidth: '450px',
-          maxHeight: '600px',
-        }}>
+          minWidth: "450px",
+          maxHeight: "600px",
+        }}
+      >
         <CircularProgress />
       </div>
-    )
+    );
   }
 
   return (
     <div className="cardContainer h-full">
       <SwipeCards
         ref={cardRef}
-        onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
-          if (currentId > 898) return
+        onSwipe={async (dir: "left" | "right" | "up" | "down") => {
+          if (currentId > 898) return;
 
-          const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
+          const amShocked = shouldIBeShocked({ data, pokeInfo, dir });
           if (shockRef.current && amShocked) {
-            typeof amShocked !== 'boolean' ? shockRef.current.shocked(cardRef, amShocked) : shockRef.current.shocked(cardRef)
+            typeof amShocked !== "boolean"
+              ? shockRef.current.shocked(cardRef, amShocked)
+              : shockRef.current.shocked(cardRef);
           } else {
-            if (!cardRef.current) console.error('CardRef not found!')
+            if (!cardRef.current) console.error("CardRef not found!");
 
-            setTimeout(() => cardRef.current?.reset(), 500)
+            setTimeout(() => cardRef.current?.reset(), 500);
           }
-          if (process.env.NODE_ENV === 'development') console.log(dir)
-          if (dir === 'left') {
-            score.pass()
-          } else if (dir === 'right') {
-            score.smash()
+          if (process.env.NODE_ENV === "development") console.log(dir);
+          if (dir === "left") {
+            score.pass();
+          } else if (dir === "right") {
+            score.smash();
           }
-          setCurrentId((id) => id + 1)
-        }}>
-        <PokeCard className={''}>
+          setCurrentId((id) => id + 1);
+        }}
+      >
+        <PokeCard className={""}>
           <div
             style={{
-              height: '100%',
-              width: '100%',
-              position: 'absolute',
-              backgroundImage: `url(/backgrounds/bg-${chosenBg || 'beach'}.${chosenBg === 'space' ? 'jpg' : 'png'})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'left',
+              height: "100%",
+              width: "100%",
+              position: "absolute",
+              backgroundImage: `url(/backgrounds/bg-${chosenBg || "beach"}.${
+                chosenBg === "space" ? "jpg" : "png"
+              })`,
+              backgroundSize: "cover",
+              backgroundPosition: "left",
             }}
           />
           <div
@@ -231,39 +270,60 @@ export default function PokeInfo({ cardRef }: Props) {
               align-items: center;
               justify-content: center;
 
-              ${style === 'hd'
+              ${style === "hd"
                 ? `image-rendering: auto;`
                 : `image-rendering: -moz-crisp-edges;
             image-rendering: pixelated;
             -ms-interpolation-mode: nearest-neighbor;`}
-            `}>
-            <img style={{ minWidth: '15rem', minHeight: '20rem', objectFit: 'contain', maxHeight: '75%', maxWidth: '90%' }} src={bgUrl} />
+            `}
+          >
+            <img
+              style={{
+                minWidth: "15rem",
+                minHeight: "20rem",
+                objectFit: "contain",
+                maxHeight: "75%",
+                maxWidth: "90%",
+              }}
+              src={bgUrl}
+            />
           </div>
           {shiny && (
             <div
               style={{
-                width: '200%',
-                height: '125%',
+                width: "200%",
+                height: "125%",
 
-                transform: 'translateX(-25%) rotate(60deg) ',
-                position: 'absolute',
-              }}>
+                transform: "translateX(-25%) rotate(60deg) ",
+                position: "absolute",
+              }}
+            >
               <motion.div
-                className={'is-shiny transform-gpu'}
-                animate={{ y: ['-150%', '1500%', '-150%'], rotate: [0, 5, 0], scaleY: [2, 1, 2] }}
+                className={"is-shiny transform-gpu"}
+                animate={{
+                  y: ["-150%", "1500%", "-150%"],
+                  rotate: [0, 5, 0],
+                  scaleY: [2, 1, 2],
+                }}
                 transition={{
-                  type: 'spring',
+                  type: "spring",
                   stiffness: 200,
                   damping: 20,
                   mass: 0.5,
                   repeat: Infinity,
-                  repeatType: 'mirror',
+                  repeatType: "mirror",
                   repeatDelay: 3,
-                }}></motion.div>
+                }}
+              ></motion.div>
             </div>
           )}
           <PokeContent className="select-none absolute w-full">
-            <Typography id="pokeName" variant="h4" fontWeight={700} component="h1">
+            <Typography
+              id="pokeName"
+              variant="h4"
+              fontWeight={700}
+              component="h1"
+            >
               {capitalizeFirstLetter(pokeInfo.name)}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
@@ -271,41 +331,56 @@ export default function PokeInfo({ cardRef }: Props) {
                 <Type type={type.type.name as any} key={i} />
               ))}
             </Stack>
-            <Typography>{data?.flavor_text_entries.find((v) => v.language.name === 'en')?.flavor_text || 'Succelent, Beautiful.'}</Typography>
+            <Typography>
+              {data?.flavor_text_entries.find((v) => v.language.name === "en")
+                ?.flavor_text || "Succelent, Beautiful."}
+            </Typography>
           </PokeContent>
         </PokeCard>
       </SwipeCards>
     </div>
-  )
+  );
 }
 
 interface ShockedProps {
-  data?: PokemonSpecies
-  pokeInfo: Pokemon
-  dir: 'left' | 'right' | 'up' | 'down'
+  data?: PokemonSpecies;
+  pokeInfo: Pokemon;
+  dir: "left" | "right" | "up" | "down";
 }
 
-function shouldIBeShocked({ data, pokeInfo, dir }: ShockedProps): boolean | string | ReactElement {
-  if (data?.is_baby && dir === 'right') {
-    return true
+function shouldIBeShocked({
+  data,
+  pokeInfo,
+  dir,
+}: ShockedProps): boolean | string | ReactElement {
+  if (data?.is_baby && dir === "right") {
+    return true;
   }
-  if (pokeInfo.id === 428 && dir === 'left') {
+  if (pokeInfo.id === 428 && dir === "left") {
     return (
       <Typography className="text-center text-lg">
-        That was the <span className="text-red-600 font-extrabold">wrong fucking</span> move, kid.
+        That was the{" "}
+        <span className="text-red-600 font-extrabold">wrong fucking</span> move,
+        kid.
       </Typography>
-    )
+    );
   }
-  return false
+  return false;
 }
 
-function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { session } = useSmash()
+function ConfirmModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const { session } = useSmash();
   const { control, handleSubmit, formState, watch } = useForm({
     defaultValues: {
-      confirm: '',
+      confirm: "",
     },
-  })
+  });
   // useEffect(() => {
   //   const unsubscribe = watch((vals) => {
   //     console.log('watch', vals, formState)
@@ -315,22 +390,25 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
   //   }
   // }, [watch])
 
-  const { errors } = formState
+  const { errors } = formState;
 
   const onSubmit = handleSubmit((data) => {
     if (session)
-      return fetch('/api/user/wipe', { method: 'DELETE' }).then((v) => {
+      return fetch("/api/user/wipe", { method: "DELETE" }).then((v) => {
         if (v.status === 200) {
-          localStorage.setItem('score', JSON.stringify({ choices: {}, currentId: 1, smashes: 0, passes: 0 }))
-          window.location.reload()
-        } else throw new Error('Failed to wipe data')
-      })
+          localStorage.setItem(
+            "score",
+            JSON.stringify({ choices: {}, currentId: 1, smashes: 0, passes: 0 })
+          );
+          window.location.reload();
+        } else throw new Error("Failed to wipe data");
+      });
     else {
-      localStorage.removeItem('offlineScore')
-      window.location.reload()
-      return Promise.resolve()
+      localStorage.removeItem("offlineScore");
+      window.location.reload();
+      return Promise.resolve();
     }
-  })
+  });
   return (
     <Modal
       aria-labelledby="confirm-wipe-modal-title"
@@ -341,15 +419,25 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
       BackdropComponent={Backdrop}
       BackdropProps={{
         timeout: 500,
-      }}>
+      }}
+    >
       <Fade in={open}>
         <Box component="form" onSubmit={onSubmit} sx={modalStyle}>
           <Typography id="confirm-wipe-modal-title" variant="h4" component="h2">
-            Hold Up! Let's make sure you understand what you're doing!
+            Hold Up! Let&apos;s make sure you understand what you&apos;re doing!
           </Typography>
-          <Typography id="confirm-wipe-modal-description" variant="h6" align="center">
-            You're about to wipe <strong className="text-red-400 font-extrabold">all your choices</strong> and <strong className="text-red-400 font-extrabold">start over</strong>. Are you sure you
-            want to do this?
+          <Typography
+            id="confirm-wipe-modal-description"
+            variant="h6"
+            align="center"
+          >
+            You&apos;re about to wipe{" "}
+            <strong className="text-red-400 font-extrabold">
+              all your choices
+            </strong>{" "}
+            and{" "}
+            <strong className="text-red-400 font-extrabold">start over</strong>.
+            Are you sure you want to do this?
           </Typography>
           <Controller
             name="confirm"
@@ -357,19 +445,24 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
             rules={{
               required: true,
               validate: {
-                positive: (v) => v.toLowerCase() === 'confirm',
+                positive: (v) => v.toLowerCase() === "confirm",
               },
             }}
-            render={({ field: { onBlur, onChange, ref, value }, fieldState }) => (
+            render={({
+              field: { onBlur, onChange, ref, value },
+              fieldState,
+            }) => (
               <TextField
                 id="confirm-wipe-modal-field"
                 type="other"
-                sx={{ '& > label': { fontWeight: '700' } }}
+                sx={{ "& > label": { fontWeight: "700" } }}
                 variant="outlined"
                 fullWidth
                 error={fieldState.invalid}
                 label="Type CONFIRM to Wipe Your Account"
-                helperText={fieldState.error && "You didn't type CONFIRM. Try again."}
+                helperText={
+                  fieldState.error && "You didn't type CONFIRM. Try again."
+                }
                 onChange={(e) => onChange(e.target.value)}
                 InputProps={{ onBlur }}
                 inputRef={ref}
@@ -377,11 +470,17 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
               />
             )}
           />
-          <LoadingButton type="submit" sx={{ alignSelf: 'flex-end' }} variant="contained" color="warning" loading={formState.isSubmitting}>
+          <LoadingButton
+            type="submit"
+            sx={{ alignSelf: "flex-end" }}
+            variant="contained"
+            color="warning"
+            loading={formState.isSubmitting}
+          >
             Wipe Choices
           </LoadingButton>
         </Box>
       </Fade>
     </Modal>
-  )
+  );
 }
