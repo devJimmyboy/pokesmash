@@ -47,15 +47,20 @@ export default function LoginButton(props: ButtonProps) {
   if (session) {
     return (
       <Stack direction={{ sx: 'column', md: 'row' }} padding="0" m={1.5} spacing={4} alignItems="center" justifyContent="center">
-        <Avatar sx={{ height: '100%', border: '2px white solid', cursor: 'pointer' }} onClick={() => router.push(`/users/${session.user.name}`)} src={session.user.profileImageUrl || ''} />
-        <SignInBtn onClick={() => signOut()}>
+        <Avatar
+          className="pointer-events-auto"
+          sx={{ height: '100%', border: '2px white solid', cursor: 'pointer' }}
+          onClick={() => router.push(`/users/${session.user.name}`)}
+          src={session.user.profileImageUrl || ''}
+        />
+        <SignInBtn className="pointer-events-auto" onClick={() => signOut()}>
           <Icon fontSize={24} icon="mdi:logout" />
         </SignInBtn>
       </Stack>
     )
   }
   return (
-    <Stack className="flex-col-reverse justify-between mr-2 py-2 md:m-6 md:justify-center md:py-0 md:gap-4 items-end md:items-start md:flex-row h-full" justifyContent="center">
+    <Stack className=" flex-col-reverse justify-between mr-2 py-2 md:m-6 md:justify-center md:py-0 md:gap-4 items-end md:items-start md:flex-row h-full" justifyContent="center">
       <Button
         className="pointer-events-auto"
         variant="contained"

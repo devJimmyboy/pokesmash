@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react'
-import { css, IconButton, Stack, Tooltip, useTheme } from '@mui/material'
+import { css, IconButton, Stack, Tooltip, useMediaQuery, useTheme } from '@mui/material'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -41,6 +41,13 @@ const Home: NextPage = () => {
     [currentId, cardRef]
   )
   const [seenSupport, setSeenSupport] = React.useState(false)
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  React.useEffect(() => {
+    if (isMobile)
+      setTimeout(() => {
+        setSeenSupport(true)
+      }, 5000)
+  }, [])
 
   return (
     <>
