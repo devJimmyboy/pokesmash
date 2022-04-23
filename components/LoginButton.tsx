@@ -1,11 +1,19 @@
-import { Icon } from '@iconify/react'
-import { Avatar, Button, ButtonProps, Card, CardContent, IconButton, Stack } from '@mui/material'
-import { styled } from '@mui/system'
-import classNames from 'classnames'
-import { signIn, signOut } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { useSmash } from '../lib/SmashContext'
-import Link from '../src/Link'
+import { Icon } from "@iconify/react";
+import {
+  Avatar,
+  Button,
+  ButtonProps,
+  Card,
+  CardContent,
+  IconButton,
+  Stack,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import classNames from "classnames";
+import { signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useSmash } from "../lib/SmashContext";
+import Link from "../src/Link";
 
 const SignInBtn = styled(IconButton)`
   --twitchAlpha: 0.75;
@@ -22,7 +30,7 @@ const SignInBtn = styled(IconButton)`
   background-color: transparent;
   color: var(--twitchColor);
   border-color: var(--twitchColor);
-  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
   transition: border color 0.15s ease-in-out;
 
   &:hover {
@@ -39,25 +47,25 @@ const SignInBtn = styled(IconButton)`
 
     box-shadow: 0 0 0 0.2rem var(--twitchColor);
   }
-`
+`;
 
 export default function LoginButton(props: ButtonProps) {
-  const { session } = useSmash()
-  const router = useRouter()
+  const { session } = useSmash();
+  const router = useRouter();
   if (session) {
     return (
-      <Stack className=" flex-col-reverse justify-between gap-2">
+      <Stack className=" flex-col-reverse md:flex-row items-end md:items-center md:justify-center md:gap-4 mr-2 py-2 justify-between gap-2">
         <Avatar
           className="pointer-events-auto"
-          sx={{ height: '100%', border: '2px white solid', cursor: 'pointer' }}
+          sx={{ height: "100%", border: "2px white solid", cursor: "pointer" }}
           onClick={() => router.push(`/users/${session.user.name}`)}
-          src={session.user.profileImageUrl || ''}
+          src={session.user.profileImageUrl || ""}
         />
         <SignInBtn className="pointer-events-auto" onClick={() => signOut()}>
           <Icon fontSize={24} icon="mdi:logout" />
         </SignInBtn>
       </Stack>
-    )
+    );
   }
   return (
     <Stack className=" flex-col-reverse justify-between mr-2 py-2 md:m-6 md:justify-center md:py-0 md:gap-4 items-end md:items-start md:flex-row h-full">
@@ -65,17 +73,27 @@ export default function LoginButton(props: ButtonProps) {
         className="pointer-events-auto"
         variant="contained"
         sx={{
-          borderRadius: '0.5rem',
+          borderRadius: "0.5rem",
         }}
         LinkComponent={Link}
-        href="/me">
+        href="/me"
+      >
         Stats
       </Button>
 
-      <SignInBtn className="pointer-events-auto w-20 h-12 md:w-auto md:h-auto" onClick={() => signIn('twitch')}>
-        <Icon className="text-4xl md:text-2xl" height="1em" width="1em" color="var(--twitchColor)" icon="mdi:twitch" />
+      <SignInBtn
+        className="pointer-events-auto w-20 h-12 md:w-auto md:h-auto"
+        onClick={() => signIn("twitch")}
+      >
+        <Icon
+          className="text-4xl md:text-2xl"
+          height="1em"
+          width="1em"
+          color="var(--twitchColor)"
+          icon="mdi:twitch"
+        />
         <span className="hidden md:inline">Sign in with Twitch</span>
       </SignInBtn>
     </Stack>
-  )
+  );
 }
