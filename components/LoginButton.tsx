@@ -54,7 +54,7 @@ export default function LoginButton(props: ButtonProps) {
   const router = useRouter();
   if (session) {
     return (
-      <Stack className=" flex-col-reverse md:flex-row items-end md:items-center md:justify-center md:gap-4 mr-2 py-2 justify-between gap-2">
+      <Stack className=" flex-col-reverse md:flex-row items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2">
         <Avatar
           className="pointer-events-auto"
           sx={{ height: "100%", border: "2px white solid", cursor: "pointer" }}
