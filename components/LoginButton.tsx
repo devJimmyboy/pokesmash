@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useSmash } from "../lib/SmashContext";
-import Link from "../src/Link";
+import Link, { NextLinkComposed } from "../src/Link";
 
 const SignInBtn = styled(IconButton)`
   --twitchAlpha: 0.75;
@@ -57,8 +57,9 @@ export default function LoginButton(props: ButtonProps) {
       <Stack className=" flex-col-reverse md:flex-row items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2">
         <Avatar
           className="pointer-events-auto"
+          component={NextLinkComposed}
           sx={{ height: "100%", border: "2px white solid", cursor: "pointer" }}
-          onClick={() => router.push(`/users/${session.user.name}`)}
+          to={`/users/${session.user.name}`}
           src={session.user.profileImageUrl || ""}
         />
         <SignInBtn className="pointer-events-auto" onClick={() => signOut()}>

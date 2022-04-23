@@ -87,41 +87,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
 
     useEffect(() => {
       tlTxt.timeScale(timeScale);
-    }, [timeScale, tlTxt]);
-
-    const getInstance = useCallback((instance: confetti.CreateTypes | null) => {
-      animRef.current = instance;
-    }, []);
-
-    const [loopStop, loopStart, isActive] = useRafLoop((time) => {
-      if (time < 500) console.log("Rendering");
-      if (!animRef.current) {
-        return;
-      }
-      if (skew > 0) skew = Math.max(0.8, skew - 0.001);
-      animRef.current({
-        particleCount: 1,
-        startVelocity: randomInRange(0, -10),
-        ticks: 450,
-        origin: {
-          x: Math.random(),
-          // since particles fall down, skew start toward the top
-          y: Math.random() * skew - 0.5,
-        },
-        colors: [
-          [
-            theme.palette.twitch.main,
-            theme.palette.primary.main,
-            theme.palette.smash.main,
-            theme.palette.pass.main,
-          ][Math.floor(Math.random() * 4)],
-        ],
-        shapes: ["square"],
-        gravity: randomInRange(0.4, 0.6),
-        scalar: randomInRange(0.4, 1),
-        drift: randomInRange(-0.4, 0.4),
-      });
-    }, false);
+    }, [timeScale]);
 
     useEffect(() => {
       if (!started) return;
@@ -188,7 +154,41 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
           setSeenBefore(true);
         });
       sounds.confettiPop.once("play", (s) => {});
-    }, [started, loopStop, score.choices, setSeenBefore, start, tlTxt]);
+    }, [started, listRef.current]);
+
+    const getInstance = useCallback((instance: confetti.CreateTypes | null) => {
+      animRef.current = instance;
+    }, []);
+
+    const [loopStop, loopStart, isActive] = useRafLoop((time) => {
+      if (time < 500) console.log("Rendering");
+      if (!animRef.current) {
+        return;
+      }
+      if (skew > 0) skew = Math.max(0.8, skew - 0.001);
+      animRef.current({
+        particleCount: 1,
+        startVelocity: randomInRange(0, -10),
+        ticks: 450,
+        origin: {
+          x: Math.random(),
+          // since particles fall down, skew start toward the top
+          y: Math.random() * skew - 0.5,
+        },
+        colors: [
+          [
+            theme.palette.twitch.main,
+            theme.palette.primary.main,
+            theme.palette.smash.main,
+            theme.palette.pass.main,
+          ][Math.floor(Math.random() * 4)],
+        ],
+        shapes: ["square"],
+        gravity: randomInRange(0.4, 0.6),
+        scalar: randomInRange(0.4, 1),
+        drift: randomInRange(-0.4, 0.4),
+      });
+    }, false);
 
     const onStart = useCallback(async () => {
       let tl = gsap.timeline();
@@ -213,7 +213,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
       loopStart();
 
       sounds.music.play();
-    }, [start, loopStart, isActive, tlTxt]);
+    }, [start, loopStart, isActive]);
 
     React.useImperativeHandle(
       ref,
@@ -224,7 +224,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
         },
         confetti: animRef.current,
       }),
-      [animRef, start, onStart]
+      [animRef, start]
     );
     const [muted, setMuted] = useBoolean(false);
     useEffect(() => {
@@ -400,11 +400,7 @@ function ScoreView({
       className="score-view flex flex-row items-center h-16 w-full justify-between py-2"
     >
       <div style={{ height: "100%" }}>
-        <img
-          style={{ height: "100%" }}
-          alt={`Pokemon Image - #${pokemon}`}
-          src={bgUrl}
-        />
+        <img style={{ height: "100%" }} src={bgUrl} />
       </div>
       <div className="text-2xl text-white font-semibold">
         {pokeInfo && capitalizeFirstLetter(pokeInfo.name)}
