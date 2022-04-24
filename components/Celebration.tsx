@@ -71,9 +71,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
     const animRef = useRef<confetti.CreateTypes | null>(null);
     const listRef = useRef<number>(null);
     const [timeScale, setTimeScale] = useState(1);
-    const [tlTxt, setTlTxt] = useState<GSAPTimeline>(
-      gsap.timeline({ paused: true })
-    );
+    const tlTxt = useRef<GSAPTimeline>();
     // const simRef = useRef<SimulatorRef>(null)
     // const { width, height } = useWindowSize()
     const [started, start] = useBoolean(false);
@@ -86,7 +84,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
     }, [started]);
 
     useEffect(() => {
-      tlTxt.timeScale(timeScale);
+      if (tlTxt.current) tlTxt.current.timeScale(timeScale);
     }, [timeScale]);
 
     useEffect(() => {
@@ -96,7 +94,8 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
       ).length;
       console.log(totalScore);
 
-      tlTxt
+      tlTxt.current = gsap
+        .timeline({ paused: true })
         .to(
           ids.root,
           {
@@ -201,7 +200,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
       sounds.crescendo.stop(audioId);
       if (animRef.current) {
         sounds.confettiPop.play();
-        if (tlTxt) tlTxt.play();
+        if (tlTxt.current) tlTxt.current.play();
         animRef.current({
           angle: -90,
           particleCount: 100,
@@ -233,7 +232,7 @@ const Celebration = React.forwardRef<CelebrationRef, Props>(
 
     const timeScaleShift = useCallback(() => {
       if (!started) return;
-      if (tlTxt.isActive()) {
+      if (tlTxt.current?.isActive()) {
         setTimeScale(timeScale * 2);
       }
     }, [started, timeScale, tlTxt, setTimeScale]);

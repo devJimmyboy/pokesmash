@@ -84,7 +84,6 @@ const Admin: NextPage = (props) => {
           {session?.user.name}
         </span>
       </Typography>
-      <PokemonData />
       <MsgForm />
     </Box>
   );
@@ -92,51 +91,6 @@ const Admin: NextPage = (props) => {
 export default Admin;
 
 interface PokemonDataProps {}
-const PokemonData: React.FC<PokemonDataProps> = ({}) => {
-  const db = getDatabase(app);
-  const [pokeData, setPokeData] = React.useState<
-    { smashCount: number; passCount: number; id: number }[]
-  >([]);
-  useEffect(() => {
-    get(ref(db, "pokemon")).then((snap) => {
-      const data = snap.val();
-      const pokeData = Object.keys(data).map((key) => {
-        return {
-          id: parseInt(key),
-          smashCount: data[key].smashCount,
-          passCount: data[key].passCount,
-        };
-      });
-      setPokeData(pokeData);
-    });
-    return () => {};
-  }, [db]);
-  const theme = useTheme();
-  return (
-    <Paper
-      className="flex flex-col items-center justify-center"
-      sx={{
-        width: 500,
-        height: 400,
-        bgcolor: theme.palette.background.default,
-        color: theme.palette.info.dark,
-      }}
-    >
-      <Typography variant="h5" component="h5">
-        Pokemon
-      </Typography>
-      <BarChart data={pokeData} width={500} height={300}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="id" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="passCount" fill={theme.palette.pass.main} />
-        <Bar dataKey="smashCount" fill={theme.palette.smash.main} />
-      </BarChart>
-    </Paper>
-  );
-};
 
 type MsgFormData = {
   title: string;

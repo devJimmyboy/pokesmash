@@ -16,7 +16,7 @@ import { css, styled, SxProps } from "@mui/system";
 import { motion } from "framer-motion";
 import { Pokemon, PokemonSpecies } from "pokenode-ts";
 import React, { ReactElement, RefObject, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useBoolean } from "react-use";
@@ -375,7 +375,7 @@ function ConfirmModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { session } = useSmash();
+  const { session, score } = useSmash();
   const { control, handleSubmit, formState, watch } = useForm({
     defaultValues: {
       confirm: "",
@@ -391,23 +391,27 @@ function ConfirmModal({
   // }, [watch])
 
   const { errors } = formState;
-
-  const onSubmit = handleSubmit((data) => {
-    if (session)
-      return fetch("/api/user/wipe", { method: "DELETE" }).then((v) => {
-        if (v.status === 200) {
-          localStorage.setItem(
-            "score",
-            JSON.stringify({ choices: {}, currentId: 1, smashes: 0, passes: 0 })
-          );
-          window.location.reload();
-        } else throw new Error("Failed to wipe data");
-      });
-    else {
-      localStorage.removeItem("offlineScore");
-      window.location.reload();
-      return Promise.resolve();
-    }
+  const wipeAccount = React.useCallback<SubmitHandler<{ confirm: string }>>(
+    async (_data) => {
+      if (session)
+        return fetch("/api/user/wipe", { method: "DELETE" }).then(async (v) => {
+          if (v.status === 200) {
+            await score.wipe();
+          } else {
+            console.error("Failed to wipe account");
+            throw new Error("Failed to wipe data");
+          }
+        });
+      else {
+        await score.wipe();
+        return Promise.resolve();
+      }
+    },
+    [session]
+  );
+  const onSubmit = handleSubmit(async (data) => {
+    await wipeAccount(data);
+    onClose();
   });
   return (
     <Modal

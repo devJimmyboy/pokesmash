@@ -63,6 +63,7 @@ interface Score {
   currentId: number;
   smash: () => Promise<void>;
   pass: () => Promise<void>;
+  wipe: () => Promise<void>;
 }
 
 export type Styling = "hd" | "showdown" | "3d" | "clean";
@@ -117,6 +118,7 @@ const SmashContext = React.createContext<CtxData>({
     currentId: 1,
     async smash() {},
     async pass() {},
+    async wipe() {},
   },
   messages: [],
   setMessages: undefined,
@@ -157,20 +159,14 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   }, [router.events]);
 
   const { data: session, status } = useSession({ required: false });
-  const [style, setStyle] = useLocalStorage<Styling>(
-    "pokemonStyle",
-    "showdown"
-  );
+  const [style, setStyle] = React.useState<Styling>("showdown");
   const [chance] = React.useState(new Chance());
-  // useEffect(() => {
-  //   if(session?.user?.id)
-  //     setChance(new Chance(session?.user?.id))
-  //   else
-  //     setChance(new Chance())
-  // }, [session])
+  useEffect(() => {
+    localStorage.setItem("pokemonStyle", style);
+  }, [style]);
 
   const [messages, setMessages] = useList<FBMessage>([]);
-  const [score, setScore] = useState<Omit<Score, "smash" | "pass">>({
+  const [score, setScore] = useState<Omit<Score, "smash" | "pass" | "wipe">>({
     smashes: 0,
     passes: 0,
     currentId: 1,
@@ -249,6 +245,16 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       return prev;
     });
     onChoice(props);
+  }, [currentId, session, score]);
+  const wipe = React.useCallback(async () => {
+    setCurrentId(1);
+    setScore((prev) => {
+      prev.choices = {};
+      prev.currentId = 1;
+      prev.smashes = 0;
+      prev.passes = 0;
+      return prev;
+    });
   }, [currentId, session, score]);
 
   // In app messages
@@ -378,6 +384,10 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     if (status !== "loading")
       localStorage.setItem(storageKey, JSON.stringify(score));
   }, [score]);
+  useEffect(() => {
+    const storedStyle = localStorage.getItem("pokemonStyle");
+    if (storedStyle) setStyle(storedStyle as Styling);
+  }, []);
 
   React.useEffect(() => {
     prefetch(currentId);
@@ -394,7 +404,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         pokeInfo,
         style,
         error,
-        score: { ...score, smash, pass },
+        score: { ...score, smash, pass, wipe },
         shockRef,
         messages,
         chance,
@@ -405,7 +415,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
       <Celebration ref={celebrateRef} />
       <div id="appControl">
         {showStyleSwitch && (
-          <Box className="absolute bottom-2 md:bottom-auto md:top-2 left-2">
+          <Box className="fixed bottom-2 md:bottom-auto md:top-2 left-2 z-50">
             <StyleForm
               value={style || "showdown"}
               onChange={(s) => setStyle(s as Styling)}
