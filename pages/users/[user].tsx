@@ -171,7 +171,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
               justifySelf="flex-end"
               alignSelf="flex-end"
             >
-              {score.passCount + score.smashCount || "?"} / 868
+              {score.passCount + score.smashCount || "?"} / 898
             </Typography>
           </div>
           <StyledTabs

@@ -134,7 +134,7 @@ const fs = getFirestore(app);
 export default function SmashProvider(props: PropsWithChildren<Props>) {
   const router = useRouter();
 
-  const pokeRef = ref(db, `pokemon`);
+  // const pokeRef = ref(db, `pokemon`);
   const [showStyleSwitch, setShowStyleSwitch] = React.useState(true);
   const celebrateRef = React.useRef<CelebrationRef>(null);
   const seenBefore = useLocalStorage<boolean>("seenCreditsBefore", false);
@@ -145,18 +145,18 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     celebrateRef.current?.start();
   };
 
-  useEffect(() => {
-    const onRouteChange = (url: string, { shallow }: { shallow: boolean }) => {
-      const bool = url.toString().match(/\/?((users|me)(\/.*?)?)?$/y);
-      console.log(url, bool);
+  // useEffect(() => {
+  //   const onRouteChange = (url: string, { shallow }: { shallow: boolean }) => {
+  //     const bool = url.toString().match(/\/?((users|me)(\/.*?)?)?$/y);
+  //     console.log(url, bool);
 
-      setShowStyleSwitch(!!bool);
-    };
-    router.events.on("routeChangeStart", onRouteChange);
-    return () => {
-      router.events.off("routeChangeStart", onRouteChange);
-    };
-  }, [router.events]);
+  //     setShowStyleSwitch(!!bool);
+  //   };
+  //   router.events.on("routeChangeStart", onRouteChange);
+  //   return () => {
+  //     router.events.off("routeChangeStart", onRouteChange);
+  //   };
+  // }, [router.events]);
 
   const { data: session, status } = useSession({ required: false });
   const [style, setStyle] = React.useState<Styling>("showdown");
@@ -193,10 +193,10 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   useEffect(() => {
     if (currentId < score.currentId) return;
     setScore((prev) => ({ ...prev, currentId }));
-    if (currentId > 898) {
-      startCelebration();
+    if (currentId > 898 && !seenBefore[0]) {
+      startCelebration(true);
     }
-  }, [currentId, score.currentId, startCelebration]);
+  }, [currentId, score.currentId]);
 
   const smash = React.useCallback(async () => {
     if (currentId > 898) return;

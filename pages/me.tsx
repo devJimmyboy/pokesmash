@@ -140,7 +140,7 @@ const UserProfile: NextPage<Props> = ({}) => {
               justifySelf="flex-end"
               alignSelf="flex-end"
             >
-              {score.passes + score.smashes || "?"} / 868
+              {score.passes + score.smashes || "?"} / 898
             </Typography>
           </div>
           <StyledTabs
