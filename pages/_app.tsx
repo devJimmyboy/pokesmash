@@ -17,6 +17,8 @@ import FirebaseComponents from '../firebase/FirebaseComponents'
 import SmashProvider from '../lib/SmashContext'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
+import { DefaultSeo } from 'next-seo'
+import SEO from '../next-seo.config'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -34,6 +36,7 @@ export default function MyApp(props: MyAppProps) {
   return (
     <SessionProvider session={session}>
       <CacheProvider value={emotionCache}>
+        <DefaultSeo {...SEO} />
         <Head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="initial-scale=1, width=device-width" />
@@ -42,34 +45,6 @@ export default function MyApp(props: MyAppProps) {
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="manifest" href="/site.webmanifest" />
           <link rel="icon" type="image/png" href="/favicon.png" />
-          <title>Pokémon Smash or Pass</title>
-          <meta name="title" content="PokeSmash - Pokémon Smash or Pass" />
-          <meta
-            name="description"
-            content="A website that's a means of making the Pokemon Smash or Pass trend have more mainstream accessibility.Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
-          />
-
-          <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://pokesmash.xyz/" />
-          <meta property="og:title" content="PokéSmash - Pokémon Smash or Pass" />
-          <meta
-            property="og:description"
-            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon.
-This website is a means of making that trend have more mainstream accessibility.
-Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
-          />
-          <meta property="og:image" content="/meta.png" />
-
-          <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:url" content="https://pokesmash.xyz/" />
-          <meta property="twitter:title" content="PokéSmash - Pokémon Smash or Pass" />
-          <meta
-            property="twitter:description"
-            content="A simple concept, really. Smash or Pass has been instilled in society since the rise of dating apps (and possibly longer). Recently, however, YouTube personality Markiplier started a trend applying the simplicity of Smash or Pass to the vast complexity of Pokémon.
-This website is a means of making that trend have more mainstream accessibility.
-Even if you have done a Pokémon Smash or Pass, this site will show you how far off the average your opinion is and more!"
-          />
-          <meta property="twitter:image" content="/meta.png" />
         </Head>
         <FirebaseAppProvider firebaseApp={createFirebaseApp()}>
           <FirebaseComponents>

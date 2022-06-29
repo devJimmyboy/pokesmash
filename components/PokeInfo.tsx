@@ -88,6 +88,11 @@ const PokeContent = styled(CardContent)`
   & > #pokeName {
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
   }
+  &.desc-hidden > #pokeDesc {
+    height: 0px;
+    opacity: 0;
+    transition: height 0.5s ease-in-out, opacity 0.1s ease-in-out;
+  }
 `
 
 const getBg = (pokeInfo: Pokemon) => {
@@ -188,7 +193,12 @@ export default function PokeInfo({ cardRef }: Props) {
   }
 
   return (
-    <div className="cardContainer h-full">
+    <div
+      className="cardContainer h-full"
+      onContextMenu={(e) => {
+        e.preventDefault()
+        toggleDesc()
+      }}>
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
@@ -278,7 +288,7 @@ export default function PokeInfo({ cardRef }: Props) {
                 }}></motion.div>
             </div>
           )}
-          <PokeContent className="select-none absolute w-full">
+          <PokeContent className={`select-none absolute w-full ${hideDesc && 'desc-hidden'}`}>
             <Typography id="pokeName" variant="h4" fontWeight={700} component="h1" fontSize={{ xs: '1.5rem', md: '2rem' }}>
               {capitalizeFirstLetter(pokeInfo.name)}
             </Typography>
@@ -287,7 +297,7 @@ export default function PokeInfo({ cardRef }: Props) {
                 <Type type={type.type.name as any} key={i} />
               ))}
             </Stack>
-            <Typography fontSize={{ xs: '0.75rem', md: '1rem' }}>
+            <Typography id="pokeDesc" fontSize={{ xs: '0.75rem', md: '1rem' }}>
               {data?.flavor_text_entries.find((v) => v.language.name === 'en')?.flavor_text.replaceAll(//gi, ' ') || 'Succelent, Beautiful.'}
             </Typography>
           </PokeContent>

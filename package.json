@@ -7,8 +7,7 @@
     "dev:fb": "cross-env FIRESTORE_EMULATOR_HOST='localhost:8080' FIREBASE_DATABASE_EMULATOR_HOST='localhost:9000' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "husky install"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/cache": "^11.9.3",
@@ -32,10 +31,12 @@
     "framer-motion": "^6.3.16",
     "gsap": "^3.10.4",
     "howler": "^2.2.3",
+    "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
     "next": "^12.2.0",
     "next-auth": "^4.7.0",
     "next-firebase-auth": "^1.0.0-canary.9",
+    "next-seo": "^5.4.0",
     "pixi-webfont-loader": "^1.0.2",
     "pixi.js": "^6.4.2",
     "pokenode-ts": "^1.14.0",
@@ -86,7 +87,6 @@
     "eslint-config-next": "12.2.0",
     "eslint-config-prettier": "^8.5.0",
     "html2canvas": "^1.4.1",
-    "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "listr": "^0.14.3",
     "lodash.throttle": "^4.1.1",

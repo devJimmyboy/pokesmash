@@ -1,43 +1,47 @@
-import { InputUnstyled, inputUnstyledClasses } from "@mui/base";
-import { styled } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { InputUnstyled, inputUnstyledClasses } from '@mui/base'
+import { styled } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 
-import { useSmash } from "../lib/SmashContext";
+import { useSmash } from '../lib/SmashContext'
 
 interface Props {}
 
 export default function IdField({}: Props) {
-  const { currentId, setCurrentId, score } = useSmash();
+  const { currentId, setCurrentId, score } = useSmash()
 
   const updateId = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.currentTarget.value && e.currentTarget.value.length > 0) {
-        let nId = currentId;
+        let nId = currentId
         try {
-          nId = parseInt(e.currentTarget.value);
+          nId = parseInt(e.currentTarget.value)
         } catch (e) {
-          nId = currentId;
+          nId = currentId
         }
-        if (nId >= score.currentId) setCurrentId(score.currentId);
-        else if (nId > 0) setCurrentId(() => nId);
-        else e.currentTarget.textContent = currentId.toString();
+        if (nId >= score.currentId) setCurrentId(score.currentId)
+        else if (nId > 0) setCurrentId(() => nId)
+        else e.currentTarget.textContent = currentId.toString()
       }
     },
     [currentId, setCurrentId, score]
-  );
+  )
 
   return (
     <InputEditable
       value={currentId || 1}
-      type="other"
+      type="number"
       onChange={updateId}
       onKeyDown={(e: React.KeyboardEvent<HTMLSpanElement>) => {
-        e.stopPropagation();
+        e.stopPropagation()
       }}
-    >
+      componentsProps={{
+        input: {
+          'data-form-type': 'other',
+        } as any,
+      }}>
       IdField
     </InputEditable>
-  );
+  )
 }
 const InputEditable = styled(InputUnstyled)`
   display: inline;
@@ -63,10 +67,10 @@ const InputEditable = styled(InputUnstyled)`
     }
     font-weight: 700;
     font-size: 1.5rem;
-    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
     text-align: center;
   }
   & .${inputUnstyledClasses.root} {
     width: min-content;
   }
-`;
+`
