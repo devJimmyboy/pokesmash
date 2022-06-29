@@ -1,8 +1,8 @@
-import { Typography } from "@mui/material"
-import { motion, useAnimation } from "framer-motion"
-import Image from "next/image"
-import React, { ReactElement, RefObject, useEffect, useState } from "react"
-import { SwipeRef } from "./SwipeCards"
+import { Typography } from '@mui/material'
+import { motion, useAnimation } from 'framer-motion'
+import Image from 'next/image'
+import React, { ReactElement, RefObject, useEffect, useState } from 'react'
+import { SwipeRef } from './SwipeCards'
 export type ShockRef = {
   shocked: (cardRef?: RefObject<SwipeRef>, text?: string | ReactElement) => void
 }
@@ -15,7 +15,7 @@ const defaultShockText = (
 )
 
 const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
-  const [src, setSource] = useState("/sounds/thud.opus")
+  const [src, setSource] = useState('/sounds/thud.opus')
   const [shockText, setShockText] = useState<string | ReactElement>(defaultShockText)
   const audio = React.useRef<HTMLAudioElement>(null)
   const api = useAnimation()
@@ -31,19 +31,21 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
         else audio.current.currentTime = 0
       }
       if (text) setShockText(text)
+      else setShockText(defaultShockText)
+
       await api.start({
         opacity: 1,
         scale: 1.25,
-        transition: { duration: 0.4, ease: "easeIn" },
+        transition: { duration: 0.4, ease: 'easeIn' },
       })
       await api.start({
         scale: 2,
-        transition: { duration: 1, ease: "linear" },
+        transition: { duration: 1, ease: 'linear' },
       })
       await api.start({
         scale: 10,
         opacity: 0,
-        transition: { duration: 0.2, ease: "easeOut" },
+        transition: { duration: 0.2, ease: 'easeOut' },
         transitionEnd: { scale: 0.75 },
       })
       if (cardRef && cardRef.current) {
@@ -57,16 +59,16 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
         <audio preload="/sounds/thud.opus" ref={audio} src={src} />
         <motion.div
           style={{
-            position: "absolute",
-            translateX: "-50%",
-            translateY: "-50%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            transformOrigin: "0.5 0.5",
-            top: "50%",
-            left: "50%",
+            position: 'absolute',
+            translateX: '-50%',
+            translateY: '-50%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            transformOrigin: '0.5 0.5',
+            top: '50%',
+            left: '50%',
             opacity: 0,
             scale: 0.75,
             maxWidth: 128,
@@ -79,6 +81,6 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
     </>
   )
 })
-ShockValue.displayName = "ShockValue"
+ShockValue.displayName = 'ShockValue'
 
 export default ShockValue
