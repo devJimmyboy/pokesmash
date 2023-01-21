@@ -12,6 +12,7 @@ import useSWR from 'swr'
 
 import { pokeClient, useSmash } from '../lib/SmashContext'
 import { capitalizeFirstLetter, usePokemonPicture } from '../lib/utils'
+import { NUM_POKEMON } from '../src/constants'
 import Fade from './Fade'
 import SwipeCards, { SwipeRef } from './SwipeCards'
 import Type, { PokeType } from './Type'
@@ -118,12 +119,12 @@ export default function PokeInfo({ cardRef }: Props) {
     () => pokeInfo?.species?.name,
     (name: string) => pokeClient.getPokemonSpeciesByName(name)
   )
-  const { bgUrl, shiny } = usePokemonPicture()
+  const { bgUrl, shiny } = usePokemonPicture(undefined, true)
 
   useHotkeys(
     'up',
     () => {
-      if (currentId > 898) return
+      if (currentId > NUM_POKEMON) return
       if (currentId < score.currentId) {
         setCurrentId((prev) => prev + 1)
       } else {
@@ -137,7 +138,7 @@ export default function PokeInfo({ cardRef }: Props) {
   useHotkeys(
     'down',
     (e) => {
-      if (currentId > 898) return
+      if (currentId > NUM_POKEMON) return
       if (currentId > 1) {
         setCurrentId((prev) => prev - 1)
       }
@@ -152,7 +153,7 @@ export default function PokeInfo({ cardRef }: Props) {
     }
   }, [pokeInfo, style])
 
-  if (currentId === 899) {
+  if (currentId > NUM_POKEMON) {
     return (
       <div className="cardContainer h-full flex flex-col items-center justify-center">
         <MotionText
@@ -202,7 +203,7 @@ export default function PokeInfo({ cardRef }: Props) {
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
-          if (currentId > 898) return
+          if (currentId > NUM_POKEMON) return
 
           const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
           if (shockRef.current && amShocked) {
@@ -244,7 +245,7 @@ export default function PokeInfo({ cardRef }: Props) {
               align-items: center;
               justify-content: center;
 
-              ${style === 'hd'
+              ${style === 'hd' || currentId > 905
                 ? `image-rendering: auto;`
                 : `image-rendering: -moz-crisp-edges;
             image-rendering: pixelated;
@@ -261,6 +262,13 @@ export default function PokeInfo({ cardRef }: Props) {
               src={bgUrl}
             />
           </div>
+          {currentId === 1 && (
+            <div className="px-2" style={{ position: 'absolute', top: '12px' }}>
+              <Typography className="filter drop-shadow" fontWeight={600} fontSize={24} textAlign="center">
+                Welcome to PokeSmash! Swipe left to pass and right to smash! You can also right click the card to hide the description.
+              </Typography>
+            </div>
+          )}
           {shiny && (
             <div
               style={{
@@ -278,13 +286,12 @@ export default function PokeInfo({ cardRef }: Props) {
                   scaleY: [2, 1, 2],
                 }}
                 transition={{
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 20,
-                  mass: 0.5,
+                  type: 'keyframes',
+                  duration: 2,
+                  ease: 'easeInOut',
                   repeat: Infinity,
                   repeatType: 'mirror',
-                  repeatDelay: 3,
+                  repeatDelay: 1,
                 }}></motion.div>
             </div>
           )}

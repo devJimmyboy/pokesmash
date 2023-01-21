@@ -18,8 +18,9 @@ export default function IdField({}: Props) {
         } catch (e) {
           nId = currentId
         }
-        if (nId >= score.currentId) setCurrentId(score.currentId)
-        else if (nId > 0) setCurrentId(() => nId)
+        // if (nId >= score.currentId) setCurrentId(score.currentId)
+        // else
+        if (nId > 0) setCurrentId(() => nId)
         else e.currentTarget.textContent = currentId.toString()
       }
     },
@@ -34,7 +35,7 @@ export default function IdField({}: Props) {
       onKeyDown={(e: React.KeyboardEvent<HTMLSpanElement>) => {
         e.stopPropagation()
       }}
-      componentsProps={{
+      slotProps={{
         input: {
           'data-form-type': 'other',
         } as any,
@@ -57,7 +58,7 @@ const InputEditable = styled(InputUnstyled)`
     border: 0;
     height: 100%;
     outline: none;
-    max-width: 4ch;
+    max-width: 5ch;
     border-radius: 0.625rem;
     background: ${(props) => props.theme.palette.background.paper};
     &:focus-visible {

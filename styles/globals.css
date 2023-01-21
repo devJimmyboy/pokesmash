@@ -44,8 +44,7 @@ kbd {
 
 .is-shiny {
   position: absolute;
-
-  background: linear-gradient(-185deg, transparent -20%, #e2e2e28f 110%);
+  background: linear-gradient(-185deg, transparent -20%, #ffffffaf 110%);
   display: block;
   width: 200%;
   height: 45px;

@@ -17,6 +17,7 @@ import { ScoreDisplay } from '../../components/SmashPass'
 import admin from '../../firebase/adminApp'
 import { createFirebaseApp } from '../../firebase/clientApp'
 import { useSmash } from '../../lib/SmashContext'
+import { NUM_POKEMON } from '../../src/constants'
 import Link from '../../src/Link'
 
 const ScoreHolder = styled('div')`
@@ -105,7 +106,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             </Typography>
             <div className="flex-grow" />
             <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-              {score.passCount + score.smashCount || '?'} / 898
+              {score.passCount + score.smashCount || '?'} / {NUM_POKEMON}
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">

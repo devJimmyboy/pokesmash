@@ -1,5 +1,6 @@
 import { getDatabase, increment, ref, runTransaction, update } from 'firebase/database'
 import { Session } from 'next-auth'
+import { getSession } from 'next-auth/react'
 
 import { createFirebaseApp } from './clientApp'
 

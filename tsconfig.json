@@ -22,17 +22,10 @@
   },
   "include": [
     "next-env.d.ts",
-    "components",
-    "pages",
-    "scripts",
-    "src",
-    "lib",
-    "firebase",
-    "types",
-    "./*.ts"
+    "**/*.ts",
+    "**/*.tsx"
   ],
   "exclude": [
-    "node_modules",
-    "functions"
+    "node_modules"
   ]
 }

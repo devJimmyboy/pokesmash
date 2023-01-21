@@ -1,1 +1,1 @@
-export const NUM_POKEMON = 898;
+export const NUM_POKEMON = 1008
