@@ -54,6 +54,7 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
           if (id <= 649) setSprite(buildUrl(`/other/dream-world/${id}.svg`))
           else setSprite(buildUrl(`/${id}.png`))
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, currentId, style, chance])
   return { bgUrl: sprite, shiny }
 }

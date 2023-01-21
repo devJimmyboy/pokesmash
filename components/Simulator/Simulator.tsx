@@ -7,7 +7,7 @@ import { gsap } from 'gsap'
 import { PixiPlugin } from 'gsap/PixiPlugin'
 gsap.registerPlugin(PixiPlugin)
 PixiPlugin.registerPIXI(PIXI)
-PIXI.Loader.registerPlugin(WebfontLoaderPlugin)
+PIXI.extensions.add(WebfontLoaderPlugin)
 
 import { useQueue } from 'react-use'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -33,7 +33,6 @@ const Filters = withFilters(Container, {})
 const spriteNames = ['oak', 'textBox']
 
 const Simulator = React.forwardRef<SimulatorRef, Props>(({ width, height, ready, text }, ref) => {
-  const loader = useRef(new PIXI.Loader())
   const sprites = useRef<Array<RefObject<PIXI.DisplayObject>>>([])
   sprites.current.fill(useRef<PIXI.Container>(null), 0, spriteNames.length)
 
@@ -46,15 +45,16 @@ const Simulator = React.forwardRef<SimulatorRef, Props>(({ width, height, ready,
   }))
 
   const onLoadedResources = React.useCallback(
-    (loader: any, resources: any) => {
+    (resources: any) => {
       if (loaded) return
       setLoaded(true)
     },
     [loaded, setLoaded]
   )
   useEffect(() => {
-    if (Object.values(loader.current.resources).length <= 0) {
-      loader.current.add({ name: 'Retro Gaming', url: '/fonts/Retro Gaming.ttf' }).load(onLoadedResources)
+    if (PIXI.Assets.cache.has('Retro Gaming')) {
+      PIXI.Assets.add('Retro Gaming', '/fonts/Retro Gaming.ttf')
+      PIXI.Assets.load('Retro Gaming').then(onLoadedResources)
     }
   }, [])
   if (!loaded) return null

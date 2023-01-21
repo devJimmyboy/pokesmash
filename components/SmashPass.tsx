@@ -1,11 +1,11 @@
-import { ButtonUnstyled, ButtonUnstyledProps } from "@mui/base";
-import { Button, Stack, useTheme } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { motion, useAnimation, Variants } from "framer-motion";
-import React, { useCallback, useEffect } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { ButtonUnstyled, ButtonUnstyledProps } from '@mui/base'
+import { Button, Stack, useTheme } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import { motion, useAnimation, Variants } from 'framer-motion'
+import React, { useCallback, useEffect } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 
-import { useSmash } from "../lib/SmashContext";
+import { useSmash } from '../lib/SmashContext'
 
 const MotionButton = motion(Button)
 const ChoiceButtonRoot = styled(MotionButton)`
@@ -46,6 +46,8 @@ const ChoiceButtonRoot = styled(MotionButton)`
     }
   }
 `
+
+const MButtonUnstyled = motion(ButtonUnstyled)
 
 const Kbd = styled('kbd')`
   background-color: transparent;
@@ -151,5 +153,19 @@ function ChoiceButton({ choiceType, onChoice, ...props }: ChoiceButtonProps) {
     onChoice(choiceType)
   }, [api, currentId, onChoice, score])
   useHotkeys(choiceType === 'pass' ? 'left' : 'right', onClick, [onClick])
-  return <ButtonUnstyled {...props} className={`${choiceType}`} onClick={onClick} variants={variants} animate={api} component={ChoiceButtonRoot} whileHover="selected" whileTap={{ scale: 0.95 }} />
+  return (
+    // @ts-ignore
+    <MButtonUnstyled
+      {...props}
+      className={`${choiceType}`}
+      onClick={onClick}
+      variants={variants}
+      animate={api}
+      slots={{
+        root: ChoiceButtonRoot,
+      }}
+      whileHover="selected"
+      whileTap={{ scale: 0.95 }}
+    />
+  )
 }
