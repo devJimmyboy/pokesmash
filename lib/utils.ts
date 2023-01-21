@@ -2,6 +2,7 @@ import { getDatabase } from 'firebase/database'
 import React from 'react'
 import { useLocalStorage } from 'react-use'
 import { useSmash } from './SmashContext'
+import howler from 'howler'
 const buildUrl = (path: string) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${path}`
 
 export function capitalizeFirstLetter(string: string) {
@@ -14,6 +15,11 @@ export function capitalizeWords(string: string) {
   })
 }
 
+const shinySound = new howler.Howl({
+  src: '/sounds/shiny.mp3',
+  volume: 0.5,
+  preload: true,
+})
 // const db = getDatabase()
 
 export const usePokemonPicture = (i?: number, calcShiny = false) => {
@@ -29,7 +35,9 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
     const shinyChance = (1 / 850) * 100
     // 100 / 4096
     const isShiny = !calcShiny ? shinies?.includes(id) ?? false : shinies?.includes(id) || chance.bool({ likelihood: shinyChance })
-
+    if (isShiny && calcShiny) {
+      shinySound.play()
+    }
     setShiny(isShiny)
     if (isShiny && !shinies?.includes(id)) {
       setShinies((s) => (!s ? [id] : [...s, id]))

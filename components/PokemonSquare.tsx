@@ -1,5 +1,9 @@
-import { Box, Typography, css } from '@mui/material'
+import { Icon } from '@iconify/react'
+import { Box, Typography, css, Tooltip } from '@mui/material'
+import { motion } from 'framer-motion'
+import { clamp } from 'lodash'
 import React from 'react'
+import { useWindowSize } from 'react-use'
 import { Styling } from '../lib/SmashContext'
 import { usePokemonPicture } from '../lib/utils'
 import { NUM_POKEMON } from '../src/constants'
@@ -12,6 +16,7 @@ interface Props {
 
 export default function PokemonSquare({ i, style, choice }: Props) {
   const { bgUrl, shiny } = usePokemonPicture(i < 1 || i > NUM_POKEMON ? undefined : i)
+  const { width, height } = useWindowSize()
   if (i < 1 || i > NUM_POKEMON) {
     return null
   }
@@ -42,9 +47,22 @@ export default function PokemonSquare({ i, style, choice }: Props) {
             {i.toString()}
           </Typography>
           <Typography className="hidden group-hover:inline text-lg" variant="h4" component="h4" fontWeight={700}>
-            {choice as string}
+            {choice.slice(0, 1).toUpperCase() + choice.slice(1)}
           </Typography>
         </div>
+        {shiny && (
+          <motion.div
+            className="absolute text-yellow-400"
+            // custom={matches}
+            // initial={{ scale: 0.01, translateX: matches ? 64 : 40, translateY: matches ? -64 : -40 }}
+            animate={{ scale: [1, 1.25, 1], rotate: 360 }}
+            style={{ translateX: 40, translateY: -40 }}
+            transition={{ repeat: Infinity, duration: 1 }}>
+            <Tooltip title="Shiny!" placement="right">
+              <Icon icon="fa6-solid:star" style={{ fontSize: clamp((32 * width) / 800, 12, 32) }} />
+            </Tooltip>
+          </motion.div>
+        )}
       </Box>
     </>
   )

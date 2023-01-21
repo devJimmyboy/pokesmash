@@ -328,15 +328,18 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     }
   }, [session])
   useEffect(() => {
+    if (score.smashes === 0 && score.passes === 0) return
     const storageKey = session ? 'score' : 'offlineScore'
+    if (process.env.NODE_ENV === 'development') console.log('Saving score to local storage', score)
     if (status !== 'loading') localStorage.setItem(storageKey, JSON.stringify(score))
-  }, [score])
+  }, [score.smashes, score.passes, score.currentId, score.choices])
   useEffect(() => {
     const storedStyle = localStorage.getItem('pokemonStyle')
     if (storedStyle) setStyle(storedStyle as Styling)
   }, [])
 
   React.useEffect(() => {
+    // console.log('score id', currentId)
     prefetch(currentId)
   }, [currentId])
 

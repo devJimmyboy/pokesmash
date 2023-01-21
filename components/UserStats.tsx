@@ -1,15 +1,16 @@
-import { useTheme } from "@mui/material";
-import { child, getDatabase, ref } from "firebase/database";
-import { motion, useAnimation } from "framer-motion";
-import { Pokemon } from "pokenode-ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { useObjectVal } from "react-firebase-hooks/database";
-import useSWR from "swr";
+import { Icon } from '@iconify/react'
+import { Tooltip, useMediaQuery, useTheme } from '@mui/material'
+import { child, getDatabase, ref } from 'firebase/database'
+import { motion, useAnimation } from 'framer-motion'
+import { Pokemon } from 'pokenode-ts'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useObjectVal } from 'react-firebase-hooks/database'
+import useSWR from 'swr'
 
-import { createFirebaseApp } from "../firebase/clientApp";
-import { pokeClient, useSmash } from "../lib/SmashContext";
-import { capitalizeWords, usePokemonPicture } from "../lib/utils";
-import { PokeType, typeToColor } from "./Type";
+import { createFirebaseApp } from '../firebase/clientApp'
+import { pokeClient, useSmash } from '../lib/SmashContext'
+import { capitalizeWords, usePokemonPicture } from '../lib/utils'
+import { PokeType, typeToColor } from './Type'
 
 type Props = {}
 
@@ -19,6 +20,7 @@ const pokemon = ref(db, 'pokemon')
 
 export default function UserStats({}: Props) {
   const theme = useTheme()
+  const matches = useMediaQuery('(min-width:800px)')
   const { currentId, style } = useSmash()
   const { data: prevPokemon } = useSWR<Pokemon, null>(
     () => currentId > 1 && `${currentId - 1}`,
@@ -66,6 +68,7 @@ export default function UserStats({}: Props) {
               backgroundImage: `url(/backgrounds/bg.png)`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
+              // position: 'relative',
             }}>
             <div
               className="w-full h-full flex items-center justify-center  p-0 m-0"
@@ -78,6 +81,19 @@ export default function UserStats({}: Props) {
               }}
             />
           </div>
+          {shiny && (
+            <motion.div
+              className="absolute text-yellow-400"
+              // custom={matches}
+              // initial={{ scale: 0.01, translateX: matches ? 64 : 40, translateY: matches ? -64 : -40 }}
+              animate={{ scale: [1, 1.25, 1], rotate: 360 }}
+              style={{ translateX: matches ? 64 : 40, translateY: matches ? -64 : -40 }}
+              transition={{ repeat: Infinity, duration: 1 }}>
+              <Tooltip title="Shiny!" placement="right">
+                <Icon icon="fa6-solid:star" style={{ fontSize: 32 }} />
+              </Tooltip>
+            </motion.div>
+          )}
           <div className="flex flex-col w-1/3">
             <span className="font-semibold text-lg">Smashes</span>
             <motion.div style={{ borderRadius: 4, height: 32, backgroundColor: theme.palette.smash.main, width: '0.1%' }} animate={smashWidth}></motion.div>
