@@ -30,7 +30,8 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
   const { chance, style, currentId } = useSmash()
   useEffect(() => {
     const knownShinies = JSON.parse(localStorage.getItem('pokesmash-shinies') ?? '[]') as number[]
-    if (knownShinies.length !== shinies.length) setShinies(knownShinies)
+    if (knownShinies.length > shinies.length) setShinies(knownShinies)
+    else if (knownShinies.length < shinies.length) localStorage.setItem('pokesmash-shinies', JSON.stringify(shinies))
   }, [shinies, i ? i : currentId])
 
   const [shiny, setShiny] = React.useState(false)
