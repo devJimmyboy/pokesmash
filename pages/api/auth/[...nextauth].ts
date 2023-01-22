@@ -15,6 +15,9 @@ const api = new ApiClient({ authProvider: auth })
 
 export default NextAuth({
   // Configure one or more authentication providers
+  theme: { colorScheme: 'dark' },
+  debug: true,
+
   providers: [
     TwitchProvider({
       clientId: process.env.TWITCH_ID as string,
