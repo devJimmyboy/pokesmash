@@ -1,5 +1,5 @@
 import { getDatabase } from 'firebase/database'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocalStorage } from 'react-use'
 import { useSmash } from './SmashContext'
 import howler from 'howler'
@@ -25,8 +25,13 @@ const shinySound = new howler.Howl({
 export const usePokemonPicture = (i?: number, calcShiny = false) => {
   // const db = useFirestore()
   // const a =
-  const [shinies, setShinies] = useLocalStorage<number[]>('pokesmash-shinies', [])
+  const [shinies, setShinies] = useState<number[]>([])
+
   const { chance, style, currentId } = useSmash()
+  useEffect(() => {
+    const knownShinies = JSON.parse(localStorage.getItem('pokesmash-shinies') ?? '[]') as number[]
+    if (knownShinies.length !== shinies.length) setShinies(knownShinies)
+  }, [shinies, i ? i : currentId])
 
   const [shiny, setShiny] = React.useState(false)
   const [sprite, setSprite] = React.useState(buildUrl('/substitute.png'))
@@ -34,6 +39,7 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
     const id = i || currentId
     const shinyChance = (1 / 850) * 100
     // 100 / 4096
+    if (process.env.NODE_ENV === 'development' && calcShiny) console.log('rolling for shiny', id)
     const isShiny = !calcShiny ? shinies?.includes(id) ?? false : shinies?.includes(id) || chance.bool({ likelihood: shinyChance })
     if (isShiny && calcShiny) {
       shinySound.play()
@@ -63,7 +69,7 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
           else setSprite(buildUrl(`/${id}.png`))
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i, currentId, style, chance])
+  }, [i, currentId, style, chance, shinies])
   return { bgUrl: sprite, shiny }
 }
 
