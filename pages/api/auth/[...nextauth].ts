@@ -52,7 +52,7 @@ export default NextAuth({
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-    emulator: {},
+    // emulator: {},
   }),
   callbacks: {
     async session({ session, user }) {
