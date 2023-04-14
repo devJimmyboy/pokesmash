@@ -109,9 +109,9 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x.webp" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x.webp" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x.webp" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
           </StyledTabs>
           <div
             className="relative flex-grow w-full overflow-hidden"
