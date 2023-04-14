@@ -1,27 +1,31 @@
-import dotenv from "dotenv";
-import * as admin from "firebase-admin";
-import fs from "fs";
-import Listr, { ListrContext, ListrTaskWrapper } from "listr";
-import path from "path";
-import { hideBin } from "yargs/helpers";
-import yargs from "yargs/yargs";
+import dotenv from 'dotenv'
+import * as admin from 'firebase-admin'
+import fs from 'fs'
+import Listr, { ListrContext, ListrTaskWrapper } from 'listr'
+import path from 'path'
+import { hideBin } from 'yargs/helpers'
+import yargs from 'yargs/yargs'
 
 console.log(process.cwd())
 
 dotenv.config({ debug: true })
 let display: (string | number)[] | undefined
-let sort: string;
+let sort: string
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS as string)), databaseURL: process.env.FIREBASE_ADMIN_DATABASE_URL as string })
 
 yargs(hideBin(process.argv))
-  .options({ sort: { type: 'string', default: 'smashes', description: 'sort stats by...',choices: ["smashes", "passes", "choices", "id"] }, display: {
-    type: "array", choices: ["smashes", "passes", "id"]
-  } })
-  .describe("key", "description")
+  .options({
+    sort: { type: 'string', default: 'smashes', description: 'sort stats by...', choices: ['smashes', 'passes', 'choices', 'id'] },
+    display: {
+      type: 'array',
+      choices: ['smashes', 'passes', 'id'],
+    },
+  })
+  .describe('key', 'description')
   .parseAsync()
   .then((flags) => {
     display = flags.display
-    sort = flags.sort;
+    sort = flags.sort
     listStats()
   })
 
@@ -47,7 +51,7 @@ async function listStats() {
     { title: `Writing new Pokemon Data`, task: writeUserData },
   ])
   async function main(ctx: ListrContext, task: ListrTaskWrapper) {
-    task.output = `Reading ${user}'s data`
+    let user = (ctx.task.output = `Reading ${user}'s data`)
     const pokemonSnap = await pokemon.get()
 
     if (user && user !== 'all') {
