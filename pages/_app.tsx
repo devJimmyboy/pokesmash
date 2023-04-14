@@ -50,12 +50,13 @@ export default function MyApp(props: MyAppProps) {
         <Script
           async
           id="adsense-id"
-          strategy="afterInteractive"
+          onLoad={() => {
+            console.log('Script loaded')
+          }}
           onError={(e) => {
             console.error('Script failed to load', e)
           }}
-          data-ad-client="ca-pub-9360491196956264"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9360491196956264"
           crossOrigin="anonymous"></Script>
         <FirebaseAppProvider firebaseApp={createFirebaseApp()}>
           <FirebaseComponents>
