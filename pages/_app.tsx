@@ -46,17 +46,17 @@ export default function MyApp(props: MyAppProps) {
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="manifest" href="/site.webmanifest" />
           <link rel="icon" type="image/png" href="/favicon.png" />
-          <Script
-            async
-            id="adsense-id"
-            strategy="afterInteractive"
-            onError={(e) => {
-              console.error('Script failed to load', e)
-            }}
-            data-ad-client="ca-pub-9360491196956264"
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-            crossOrigin="anonymous"></Script>
         </Head>
+        <Script
+          async
+          id="adsense-id"
+          strategy="afterInteractive"
+          onError={(e) => {
+            console.error('Script failed to load', e)
+          }}
+          data-ad-client="ca-pub-9360491196956264"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          crossOrigin="anonymous"></Script>
         <FirebaseAppProvider firebaseApp={createFirebaseApp()}>
           <FirebaseComponents>
             <ThemeProvider theme={theme}>
