@@ -50,7 +50,8 @@ export const usePokemonPicture = (i?: number, calcShiny = false) => {
       setShinies((s) => (!s ? [id] : [...s, id]))
     }
     if (id > 905) {
-      setSprite(`/sprites/${id}${isShiny ? '-shiny' : ''}.png`)
+      if (style === 'showdown' && !isShiny) setSprite(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`)
+      else setSprite(isShiny ? `/sprites/${id}-shiny.png` : `/sprites/${id}.png`)
       // setSprite(`https://www.dragonflycave.com/sprites/gen9/unified/${isShiny ? 'shiny/' : ''}${id}.png`)
     } else
       switch (style) {

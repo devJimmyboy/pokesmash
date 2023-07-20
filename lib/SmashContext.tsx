@@ -71,6 +71,7 @@ interface CtxData {
   setMessages: ListActions<FBMessage> | undefined
   seenBefore: [boolean | undefined, Dispatch<SetStateAction<boolean | undefined>>, () => void]
   startCelebration: (force?: boolean) => Promise<void>
+  hideDesc: [boolean, Dispatch<SetStateAction<boolean>>]
 }
 export type FBMessage = {
   id: string
@@ -108,6 +109,12 @@ const SmashContext = React.createContext<CtxData>({
   setMessages: undefined,
   seenBefore: [false, () => {}, () => {}],
   startCelebration: () => Promise.resolve(),
+  hideDesc: [
+    false,
+    (bool) => {
+      return bool
+    },
+  ],
 })
 
 interface Props {}
@@ -144,6 +151,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
 
   const { data: session, status } = useSession({ required: false })
   const [style, setStyle] = React.useState<Styling>('showdown')
+  const [hideDesc, toggleHideDesc] = React.useState<boolean>(false)
   const [chance] = React.useState(new Chance())
   useEffect(() => {
     localStorage.setItem('pokemonStyle', style)
@@ -360,6 +368,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         chance,
         seenBefore,
         startCelebration,
+        hideDesc: [hideDesc, toggleHideDesc],
       }}>
       <Celebration ref={celebrateRef} />
       <div id="appControl">

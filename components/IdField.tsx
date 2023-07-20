@@ -58,7 +58,8 @@ const InputEditable = styled(InputUnstyled)`
     border: 0;
     height: 100%;
     outline: none;
-    max-width: 5ch;
+    width: fit-content;
+    max-width: 6.5ch;
     border-radius: 0.625rem;
     background: ${(props) => props.theme.palette.background.paper};
     &:focus-visible {

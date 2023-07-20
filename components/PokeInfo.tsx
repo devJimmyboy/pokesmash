@@ -102,7 +102,7 @@ const getBg = (pokeInfo: Pokemon) => {
 
 export default function PokeInfo({ cardRef }: Props) {
   const smashCtx = useSmash() as NonNullable<ReturnType<typeof useSmash>>
-  const [hideDesc, toggleDesc] = useBoolean(false)
+  // const [hideDesc, toggleDesc] = useBoolean(false)
   const {
     currentId,
     pokeInfo,
@@ -112,6 +112,7 @@ export default function PokeInfo({ cardRef }: Props) {
     shockRef,
     seenBefore: [seenBefore],
     startCelebration,
+    hideDesc: [hideDesc, toggleDesc],
   } = smashCtx
   const [modalShown, toggleConfirm] = useBoolean(false)
 
@@ -162,15 +163,28 @@ export default function PokeInfo({ cardRef }: Props) {
           initial={{ scale: 0, rotate: -720, opacity: 0 }}
           animate={{ scale: 1.5, opacity: 1, rotate: 0 }}
           transition={{ duration: 1 }}
+          sx={{}}
           textAlign="center">
           {"Nice! You're a Degenerate!"}
         </MotionText>
         {seenBefore && (
           <>
-            <Button size="large" variant="contained" className="mt-24" onClick={() => startCelebration(true)}>
+            <Button
+              size="large"
+              variant="contained"
+              sx={{
+                marginTop: '3rem',
+              }}
+              onClick={() => startCelebration(true)}>
               Watch Ending Cutscene Again
             </Button>
-            <Button size="large" variant="contained" className="mt-12" onClick={() => toggleConfirm(true)}>
+            <Button
+              size="large"
+              variant="contained"
+              sx={{
+                marginTop: '1.5rem',
+              }}
+              onClick={() => toggleConfirm(true)}>
               Reset Account
             </Button>
             <ConfirmModal open={modalShown} onClose={() => toggleConfirm(false)} />
@@ -198,7 +212,7 @@ export default function PokeInfo({ cardRef }: Props) {
       className="cardContainer h-full"
       onContextMenu={(e) => {
         e.preventDefault()
-        toggleDesc()
+        toggleDesc((v) => !v)
       }}>
       <SwipeCards
         ref={cardRef}
@@ -245,7 +259,7 @@ export default function PokeInfo({ cardRef }: Props) {
               align-items: center;
               justify-content: center;
 
-              ${style === 'hd' || currentId > 905
+              ${style === 'hd' || (currentId > 905 && shiny)
                 ? `image-rendering: auto;`
                 : `image-rendering: -moz-crisp-edges;
             image-rendering: pixelated;

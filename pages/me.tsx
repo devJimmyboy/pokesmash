@@ -82,7 +82,13 @@ const UserProfile: NextPage<Props> = ({}) => {
           <meta name="description" content={`The user page for Yourself. Shows the Smashes and Passes you chose.`} />
         </Head>
         <Stack className="poke-scrollbar" sx={{ overflow: 'hidden', height: '100vh' }} direction="column" p={6} pb={2} alignItems="center">
-          <Tooltip className="absolute top-12 md:top-24 left-4" title="Go Back">
+          <Tooltip
+            title="Go Back"
+            sx={{
+              position: 'fixed',
+              top: 96,
+              left: 10,
+            }}>
             <IconButton className="fancy-bg w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
               <Icon icon="fa-solid:arrow-left" />
             </IconButton>
@@ -100,9 +106,9 @@ const UserProfile: NextPage<Props> = ({}) => {
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x.webp" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x.webp" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x.webp" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
           </StyledTabs>
           <div
             className="relative flex-grow w-full overflow-hidden"
@@ -212,14 +218,18 @@ function StatsPage(props: StatsPageProps) {
           <Typography variant="h3" component="h3" fontWeight={600}>
             Passes
           </Typography>
-          <ScoreDisplay className="passes p-12 text-5xl">{props.passes}</ScoreDisplay>
+          <ScoreDisplay className="passes p-12" sx={{ fontSize: '64px' }}>
+            {props.passes}
+          </ScoreDisplay>
         </div>
         <div className="text-opacity-75 text-green-400 rounded-full outline outline-1 outline-current  w-1 fancy-bg" />
         <div className="flex flex-col gap-4 items-center ">
           <Typography variant="h3" component="h3" fontWeight={600}>
             Smashes
           </Typography>
-          <ScoreDisplay className="smashes p-12 text-5xl">{props.smashes}</ScoreDisplay>
+          <ScoreDisplay className="smashes p-12" sx={{ fontSize: '64px' }}>
+            {props.smashes}
+          </ScoreDisplay>
         </div>
       </div>
     </div>

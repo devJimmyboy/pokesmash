@@ -42,10 +42,10 @@ const SignInBtn = styled(IconButton)`
 
 export default function LoginButton(props: ButtonProps) {
   const { session } = useSmash()
-  const router = useRouter()
+  // const router = useRouter()
   if (session) {
     return (
-      <Stack className=" flex-col-reverse md:flex-row items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2">
+      <Stack className="items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2" direction={{ xs: 'column-reverse', md: 'row' }}>
         <Avatar
           className="pointer-events-auto"
           component={NextLinkComposed}
@@ -60,7 +60,7 @@ export default function LoginButton(props: ButtonProps) {
     )
   }
   return (
-    <Stack className=" flex-col-reverse justify-between mr-2 py-2 md:m-6 md:justify-center md:py-0 md:gap-4 items-end md:items-start md:flex-row h-full">
+    <Stack className="items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2" direction={{ xs: 'column-reverse', md: 'row' }}>
       <Button
         className="pointer-events-auto"
         variant="contained"

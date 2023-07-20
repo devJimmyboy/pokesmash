@@ -74,7 +74,7 @@ const ShockValue = React.forwardRef<ShockRef, Props>(({}, ref) => {
             maxWidth: 128,
           }}
           animate={api}>
-          <Image width={128} height={128} src="/img/HUH.png" alt="HUH" />
+          <Image width={168} height={128} src="/img/HUHHH.webp" alt="HUH" />
           {shockText}
         </motion.div>
       </div>

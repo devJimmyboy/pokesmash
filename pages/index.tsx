@@ -17,6 +17,7 @@ import Link from '../src/Link'
 
 import type { NextPage } from 'next'
 import { NUM_POKEMON } from '../src/constants'
+import MobileDrawer from '../components/MobileDrawer'
 const headerCSS = css`
   -webkit-text-stroke: 1pt #3b4cca;
   font-weight: bold;
@@ -84,14 +85,14 @@ const Home: NextPage = () => {
               background-clip: text;
               -webkit-background-clip: text;
               -webkit-text-stroke-color: transparent;
-              cursor: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/1x), default;
+              cursor: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/1x.webp), default;
               background-size: 120%;
               background-position: center;
               transition: color 0.4s ease-in-out;
               font-size: inherit;
               &:hover {
                 color: transparent;
-                background-image: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/4x);
+                background-image: url(https://cdn.7tv.app/emote/609f355eb55466cf076467b1/4x.webp);
               }
             `}>
             SMASH
@@ -100,8 +101,18 @@ const Home: NextPage = () => {
         <PokeInfo cardRef={cardRef} />
 
         {error && <div>Error! {error.message || 'Please Reload'}</div>}
-        <Stack direction="column" sx={{ height: 400, mt: '1rem' }} spacing={4}>
-          <Typography component="div" className="flex flex-row gap-2 justify-center items-center text-lg md:text-xl lg:text-2xl xl:text-3xl" fontWeight="bold" align="center">
+        <Stack direction="column" sx={{ height: 400, mt: '1rem' }} spacing={{ xs: 2, md: 4 }}>
+          <Typography
+            component="div"
+            className="flex flex-row gap-2 justify-center items-center"
+            fontSize={{
+              xs: '1.125rem',
+              md: '1.25rem',
+              lg: '1.5rem',
+              xl: '1.875rem',
+            }}
+            fontWeight="bold"
+            align="center">
             Pokemon <IdField /> of {NUM_POKEMON}
           </Typography>
           <SmashPass smashes={score.smashes} passes={score.passes} onChoice={onButtonPress} />
@@ -133,14 +144,14 @@ const Home: NextPage = () => {
             <div className="hidden md:inline"> app</div>
           </CreatedCard>
           <div className="flex-grow" />
-          <div className="flex flex-col items-start md:items-end h-32 gap-4 mx-6 my-6 w-24">
+          <div className="flex-col items-start md:items-end h-32 gap-4 mx-6 my-6 w-24 hidden md:flex">
             <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
               <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/KA49N8H">
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
             </Tooltip>
             <div className="pointer-events-auto flex flex-row-reverse  md:flex-row items-center relative group">
-              <Blurb className={`absolute text-xs md:text-sm pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 group-focus-within:opacity-100' : ''}`}>
+              <Blurb className={`pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 group-focus-within:opacity-100' : ''}`}>
                 Support me
                 <br />
                 for more sites like this!
@@ -154,6 +165,9 @@ const Home: NextPage = () => {
                 <Icon fontSize={18} icon="fa-brands:patreon" />
               </IconButton>
             </div>
+          </div>
+          <div className="pointer-events-auto">
+            <MobileDrawer />
           </div>
         </Footer>
       </Box>
@@ -200,11 +214,18 @@ const CreatedCard = styled('div')`
 const Blurb = styled('span')`
   user-select: none;
   display: flex;
-  position: relative;
+  position: absolute;
   padding: 0.25rem;
-  @media screen and (min-width: 800px) {
+  @media (min-width: 800px) {
     right: calc(15px + 3rem);
     left: unset;
+    font-size: 1rem /* 14px */;
+    line-height: 1.35rem /* 20px */;
+  }
+
+  @media (min-width: 0px) {
+    font-size: 0.75rem /* 14px */;
+    line-height: 1.25rem /* 20px */;
   }
   width: max-content;
 

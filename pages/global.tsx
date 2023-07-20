@@ -1,24 +1,18 @@
 import { Icon } from '@iconify/react'
 import { Avatar, Grid, IconButton, Stack, Tab, TabProps, Tabs, TabsProps, Tooltip, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { getDatabase, ref } from 'firebase/database'
 import { gsap } from 'gsap'
-import { GetServerSideProps, NextPage } from 'next'
+import { NextPage, GetServerSideProps } from 'next'
 import { User } from 'next-auth'
-import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import React, { useEffect, useLayoutEffect } from 'react'
-import useSWR from 'swr'
 
-import PokemonSquare from '../../components/PokemonSquare'
-import { ScoreDisplay } from '../../components/SmashPass'
-import admin from '../../firebase/adminApp'
-import { createFirebaseApp } from '../../firebase/clientApp'
-import { useSmash } from '../../lib/SmashContext'
-import { NUM_POKEMON } from '../../src/constants'
-import Link from '../../src/Link'
+import PokemonSquare from '../components/PokemonSquare'
+import { ScoreDisplay } from '../components/SmashPass'
+import { useSmash } from '../lib/SmashContext'
+import { NUM_POKEMON } from '../src/constants'
+import Link from '../src/Link'
 
 const ScoreHolder = styled('div')`
   background-position: center;
@@ -44,25 +38,22 @@ type ScoreProp = {
   passCount: number
 }
 type ScoreError = string
-interface Props {
-  user: UserProp
-}
+interface Props {}
 
 const tl = gsap.timeline({ repeat: -1 })
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-const UserProfile: NextPage<Props> = ({ user }) => {
-  const db = getDatabase(createFirebaseApp())
-  const { style, session } = useSmash()
+
+const UserProfile: NextPage<Props> = ({}) => {
+  const { style, score } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
-  const router = useRouter()
-  const { data: score, error: scoreError } = useSWR<ScoreProp, ScoreError>(typeof user === 'object' && `/api/user/score?user=${user.name.toLowerCase()}`, fetcher)
+
   const [tab, setTab] = React.useState<number>(1)
-  const [numSmashed, setNum] = React.useState(0)
-  useEffect(() => {
-    if (typeof user === 'string') {
-      return
-    }
-  }, [user])
+  const user: Partial<UserProp> = {
+    name: 'Anonymous (You)',
+    profileImageUrl: '',
+    displayName: 'Anonymous (You)',
+    username: 'Anonymous',
+  }
+
   useEffect(() => {
     if (pictureBgRef.current) {
       tl.fromTo(
@@ -80,14 +71,16 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     }
   }, [pictureBgRef])
 
-  if (typeof user === 'string') {
-    return <div className="w-full h-full flex flex-col items-center justify-center">{user}</div>
-  } else if (scoreError || !score) {
-    return <div className="w-full h-full flex flex-col items-center justify-center">{scoreError || 'Loading Stats...'}</div>
+  if (!score) {
+    return <div className="w-full h-full flex flex-col items-center justify-center">{'Unknown Error Occured.'}</div>
   } else
     return (
       <>
-        <NextSeo title={`${user.name}'s Profile`} description={`The user page for ${user.name}. Shows the Smashes and Passes they chose.`} />
+        <Head>
+          <title>{`PokeSmash - Your Stats`}</title>
+          <meta name="title" content={`PokeSmash - Your Stats`} />
+          <meta name="description" content={`The user page for Yourself. Shows the Smashes and Passes you chose.`} />
+        </Head>
         <Stack className="poke-scrollbar" sx={{ overflow: 'hidden', height: '100vh' }} direction="column" p={6} pb={2} alignItems="center">
           <Tooltip
             title="Go Back"
@@ -105,58 +98,50 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             <Avatar className=" w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 " alt={user?.name} src={user?.profileImageUrl} />
 
             <Typography fontSize={32} className="border-purple-500 border-4 select-none flex flex-row items-center gap-2 border-solid rounded-lg px-4 bg-purple-500 text-white" fontWeight={600}>
-              <IconButton className="p-0 m-0" sx={{ fontSize: 'inherit' }} onClick={() => router.push(`https://twitch.tv/${user?.displayName}`, {}, { shallow: true })}>
-                <Icon icon="fa-brands:twitch" display="inline-block" />
-              </IconButton>{' '}
               {user.displayName}
             </Typography>
             <div className="flex-grow" />
             <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-              {score.passCount + score.smashCount || '?'} / {NUM_POKEMON}
+              {score.passes + score.smashes || '?'} / {NUM_POKEMON}
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x.webp" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x.webp" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x.webp" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
           </StyledTabs>
           <div
             className="relative flex-grow w-full overflow-hidden"
             style={{
               borderRadius: '0 0 0.625rem 0.625rem',
               border: '1px solid #55df55',
-
               borderTop: 'none',
             }}>
-            {!scoreError ? (
-              tab === 1 ? (
-                <StatsPage smashes={score.smashCount} passes={score.passCount} />
-              ) : (
-                <div className="absolute h-full w-full overflow-y-auto">
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={2}
-                    sx={{
-                      p: 2,
-                      overflowX: 'hidden',
-                      overflowY: 'scroll',
-                      maxHeight: 'content',
-                    }}
-                    columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
-                    {Object.keys(score.choices)
-                      .filter((val) => score.choices[val] === (tab === 2 ? 'smash' : 'pass'))
-                      .map((id) => (
-                        <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
-                          <PokemonSquare i={Number(id)} choice={tab === 2 ? 'smash' : 'pass'} style={style || 'showdown'} />
-                        </Grid>
-                      ))}
-                  </Grid>
-                </div>
-              )
+            {tab === 1 ? (
+              <StatsPage smashes={score.smashes} passes={score.passes} />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-2xl font-semibold">{scoreError}</div>
+              <div className="absolute h-full w-full overflow-y-auto">
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={2}
+                  sx={{
+                    p: 2,
+                    overflowX: 'hidden',
+                    overflowY: 'scroll',
+                    maxHeight: 'content',
+                  }}
+                  columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
+                  {Object.keys(score.choices)
+                    .filter((val) => score.choices[val] === (tab === 2 ? 'smash' : 'pass'))
+                    .map((id) => (
+                      <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
+                        <PokemonSquare i={Number(id)} choice={tab === 2 ? 'smash' : 'pass'} style={style || 'showdown'} />
+                      </Grid>
+                    ))}
+                </Grid>
+              </div>
             )}
           </div>
         </Stack>
@@ -164,34 +149,6 @@ const UserProfile: NextPage<Props> = ({ user }) => {
     )
 }
 export default UserProfile
-
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const res = context.res
-  res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
-  const { user } = context.query as { user: string }
-  const firestore = admin.firestore()
-  const users = firestore.collection('users')
-  const userInfo = await users
-    .where('username', '==', user.toLowerCase())
-    .get()
-    .then((q) => {
-      const doc = q.docs[0]
-      if (doc?.exists) {
-        const data = doc.data()
-        delete data.email
-        return data
-      } else {
-        return 'User not found'
-      }
-    })
-
-  const props = {
-    user: userInfo,
-  }
-  return {
-    props: JSON.parse(JSON.stringify(props)),
-  }
-}
 
 interface StyledTabsProps extends TabsProps {
   children?: React.ReactNode
@@ -261,16 +218,29 @@ function StatsPage(props: StatsPageProps) {
           <Typography variant="h3" component="h3" fontWeight={600}>
             Passes
           </Typography>
-          <ScoreDisplay className="passes p-12 text-5xl">{props.passes}</ScoreDisplay>
+          <ScoreDisplay className="passes p-12" sx={{ fontSize: '64px' }}>
+            {props.passes}
+          </ScoreDisplay>
         </div>
         <div className="text-opacity-75 text-green-400 rounded-full outline outline-1 outline-current  w-1 fancy-bg" />
         <div className="flex flex-col gap-4 items-center ">
           <Typography variant="h3" component="h3" fontWeight={600}>
             Smashes
           </Typography>
-          <ScoreDisplay className="smashes p-12 text-5xl">{props.smashes}</ScoreDisplay>
+          <ScoreDisplay className="smashes p-12" sx={{ fontSize: '64px' }}>
+            {props.smashes}
+          </ScoreDisplay>
         </div>
       </div>
     </div>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // Fetch data from external API
+  const res = await fetch(`https://.../data`)
+  const data = await res.json()
+
+  // Pass data to the page via props
+  return { props: { data } }
 }
