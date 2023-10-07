@@ -158,7 +158,8 @@ export default function PokeInfo({ cardRef }: Props) {
     return (
       <div className="cardContainer h-full flex flex-col items-center justify-center">
         <MotionText
-          className="select-none w-2/3 md:w-full text-2xl md:text-7xl"
+          className="select-none w-2/3 md:w-full"
+          fontSize={{ xs: 32, sm: 48, md: 72 }}
           variant="h2"
           initial={{ scale: 0, rotate: -720, opacity: 0 }}
           animate={{ scale: 1.5, opacity: 1, rotate: 0 }}
@@ -278,7 +279,7 @@ export default function PokeInfo({ cardRef }: Props) {
           </div>
           {currentId === 1 && (
             <div className="px-2" style={{ position: 'absolute', top: '12px' }}>
-              <Typography className="filter drop-shadow" fontWeight={600} fontSize={24} textAlign="center">
+              <Typography className="filter drop-shadow" fontWeight={600} fontSize={{ xs: 38, md: 24 }} textAlign="center">
                 Welcome to PokeSmash! Swipe left to pass and right to smash! You can also right click the card to hide the description.
               </Typography>
             </div>
@@ -310,7 +311,7 @@ export default function PokeInfo({ cardRef }: Props) {
             </div>
           )}
           <PokeContent className={`select-none absolute w-full ${hideDesc && 'desc-hidden'}`}>
-            <Typography id="pokeName" variant="h4" fontWeight={700} component="h1" fontSize={{ xs: '1.5rem', md: '2rem' }}>
+            <Typography id="pokeName" variant="h4" fontWeight={700} component="h1" fontSize={{ xs: '2.25rem', md: '2rem' }}>
               {capitalizeFirstLetter(pokeInfo.name)}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ my: 1 }}>
@@ -318,7 +319,7 @@ export default function PokeInfo({ cardRef }: Props) {
                 <Type type={type.type.name as any} key={i} />
               ))}
             </Stack>
-            <Typography id="pokeDesc" fontSize={{ xs: '0.75rem', md: '1rem' }}>
+            <Typography id="pokeDesc" fontSize={{ xs: '0.85rem', md: '1rem' }}>
               {data?.flavor_text_entries.find((v) => v.language.name === 'en')?.flavor_text.replaceAll(//gi, ' ') || 'Succelent, Beautiful.'}
             </Typography>
           </PokeContent>
@@ -394,9 +395,11 @@ function ConfirmModal({ open, onClose }: { open: boolean; onClose: () => void })
       open={open}
       onClose={onClose}
       closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 500,
+      slots={{
+        backdrop: Backdrop,
+      }}
+      slotProps={{
+        backdrop: { timeout: 500 },
       }}>
       <Fade in={open}>
         <Box component="form" onSubmit={onSubmit} sx={modalStyle}>

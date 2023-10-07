@@ -45,7 +45,10 @@ export default function LoginButton(props: ButtonProps) {
   // const router = useRouter()
   if (session) {
     return (
-      <Stack className="items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2" direction={{ xs: 'column-reverse', md: 'row' }}>
+      <Stack
+        className="items-end md:items-center md:justify-center md:gap-4 md:m-6 md:py-0 mr-2 py-2 justify-between gap-2"
+        direction={{ xs: 'column-reverse', md: 'row' }}
+        display={{ xs: 'none', md: 'flex' }}>
         <Avatar
           className="pointer-events-auto"
           component={NextLinkComposed}

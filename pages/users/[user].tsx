@@ -51,13 +51,13 @@ interface Props {
 const tl = gsap.timeline({ repeat: -1 })
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const UserProfile: NextPage<Props> = ({ user }) => {
-  const db = getDatabase(createFirebaseApp())
+  // const db = getDatabase(createFirebaseApp())
   const { style, session } = useSmash()
   const pictureBgRef = React.useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: score, error: scoreError } = useSWR<ScoreProp, ScoreError>(typeof user === 'object' && `/api/user/score?user=${user.name.toLowerCase()}`, fetcher)
   const [tab, setTab] = React.useState<number>(1)
-  const [numSmashed, setNum] = React.useState(0)
+  // const [numSmashed, setNum] = React.useState(0)
   useEffect(() => {
     if (typeof user === 'string') {
       return
@@ -93,32 +93,49 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             title="Go Back"
             sx={{
               position: 'fixed',
-              top: 96,
+              top: { xs: 10, md: 96 },
               left: 10,
             }}>
             <IconButton className="fancy-bg w-10 h-10 p-0 m-0" LinkComponent={Link} href="/">
               <Icon icon="fa-solid:arrow-left" />
             </IconButton>
           </Tooltip>
-          <div className="flex flex-row gap-6 items-center w-11/12 my-2 md:my-4 lg:my-6 ">
+          <div className="flex flex-row gap-6 items-center w-11/12 mt-0 mb-4 md:mt-4 lg:mt-6 ">
             <div ref={pictureBgRef} className="rounded-full absolute w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 border-purple-700" />
-            <Avatar className=" w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 " alt={user?.name} src={user?.profileImageUrl} />
+            <Avatar
+              className="w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32 "
+              sx={{
+                height: {
+                  xs: 64,
+                  md: 96,
+                },
+                width: {
+                  xs: 64,
+                  md: 96,
+                },
+              }}
+              alt={user?.name}
+              src={user?.profileImageUrl}
+            />
 
-            <Typography fontSize={32} className="border-purple-500 border-4 select-none flex flex-row items-center gap-2 border-solid rounded-lg px-4 bg-purple-500 text-white" fontWeight={600}>
-              <IconButton className="p-0 m-0" sx={{ fontSize: 'inherit' }} onClick={() => router.push(`https://twitch.tv/${user?.displayName}`, {}, { shallow: true })}>
+            <Typography
+              fontSize={{ xs: 18, sm: 24, md: 32 }}
+              className="border-purple-500 border-4 select-none flex flex-row items-center gap-2 border-solid rounded-lg px-4 bg-purple-500 text-white"
+              fontWeight={600}>
+              <IconButton className="fancy-bg p-0 m-0" sx={{ fontSize: 'inherit' }} href={`https://twitch.tv/${user?.displayName}`}>
                 <Icon icon="fa-brands:twitch" display="inline-block" />
               </IconButton>{' '}
               {user.displayName}
             </Typography>
             <div className="flex-grow" />
-            <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
+            <Typography fontSize={{ xs: 18, sm: 24, md: 32 }} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
               {score.passCount + score.smashCount || '?'} / {NUM_POKEMON}
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
-            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60aeafcb229664e866bef5ac/4x.webp" alt="PogO" width={32} height={32} />} label="Passes" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/611a4aac62a016377dd91a25/4x.webp" alt="peepoG" width={32} height={32} />} label="Stats" iconPosition="start" />
+            <StyledTab icon={<Image src="https://cdn.7tv.app/emote/60b8cce455c320f0e89d3514/4x.webp" alt="EZ" width={32} height={32} />} label="Smashes" iconPosition="start" />
           </StyledTabs>
           <div
             className="relative flex-grow w-full overflow-hidden"
@@ -144,11 +161,11 @@ const UserProfile: NextPage<Props> = ({ user }) => {
                       overflowY: 'scroll',
                       maxHeight: 'content',
                     }}
-                    columns={{ xs: 8, sm: 18, md: 24, lg: 60 }}>
+                    columns={{ xs: 8, sm: 18, md: 24, lg: 60, xl: 60 }}>
                     {Object.keys(score.choices)
                       .filter((val) => score.choices[val] === (tab === 2 ? 'smash' : 'pass'))
                       .map((id) => (
-                        <Grid item xs={2} sm={3} md={3} lg={4} key={id}>
+                        <Grid item xs={2} sm={3} md={3} lg={6} xl={4} key={id}>
                           <PokemonSquare i={Number(id)} choice={tab === 2 ? 'smash' : 'pass'} style={style || 'showdown'} />
                         </Grid>
                       ))}
@@ -250,25 +267,25 @@ interface StatsPageProps {
   passes: number
 }
 
-function StatsPage(props: StatsPageProps) {
+export function StatsPage(props: StatsPageProps) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-12">
-      <Typography fontSize={32} fontWeight={700}>
+      {/* <Typography fontSize={32} fontWeight={700}>
         More Stats Coming soon...
-      </Typography>
+      </Typography> */}
       <div className="flex flex-row justify-around w-full">
         <div className="flex flex-col gap-4 items-center">
           <Typography variant="h3" component="h3" fontWeight={600}>
             Passes
           </Typography>
-          <ScoreDisplay className="passes p-12 text-5xl">{props.passes}</ScoreDisplay>
+          <ScoreDisplay className="passes p-12 text-6xl">{props.passes}</ScoreDisplay>
         </div>
         <div className="text-opacity-75 text-green-400 rounded-full outline outline-1 outline-current  w-1 fancy-bg" />
         <div className="flex flex-col gap-4 items-center ">
           <Typography variant="h3" component="h3" fontWeight={600}>
             Smashes
           </Typography>
-          <ScoreDisplay className="smashes p-12 text-5xl">{props.smashes}</ScoreDisplay>
+          <ScoreDisplay className="smashes p-12 text-6xl">{props.smashes}</ScoreDisplay>
         </div>
       </div>
     </div>

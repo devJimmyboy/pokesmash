@@ -26,7 +26,7 @@ const ChoiceButtonRoot = styled(MotionButton)`
 
   border-radius: 1.25rem;
   border: 4px solid var(--bColor);
-  font-size: 1.5em;
+  font-size: 1.75em;
 
   font-weight: bold;
   color: var(--bColor);
@@ -63,7 +63,7 @@ const Kbd = styled('kbd')`
 `
 
 export const ScoreDisplay = styled('div')`
-  font-size: 1em;
+  /* font-size: 1em; */
   display: flex;
   padding: 0.75em;
   gap: 2px;

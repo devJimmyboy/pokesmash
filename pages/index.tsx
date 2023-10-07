@@ -61,18 +61,19 @@ const Home: NextPage = () => {
           py: { md: 0, lg: 2, xl: 4 },
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
+          justifyContent: 'start',
           alignItems: 'center',
           height: '100vh',
         }}>
         <Typography
           variant="h4"
-          component="h1"
-          className="mt-4"
+          component="div"
+          className=""
           css={headerCSS}
           gutterBottom
           sx={{
             color: '#FFDE00',
+            mt: { xs: 2, md: 4, lg: 0 },
           }}>
           Poké
           <Typography

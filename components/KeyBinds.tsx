@@ -6,7 +6,7 @@ type Props = {}
 type Keybind = { icon: string; key: string; use: string }
 const keybinds: Keybind[] = [
   { icon: 'ep:arrow-up-bold', key: 'Up', use: 'Next Pokemon' },
-  { icon: 'ep:arrow-down-bold', key: 'Down', use: 'Previous Pokemon' },
+  { icon: 'ep:arrow-down-bold', key: 'Down', use: 'Prev Pokemon' },
 
   { icon: 'ep:arrow-left-bold', key: 'Left', use: 'Pass' },
 

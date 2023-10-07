@@ -24,7 +24,6 @@ export default function PokemonSquare({ i, style, choice }: Props) {
   return (
     <>
       <Box
-        className="w-full  aspect-square"
         sx={{
           userSelect: 'none',
           overflow: 'hidden',
@@ -33,6 +32,8 @@ export default function PokemonSquare({ i, style, choice }: Props) {
           backgroundSize: '90%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          aspectRatio: '1/1',
+          width: '100%',
           imageRendering: style === 'showdown' ? 'pixelated' : 'auto',
           backgroundColor: (theme) => `${theme.palette[choice].main}a0`,
         }}>
@@ -43,10 +44,10 @@ export default function PokemonSquare({ i, style, choice }: Props) {
               background-color: #22222280;
             }
           `}>
-          <Typography className="hidden justify-self-start group-hover:inline text-lg" variant="h4" component="h4" fontWeight={600}>
+          <Typography className="hidden justify-self-start group-hover:inline" fontSize={{ xs: 18, lg: 24 }} variant="h4" component="h4" fontWeight={600}>
             {i.toString()}
           </Typography>
-          <Typography className="hidden group-hover:inline text-lg" variant="h4" component="h4" fontWeight={700}>
+          <Typography className="hidden group-hover:inline" fontSize={{ xs: 18, lg: 24 }} variant="h4" component="h4" fontWeight={700}>
             {choice.slice(0, 1).toUpperCase() + choice.slice(1)}
           </Typography>
         </div>
