@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "pokemon": {
+      ".read": false,
+        ".write": false,
+        "$pokeId": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.exists() &&  newData.child('smashCount').val() > 100 && newData.child('passCount').val() > 100"
+        }
+    },
+    "users": {
+      "$user":{
+        ".read": true,
+        ".write": true
+      }
+    },
+    ".read": false,
+    ".write": false
+    
+  }
+}
