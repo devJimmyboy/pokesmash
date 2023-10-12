@@ -1,5 +1,5 @@
-import { ButtonUnstyled, ButtonUnstyledProps } from '@mui/base'
-import { Button, Stack, useTheme } from '@mui/material'
+import { Button, ButtonProps } from '@mui/base'
+import { Button as MuiButton, Stack, useTheme } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { motion, useAnimation, Variants } from 'framer-motion'
 import React, { useCallback, useEffect } from 'react'
@@ -7,7 +7,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 
 import { useSmash } from '../lib/SmashContext'
 
-const MotionButton = motion(Button)
+const MotionButton = motion(MuiButton)
 const ChoiceButtonRoot = styled(MotionButton)`
   --bColor: ${({ theme }) => theme.palette.primary.main};
   display: flex;
@@ -47,7 +47,7 @@ const ChoiceButtonRoot = styled(MotionButton)`
   }
 `
 
-const MButtonUnstyled = motion(ButtonUnstyled)
+const MButtonUnstyled = motion(Button)
 
 const Kbd = styled('kbd')`
   background-color: transparent;
@@ -112,7 +112,7 @@ export default function SmashPass({ onChoice, smashes, passes }: Props) {
   )
 }
 
-interface ChoiceButtonProps extends ButtonUnstyledProps {
+interface ChoiceButtonProps extends ButtonProps {
   choiceType: 'smash' | 'pass'
   onChoice: (type?: 'smash' | 'pass') => void
 }

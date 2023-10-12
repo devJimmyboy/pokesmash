@@ -2,7 +2,7 @@ import NextAuth, { User } from 'next-auth'
 import TwitchProvider from 'next-auth/providers/twitch'
 // import { FirebaseAdapter } from "../../../lib/FirebaseAdapter"
 import { FirestoreAdapter } from '@next-auth/firebase-adapter'
-import { ClientCredentialsAuthProvider } from '@twurple/auth'
+import { AppTokenAuthProvider } from '@twurple/auth'
 import { ApiClient, HelixUser } from '@twurple/api'
 
 import admin from '../../../firebase/adminApp'
@@ -10,7 +10,7 @@ import admin from '../../../firebase/adminApp'
 
 // const app = createFirebaseApp()
 
-const auth = new ClientCredentialsAuthProvider(process.env.TWITCH_ID as string, process.env.TWITCH_SECRET as string)
+const auth = new AppTokenAuthProvider(process.env.TWITCH_ID as string, process.env.TWITCH_SECRET as string)
 const api = new ApiClient({ authProvider: auth })
 
 export default NextAuth({
@@ -34,7 +34,7 @@ export default NextAuth({
           broadcasterType: userInfo.broadcasterType as any,
           profileImageUrl: userInfo.profilePictureUrl || profile.picture,
           offlineImageUrl: userInfo.offlinePlaceholderUrl,
-          viewCount: userInfo.views,
+          viewCount: 0,
           createdAt: userInfo.creationDate.toString(),
           type: userInfo.type,
         }
@@ -44,14 +44,15 @@ export default NextAuth({
     // ...add more providers here
   ],
   adapter: FirestoreAdapter({
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS as string)),
+    // apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    // appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    // authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
     databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+    // messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    // measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     // emulator: {},
   }),
   callbacks: {

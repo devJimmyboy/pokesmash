@@ -1,4 +1,4 @@
-import { InputUnstyled, inputUnstyledClasses } from '@mui/base'
+import { InputUnstyled } from '@mui/core'
 import { styled } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 
@@ -35,7 +35,7 @@ export default function IdField({}: Props) {
       onKeyDown={(e: React.KeyboardEvent<HTMLSpanElement>) => {
         e.stopPropagation()
       }}
-      slotProps={{
+      componentsProps={{
         input: {
           'data-form-type': 'other',
         } as any,
@@ -54,7 +54,7 @@ const InputEditable = styled(InputUnstyled)`
   font-size: 1.5rem;
   height: 100%;
 
-  & .${inputUnstyledClasses.input} {
+  & .MuiInput-input {
     border: 0;
     height: 100%;
     outline: none;
@@ -72,7 +72,7 @@ const InputEditable = styled(InputUnstyled)`
     font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
     text-align: center;
   }
-  & .${inputUnstyledClasses.root} {
+  & .MuiInput-root {
     width: min-content;
   }
 `

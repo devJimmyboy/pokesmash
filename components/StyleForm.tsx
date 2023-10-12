@@ -1,9 +1,9 @@
 import { ListItemIcon, Switch } from '@mui/material'
-import SwitchUnstyled, { switchUnstyledClasses } from '@mui/base/SwitchUnstyled'
+import SwitchUnstyled, { switchUnstyledClasses } from '@mui/core/SwitchUnstyled'
 import { css, styled } from '@mui/system'
 import React from 'react'
 import { blue, grey } from '@mui/material/colors'
-import { selectUnstyledClasses, OptionUnstyled, optionUnstyledClasses, PopperUnstyled, SelectUnstyledProps, SelectUnstyled } from '@mui/base'
+import { selectClasses, Option, optionClasses, Popper, SelectProps, Select } from '@mui/base'
 import Image from 'next/image'
 
 type Props = { value: string; onChange: (value: string | null) => void }
@@ -39,15 +39,15 @@ export default function StyleForm({ value, onChange }: Props) {
   )
 }
 
-const CustomSelect = React.forwardRef((props: SelectUnstyledProps<string>, ref: React.ForwardedRef<HTMLButtonElement>) => {
-  const components: SelectUnstyledProps<string>['slots'] = {
+const CustomSelect = React.forwardRef((props: SelectProps<string, false>, ref: React.ForwardedRef<HTMLButtonElement>) => {
+  const components: SelectProps<string, false>['slots'] = {
     root: StyledButton,
     listbox: StyledListbox,
     popper: StyledPopper as any,
     ...props.slots,
   }
-  return <SelectUnstyled {...props} slots={components} />
-}) as (props: SelectUnstyledProps<string> & React.RefAttributes<HTMLButtonElement>) => JSX.Element
+  return <Select {...props} slots={components} />
+}) as (props: SelectProps<string, false> & React.RefAttributes<HTMLButtonElement>) => JSX.Element
 
 const ListItemIconStyled = styled(ListItemIcon)`
   width: 64px;
@@ -97,7 +97,7 @@ const StyledButton = styled('button')(
     border-color: ${theme.palette.mode === 'dark' ? grey[700] : grey[400]};
   }
 
-  &.${selectUnstyledClasses.focusVisible} {
+  &.${selectClasses.focusVisible} {
     outline: 3px solid ${theme.palette.mode === 'dark' ? blue[600] : blue[100]};
   }
 
@@ -110,7 +110,7 @@ const StyledButton = styled('button')(
     display: none;
   }
 
-  &.${selectUnstyledClasses.expanded} {
+  &.${selectClasses.expanded} {
     &::after {
       content: '▴';
     }
@@ -140,7 +140,7 @@ const StyledListbox = styled('ul')(
   `
 )
 
-const StyledOption = styled(OptionUnstyled)(
+const StyledOption = styled(Option)(
   ({ theme }) => `
     list-style: none;
     padding: 8px;
@@ -151,34 +151,34 @@ const StyledOption = styled(OptionUnstyled)(
       border-bottom: none;
     }
 
-    &.${optionUnstyledClasses.selected} {
+    &.${optionClasses.selected} {
       background-color: ${theme.palette.mode === 'dark' ? blue[900] : blue[100]};
       
       color: ${theme.palette.mode === 'dark' ? blue[100] : blue[900]};
     }
 
-    &.${optionUnstyledClasses.highlighted} {
+    &.${optionClasses.highlighted} {
       background-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[100]};
       color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
     }
 
-    &.${optionUnstyledClasses.highlighted}.${optionUnstyledClasses.selected} {
+    &.${optionClasses.highlighted}.${optionClasses.selected} {
       background-color: ${theme.palette.mode === 'dark' ? blue[900] : blue[100]};
       color: ${theme.palette.mode === 'dark' ? blue[100] : blue[900]};
     }
 
-    &.${optionUnstyledClasses.disabled} {
+    &.${optionClasses.disabled} {
       color: ${theme.palette.mode === 'dark' ? grey[700] : grey[400]};
     }
 
-    &:hover:not(.${optionUnstyledClasses.disabled}) {
+    &:hover:not(.${optionClasses.disabled}) {
       background-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[100]};
       color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
     }
   `
 )
 
-const StyledPopper = styled(PopperUnstyled)`
+const StyledPopper = styled(Popper)`
   z-index: 10;
 `
 

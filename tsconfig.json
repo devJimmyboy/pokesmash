@@ -29,6 +29,7 @@
     "node_modules",
     "functions",
     "public",
-    "scripts"
+    "scripts",
+    "fb-functions",
   ]
 }

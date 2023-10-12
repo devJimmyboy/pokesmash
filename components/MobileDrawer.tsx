@@ -52,24 +52,24 @@ const DrawerContent = () => {
         <div className="flex flex-col items-center justify-center w-full max-h-16">
           <img className="h-12 sm:h-16" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="pika" />
         </div>
-        <NavItemButton as="a" href="/">
+        <ListItemButton href="/">
           <ListItemIcon>
             <Icon icon="mdi:home" fontSize="1.5rem" />
           </ListItemIcon>
           <ListItemText primary="Home" />
-        </NavItemButton>
-        <NavItemButton as="a" href={session ? `/users/${session?.user.displayName}` : `/me`}>
+        </ListItemButton>
+        <ListItemButton href={session ? `/users/${session?.user.displayName}` : `/me`}>
           <ListItemIcon>
             <Icon icon="mdi:home" fontSize="1.5rem" />
           </ListItemIcon>
           <ListItemText primary="Your Stats" />
-        </NavItemButton>
-        <NavItemButton as="a" href="/global">
+        </ListItemButton>
+        <ListItemButton href="/global">
           <ListItemIcon>
             <Icon icon="mdi:earth" fontSize="1.5rem" />
           </ListItemIcon>
           <ListItemText primary="Global Stats" />
-        </NavItemButton>
+        </ListItemButton>
         <NavItemButton
           onClick={() => {
             signOut()
