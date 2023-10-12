@@ -147,7 +147,7 @@ const Home: NextPage = () => {
           <div className="flex-grow" />
           <div className="flex-col items-start md:items-end h-32 gap-4 mx-6 my-6 w-24 hidden md:flex">
             <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
-              <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/KA49N8H">
+              <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/Dg2JqfyArJ">
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
             </Tooltip>
