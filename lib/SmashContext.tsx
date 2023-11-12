@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react'
 import { Box } from '@mui/material'
 import Chance from 'chance'
 import { get, getDatabase, ref } from 'firebase/database'
-import { collection, CollectionReference, getFirestore, onSnapshot, query, where } from 'firebase/firestore'
+import { collection, CollectionReference, DocumentData, getFirestore, onSnapshot, query, where } from 'firebase/firestore'
 import gsap from 'gsap'
 import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
@@ -21,9 +21,7 @@ import { createFirebaseApp } from '../firebase/clientApp'
 import { onChoice } from '../firebase/utils'
 import { NUM_POKEMON } from '../src/constants'
 
-export const pokeClient = new PokemonClient({
-  cacheOptions: { maxAge: 60 * 60 * 1000, exclude: { query: false } },
-})
+export const pokeClient = new PokemonClient({})
 
 declare global {
   interface PokemonModel {
@@ -170,7 +168,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
   const [currentId, setCurrentId] = React.useState<number>(score.currentId)
   const shockRef = React.useRef<ShockRef>(null)
 
-  const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(!currentId || currentId > NUM_POKEMON ? null : currentId.toString(), (id) => pokeClient.getPokemonById(Number(id)))
+  const { error, isValidating, data: pokeInfo } = useSWR<Pokemon>(!currentId || currentId > NUM_POKEMON ? null : currentId.toString(), (id: any) => pokeClient.getPokemonById(Number(id)))
 
   useEffect(() => {
     if (currentId < score.currentId) return
@@ -258,8 +256,8 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
     const uid = session?.user.name.toLowerCase()
     const forArr = ['all']
     if (uid) forArr.push(uid)
-    const messages = query<FBMessage>(collection(fs, `messages`) as CollectionReference<FBMessage>, where('for', 'in', forArr))
-    const unsubMessages = onSnapshot<FBMessage>(messages, (payload) => {
+    const messages = query<FBMessage, DocumentData>(collection(fs, `messages`) as CollectionReference<FBMessage>, where('for', 'in', forArr))
+    const unsubMessages = onSnapshot<FBMessage, DocumentData>(messages, (payload) => {
       if (payload.empty) return
       console.log('Messages received: ', payload.size)
       payload.forEach((msg) => {
