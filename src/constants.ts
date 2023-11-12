@@ -1,1 +1,1 @@
-export const NUM_POKEMON = 1008
+export const NUM_POKEMON = 1017
