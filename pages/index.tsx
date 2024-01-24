@@ -147,10 +147,10 @@ const Home: NextPage = () => {
               <IconButton
                 className={`fancy-bg w-10 h-10 ${seenSupport ? '' : 'animate-pulse'}`}
                 target="_blank"
-                href="https://www.patreon.com/devJimmyboy"
+                href="https://ko-fi.com/devJimmyboy"
                 onMouseLeave={() => setSeenSupport(true)}
                 onMouseEnter={() => setSeenSupport(false)}>
-                <Icon fontSize={18} icon="fa-brands:patreon" />
+                <Icon fontSize={18} icon="simple-icons:kofi" />
               </IconButton>
             </div>
           </div>
