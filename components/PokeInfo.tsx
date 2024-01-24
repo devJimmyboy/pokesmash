@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useBoolean } from 'react-use'
 import useSWR from 'swr'
+import { NUM_POKEMON } from '../src/constants'
 
 import { pokeClient, useSmash } from '../lib/SmashContext'
 import { capitalizeFirstLetter, usePokemonPicture } from '../lib/utils'
@@ -123,7 +124,7 @@ export default function PokeInfo({ cardRef }: Props) {
   useHotkeys(
     'up',
     () => {
-      if (currentId > 898) return
+      if (currentId > NUM_POKEMON) return
       if (currentId < score.currentId) {
         setCurrentId((prev) => prev + 1)
       } else {
@@ -137,7 +138,7 @@ export default function PokeInfo({ cardRef }: Props) {
   useHotkeys(
     'down',
     (e) => {
-      if (currentId > 898) return
+      if (currentId > NUM_POKEMON) return
       if (currentId > 1) {
         setCurrentId((prev) => prev - 1)
       }
@@ -202,7 +203,7 @@ export default function PokeInfo({ cardRef }: Props) {
       <SwipeCards
         ref={cardRef}
         onSwipe={async (dir: 'left' | 'right' | 'up' | 'down') => {
-          if (currentId > 898) return
+          if (currentId > NUM_POKEMON) return
 
           const amShocked = shouldIBeShocked({ data, pokeInfo, dir })
           if (shockRef.current && amShocked) {

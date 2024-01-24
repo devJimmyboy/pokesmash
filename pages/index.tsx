@@ -14,6 +14,7 @@ import { SwipeRef } from '../components/SwipeCards'
 import UserStats from '../components/UserStats'
 import { useSmash } from '../lib/SmashContext'
 import Link from '../src/Link'
+import { NUM_POKEMON } from '../src/constants'
 
 import type { NextPage } from 'next'
 const headerCSS = css`
@@ -36,7 +37,7 @@ const Home: NextPage = () => {
   const cardRef = React.useRef<SwipeRef>(null)
   const onButtonPress = React.useCallback(
     (ch: 'smash' | 'pass' | undefined) => {
-      if (currentId > 898) return
+      if (currentId > NUM_POKEMON) return
       cardRef.current?.swipe(ch === 'smash' ? 'right' : 'left')
     },
     [currentId, cardRef]
@@ -101,7 +102,7 @@ const Home: NextPage = () => {
         {error && <div>Error! {error.message || 'Please Reload'}</div>}
         <Stack direction="column" sx={{ height: 400, mt: '1rem' }} spacing={4}>
           <Typography component="div" className="flex flex-row gap-2 justify-center items-center text-lg md:text-xl lg:text-2xl xl:text-3xl" fontWeight="bold" align="center">
-            Pokemon <IdField /> of 898
+            Pokemon <IdField /> of {NUM_POKEMON}
           </Typography>
           <SmashPass smashes={score.smashes} passes={score.passes} onChoice={onButtonPress} />
 

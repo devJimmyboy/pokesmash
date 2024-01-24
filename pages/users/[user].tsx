@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useLayoutEffect } from 'react'
 import useSWR from 'swr'
+import { NUM_POKEMON } from '../../src/constants'
 
 import PokemonSquare from '../../components/PokemonSquare'
 import { ScoreDisplay } from '../../components/SmashPass'
@@ -105,7 +106,7 @@ const UserProfile: NextPage<Props> = ({ user }) => {
             </Typography>
             <div className="flex-grow" />
             <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-              {score.passCount + score.smashCount || '?'} / 898
+              {score.passCount + score.smashCount || '?'} / NUM_POKEMON
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
