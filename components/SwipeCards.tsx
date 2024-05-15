@@ -1,10 +1,10 @@
-import { useTheme } from "@mui/system";
-import { animated, SpringValue, to as interpolate, useSpring } from "@react-spring/web";
-import { useDrag } from "@use-gesture/react";
-import React, { PropsWithChildren, PropsWithRef, useState } from "react";
-import { useWindowSize } from "react-use";
+import { useTheme } from '@mui/system'
+import { animated, SpringValue, to as interpolate, useSpring } from '@react-spring/web'
+import { useDrag } from '@use-gesture/react'
+import React, { PropsWithChildren, PropsWithRef, useState } from 'react'
+import { useWindowSize } from 'react-use'
 
-import styles from "../styles/Deck.module.css";
+import styles from '../styles/Deck.module.css'
 
 import type { SpringRef } from '@react-spring/web'
 

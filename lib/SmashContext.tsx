@@ -231,7 +231,7 @@ export default function SmashProvider(props: PropsWithChildren<Props>) {
         .forEach((msg, i) => {
           function runMsgToast() {
             toast(msg.message, {
-              icon: <Icon icon={msg.icon || 'fa-solid:comment'} />,
+              icon: msg.icon?.startsWith('https://') ? <img src={msg.icon} /> : <Icon icon={msg.icon || 'fa-solid:comment'} />,
               style: { color: msg?.color },
               id: msg.id,
               duration: msg?.duration || 15000,

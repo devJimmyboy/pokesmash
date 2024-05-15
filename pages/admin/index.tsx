@@ -70,6 +70,7 @@ type MsgFormData = {
   color: string
   played?: boolean
   url?: string
+  duration: number
 }
 
 const MsgForm = () => {
@@ -88,6 +89,7 @@ const MsgForm = () => {
       url: '',
       icon: 'fa-solid:comment',
       message: '',
+      duration: 15000,
     },
   })
 
@@ -132,7 +134,7 @@ const MsgForm = () => {
                     placeholder="icon"
                     endAdornment={
                       <InputAdornment position="end" className="bg-gray-800 text-lg pointer-events-none">
-                        <Icon icon={field.value} color={color} />
+                        {field.value?.startsWith('https://') ? <img src={field.value} /> : <Icon icon={field.value} color={color} />}
                       </InputAdornment>
                     }></Input>
                 </FormControl>
@@ -157,6 +159,28 @@ const MsgForm = () => {
             }}
           />
         </div>
+        <Controller
+          name="duration"
+          control={control}
+          render={({ field }) => {
+            // field.onChange = debounce(field.onChange, 200)
+            return (
+              <FormControl>
+                <FormHelperText>Duration</FormHelperText>
+
+                <Input
+                  {...field}
+                  type="text"
+                  placeholder="duration"
+                  endAdornment={
+                    <InputAdornment position="end" className="bg-gray-800 text-lg pointer-events-none">
+                      <Icon icon="fa-solid:clock" />
+                    </InputAdornment>
+                  }></Input>
+              </FormControl>
+            )
+          }}
+        />
         <Controller name="title" control={control} render={({ field }) => <TextField label="Title:" {...field} />} />
         <Controller name="message" control={control} render={({ field }) => <TextField label="Message to Send:" {...field} />} />
 
@@ -171,8 +195,8 @@ const MsgForm = () => {
               toast(vals.message, {
                 id: 'msg-test',
                 style: { color: vals.color },
-                icon: <Icon icon={vals.icon} color={vals.color} />,
-                duration: 60000,
+                icon: vals.icon?.startsWith('https://') ? <img src={vals.icon} style={{ width: '1.5em' }} /> : <Icon icon={vals.icon} color={vals.color} />,
+                duration: vals.duration || 15000,
               })
             }}
             type="button">
