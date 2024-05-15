@@ -2,7 +2,7 @@ import { Box, Typography, css } from '@mui/material'
 import React from 'react'
 import { Styling } from '../lib/SmashContext'
 import { usePokemonPicture } from '../lib/utils'
-import { NUM_POKEMON } from '../../src/constants'
+import { NUM_POKEMON } from '../src/constants'
 
 interface Props {
   i: number
