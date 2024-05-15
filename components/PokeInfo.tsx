@@ -153,7 +153,7 @@ export default function PokeInfo({ cardRef }: Props) {
     }
   }, [pokeInfo, style])
 
-  if (currentId === 899) {
+  if (currentId > NUM_POKEMON) {
     return (
       <div className="cardContainer h-full flex flex-col items-center justify-center">
         <MotionText
