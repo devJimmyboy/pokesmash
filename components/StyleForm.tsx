@@ -43,7 +43,7 @@ const CustomSelect = React.forwardRef((props: SelectProps<string, false>, ref: R
   const components: SelectProps<string, false>['slots'] = {
     root: StyledButton,
     listbox: StyledListbox,
-    popper: StyledPopper as any,
+    // popper: StyledPopper as any,
     ...props.slots,
   }
   return <Select {...props} slots={components} />
