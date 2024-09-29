@@ -122,6 +122,15 @@ export default function PokeInfo({ cardRef }: Props) {
   )
   const { bgUrl, shiny } = usePokemonPicture(undefined, true)
 
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('reset')) {
+      toggleConfirm(true)
+      url.searchParams.delete('reset')
+      window.history.replaceState({}, '', url.toString())
+    }
+  })
+
   useHotkeys(
     'up',
     () => {
@@ -325,6 +334,7 @@ export default function PokeInfo({ cardRef }: Props) {
           </PokeContent>
         </PokeCard>
       </SwipeCards>
+      <ConfirmModal open={modalShown} onClose={() => toggleConfirm(false)} />
     </div>
   )
 }
