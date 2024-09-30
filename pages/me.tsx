@@ -12,6 +12,7 @@ import PokemonSquare from '../components/PokemonSquare'
 import { ScoreDisplay } from '../components/SmashPass'
 import { useSmash } from '../lib/SmashContext'
 import Link from '../src/Link'
+import { NUM_POKEMON } from '../src/constants'
 
 const ScoreHolder = styled('div')`
   background-position: center;
@@ -95,7 +96,7 @@ const UserProfile: NextPage<Props> = ({}) => {
             </Typography>
             <div className="flex-grow" />
             <Typography fontSize={32} fontWeight={600} justifySelf="flex-end" alignSelf="flex-end">
-              {score.passes + score.smashes || '?'} / NUM_POKEMON
+              {score.passes + score.smashes || '?'} / {NUM_POKEMON}
             </Typography>
           </div>
           <StyledTabs value={tab} variant="fullWidth" onChange={(e, nTab) => setTab(nTab)} sx={{ width: '100%' }} aria-label="User's Stats, Smash list, and Pass list.">
