@@ -236,7 +236,7 @@ export default function PokeInfo({ cardRef }: Props) {
               height: '100%',
               width: '100%',
               position: 'absolute',
-              backgroundImage: `url(/backgrounds/bg-${chosenBg || 'beach'}.${chosenBg === 'space' ? 'jpg' : 'png'})`,
+              backgroundImage: `url(https://raw.githubusercontent.com/devJimmyboy/pokesmash/refs/heads/main/public/backgrounds/bg-${chosenBg || 'beach'}.${chosenBg === 'space' ? 'jpg' : 'png'})`,
               backgroundSize: 'cover',
               backgroundPosition: 'left',
             }}
