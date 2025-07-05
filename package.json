@@ -71,7 +71,7 @@
     "@types/howler": "^2.2.9",
     "@types/listr": "^0.14.6",
     "@types/lodash.throttle": "^4.1.7",
-    "@types/node": "^24.0.10",
+    "@types/node": "^18",
     "@types/passport": "^1.0.13",
     "@types/passport-oauth2": "^1.4.13",
     "@types/prompts": "^2.4.6",

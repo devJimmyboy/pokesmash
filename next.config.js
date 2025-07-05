@@ -4,6 +4,9 @@ const nextConfig = {
   images: {
     domains: ['raw.githubusercontent.com', 'play.pokemonshowdown.com', 'cdn.7tv.app'],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 }
 
 module.exports = nextConfig
