@@ -40,7 +40,7 @@ const Home: NextPage = () => {
       if (currentId > NUM_POKEMON) return
       cardRef.current?.swipe(ch === 'smash' ? 'right' : 'left')
     },
-    [currentId, cardRef]
+    [currentId, cardRef],
   )
   const [seenSupport, setSeenSupport] = React.useState(false)
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -49,7 +49,7 @@ const Home: NextPage = () => {
       setTm(
         setTimeout(() => {
           setSeenSupport(true)
-        }, 5000)
+        }, 5000),
       )
   }, [isMobile, timeout])
 
@@ -134,11 +134,11 @@ const Home: NextPage = () => {
           </CreatedCard>
           <div className="flex-grow" />
           <div className="flex flex-col items-start md:items-end h-32 gap-4 mx-6 my-6 w-24">
-            <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
+            {/* <Tooltip className="pointer-events-auto " title="Join our Discord for future projects and updates!" placement="left-start">
               <IconButton className="discord-bg w-10 h-10" target="_blank" href="https://discord.gg/Dg2JqfyArJ">
                 <Icon fontSize={18} icon="fa-brands:discord" />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <div className="pointer-events-auto flex flex-row-reverse  md:flex-row items-center relative group">
               <Blurb className={`absolute text-xs md:text-sm pointer-events-none text-center transition-opacity ${seenSupport ? 'opacity-0 group-focus-within:opacity-100' : ''}`}>
                 Support me
